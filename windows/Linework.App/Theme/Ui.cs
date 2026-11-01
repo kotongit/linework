@@ -167,6 +167,9 @@ public static class Ui
         return new Viewbox { Width = size, Height = size, Child = new Canvas { Width = 24, Height = 24, Children = { path } } };
     }
 
+    public const string StarIcon = "M12 3l2.7 5.8 6.3.8-4.6 4.3 1.2 6.3L12 17l-5.6 3.2 1.2-6.3L3 9.6l6.3-.8z";
+    public const string ChevronLeftIcon = "M15 5L8 12L15 19";
+    public const string ChevronRightIcon = "M9 5L16 12L9 19";
     public const string FlameIcon = "M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-4 2.5-7 1.5 1 2.5 2.5 2.5 4 1-2 1.5-5 1-9z";
     public const string ArrowDownRightIcon = "M6 6L18 18M18 8V18H8";
 

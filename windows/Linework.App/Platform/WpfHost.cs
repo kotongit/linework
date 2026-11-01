@@ -57,7 +57,7 @@ public sealed class WpfHost : ILibraryHost
         }
     }
 
-    public (Linework.Core.Crop.NormalizedRect Rect, bool Found) AutoCrop(string path) => (Linework.Core.Crop.CropMath.Unit, false);
+    public (Linework.Core.Crop.NormalizedRect Rect, bool Found) AutoCrop(string path) => AutoCropper.Crop(path);
 
     public DateTimeOffset Now
     {

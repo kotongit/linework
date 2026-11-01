@@ -51,7 +51,6 @@ public sealed class MainWindow : GlassWindow
         App.PropertyChanged += (_, _) => Dispatcher.BeginInvoke(Route);
         Session.PropertyChanged += (_, _) => Dispatcher.BeginInvoke(Route);
         context.Settings.PropertyChanged += (_, _) => Dispatcher.BeginInvoke(Route);
-        Session.ImportRequested += () => { };
 
         Activated += (_, _) =>
         {
@@ -171,6 +170,7 @@ public sealed class MainWindow : GlassWindow
 
     void Scan()
     {
+        if (App.Library is { } library) _ = PhotoScanner.RunAsync(library, App.Host);
     }
 
     FrameworkElement CaptionButtons()
@@ -268,5 +268,9 @@ public sealed class MainWindow : GlassWindow
         return panel;
     }
 
-    UIElement Section(AppSection section, LibraryStore library) => new Grid();
+    UIElement Section(AppSection section, LibraryStore library) => section switch
+    {
+        AppSection.Library => new LibraryView(_context, library),
+        _ => new Grid(),
+    };
 }

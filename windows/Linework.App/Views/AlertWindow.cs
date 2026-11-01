@@ -36,6 +36,28 @@ public sealed class AlertWindow : GlassWindow
             row.Margin(0, 8)).Margin(28, 24, 28, 24);
     }
 
+    /// <summary>Asks for a line of text. Null if cancelled.</summary>
+    public static string? AskText(string title, string initial, string confirm = "Save", string cancel = "Cancel")
+    {
+        if (Silent) return null;
+        var (field, box) = Ui.UnderlinedField(16, 200, title);
+        box.Text = initial;
+        box.SelectAll();
+        var window = new AlertWindow(title, "", [confirm, cancel]) { Owner = Application.Current?.MainWindow };
+        var body = (System.Windows.Controls.StackPanel)window.Content!;
+        body.Children.RemoveAt(1);
+        body.Children.Insert(1, field);
+        box.KeyDown += (_, e) =>
+        {
+            if (e.Key != System.Windows.Input.Key.Enter) return;
+            window._answer = 0;
+            window.Close();
+        };
+        window.Loaded += (_, _) => box.Focus();
+        window.ShowDialog();
+        return window._answer == 0 ? box.Text : null;
+    }
+
     /// <summary>Returns which button was chosen; closing the window counts as the last.</summary>
     public static int Ask(string title, string text, params string[] buttons)
     {

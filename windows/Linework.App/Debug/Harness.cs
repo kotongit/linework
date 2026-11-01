@@ -124,6 +124,7 @@ public static partial class Harness
         await Shoot("settings", SettingsWindow.Body(context), 420, 340);
         await Shoot("about", AboutWindow.Body(), 420, 240);
         await Shoot("topbar", new TopBar(context, library, () => { }), 1280, 52);
+        await PhotoStages(path, context, library);
         Check("Screenshots were written", Directory.GetFiles(_shots, "*.png").Length >= 12);
     }
 }

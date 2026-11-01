@@ -14,6 +14,6 @@
     <Using Include="Xunit" />
     <Using Include="Linework.Core" />
     <!-- The stores have no WPF in them, so their rules run here without spending Windows minutes. -->
-    <Compile Include="../Linework.App/Library/ObservableObject.cs;../Linework.App/Library/ILibraryHost.cs;../Linework.App/Library/Settings.cs;../Linework.App/Library/LibraryLocation.cs;../Linework.App/Library/LibraryStore.cs;../Linework.App/Library/AppModel.cs;../Linework.App/Debug/StoreChecks.cs" LinkBase="AppShared" />
+    <Compile Include="../Linework.App/Library/ObservableObject.cs;../Linework.App/Library/ILibraryHost.cs;../Linework.App/Library/Settings.cs;../Linework.App/Library/LibraryLocation.cs;../Linework.App/Library/LibraryStore.cs;../Linework.App/Library/AppModel.cs;../Linework.App/Debug/StoreChecks.cs;../Linework.App/Library/ImportService.cs;../Linework.App/Library/PhotoScanner.cs;../Linework.App/Debug/PhotoChecks.cs" LinkBase="AppShared" />
   </ItemGroup>
 </Project>

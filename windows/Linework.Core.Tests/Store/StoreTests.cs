@@ -51,6 +51,14 @@ public class StoreTests
     }
 
     [Fact]
+    public async Task PhotoChecksPass()
+    {
+        var failures = new List<string>();
+        await PhotoChecks.RunAsync(Lib.Temp(), new FakeHost(), Repo.Fixture("sample-person.jpg"), Repo.Fixture("library/Photos/pose one.png"), (name, ok) => { if (!ok) failures.Add(name); });
+        Assert.Empty(failures);
+    }
+
+    [Fact]
     public void ChangesSaveAfterADelayAndAtFlush()
     {
         var host = new FakeHost();

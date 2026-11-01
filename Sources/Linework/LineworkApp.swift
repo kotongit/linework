@@ -25,6 +25,7 @@ struct LineworkApp: App {
         }
     }
 
+    @State private var app = AppModel()
     @State private var store = SessionStore()
     /// Here so there's only ever one over the folder: it deletes copies no item uses, and the canvas outlives windows and sections.
     @State private var freehand = FreehandStore()
@@ -33,6 +34,7 @@ struct LineworkApp: App {
     var body: some Scene {
         WindowGroup {
             AppShell()
+                .environment(app)
                 .environment(store)
                 .environment(freehand)
         }
@@ -41,6 +43,7 @@ struct LineworkApp: App {
         .defaultSize(width: 1280, height: 800)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            LibraryCommands(app: app, store: store)
             GoCommands(store: store)
         }
 
@@ -77,6 +80,12 @@ private struct AboutMenuButton: View {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
+        #if DEBUG
+        if CommandLine.arguments.contains("--library-checks") {
+            Task { @MainActor in DebugLibraryChecks.run() }
+            return
+        }
+        #endif
         if CommandLine.arguments.contains("--print-counts") {
             Task { @MainActor in DebugSnapshots.printCounts() }
         } else if let i = CommandLine.arguments.firstIndex(of: "--snapshots"), CommandLine.arguments.count > i + 1 {
@@ -84,6 +93,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 await DebugSnapshots.run(outDir: URL(fileURLWithPath: CommandLine.arguments[i + 1]),
                                          sources: CommandLine.arguments[(i + 2)...].map { URL(fileURLWithPath: $0) })
             }
+        }
+    }
+}
+
+private struct LibraryCommands: Commands {
+    let app: AppModel
+    let store: SessionStore
+
+    var body: some Commands {
+        CommandGroup(after: .newItem) {
+            Button("Open Library…") { app.closeForSwitch() }
+                .disabled(store.isSessionActive)
+            Button("Reveal Library in Finder") {
+                if let root = app.library?.root { NSWorkspace.shared.activateFileViewerSelecting([root]) }
+            }
+            .disabled(app.library == nil)
         }
     }
 }

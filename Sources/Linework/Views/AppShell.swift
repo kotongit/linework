@@ -23,6 +23,7 @@ enum AppRoute: Hashable {
 
 /// The main window: welcome on first launch, otherwise the main menu or a section under the top bar.
 struct AppShell: View {
+    @Environment(AppModel.self) private var app
     @Environment(SessionStore.self) private var store
     @Environment(\.openSettings) private var openSettings
     @AppStorage("linework.name") private var name = ""
@@ -33,10 +34,14 @@ struct AppShell: View {
         @Bindable var store = store
         ZStack {
             GlassBackground()
-            if LineworkCopy.shouldShowWelcome(name: name, welcomed: welcomed) {
-                WelcomeView { }
+            if let library = app.library {
+                if LineworkCopy.shouldShowWelcome(name: name, welcomed: welcomed) {
+                    WelcomeView { }
+                } else {
+                    routed.environment(library)
+                }
             } else {
-                routed
+                LibraryChooserView()
             }
         }
         .frame(minWidth: 1100, minHeight: 700)
@@ -51,7 +56,10 @@ struct AppShell: View {
             }
         }
         .sheet(isPresented: $showingSetup) {
-            SessionSetupView()
+            if let library = app.library { SessionSetupView().environment(library) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            app.library?.reloadIfChanged()
         }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)) { _ in
             showingSetup = true

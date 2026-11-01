@@ -96,3 +96,7 @@ enum Storage {
         for url in urls { try? FileManager.default.removeItem(at: url) }
     }
 }
+
+enum ImageFiles {
+    static func isReadableImage(_ url: URL) -> Bool { Storage.isReadableImage(url) }
+}

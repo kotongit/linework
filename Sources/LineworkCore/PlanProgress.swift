@@ -71,4 +71,41 @@ public enum PlanProgress {
     public static func heatmapSeconds(sessionSeconds: Int, tickedMinutes: Int) -> Int {
         max(sessionSeconds, tickedMinutes * 60)
     }
+
+    // MARK: Lessons
+
+    public static func status(for ref: PlanDayRef, ticks: Set<String>, schedule: PlanSchedule) -> DayStatus {
+        let day = schedule.day(for: ref)
+        let checked = Set(day.blocks.filter { ticks.contains(schedule.tickKey(ref, $0.kind)) }.map(\.kind.rawValue))
+        return status(of: day, checked: checked)
+    }
+
+    private static func isWeekComplete(_ sequenceIndex: Int, ticks: Set<String>, schedule: PlanSchedule) -> Bool {
+        (0..<7).allSatisfy { weekday in
+            let status = status(for: .plan(sequenceIndex: sequenceIndex, weekday: weekday), ticks: ticks, schedule: schedule)
+            return status == .rest || status == .complete
+        }
+    }
+
+    /// The biggest thing a lesson's ticks complete; nil unless that day itself is complete.
+    public static func celebration(for ref: PlanDayRef, ticks: Set<String>, schedule: PlanSchedule) -> Celebration? {
+        guard status(for: ref, ticks: ticks, schedule: schedule) == .complete else { return nil }
+        guard case let .plan(sequenceIndex, _) = ref, isWeekComplete(sequenceIndex, ticks: ticks, schedule: schedule) else { return .day }
+        let weekIndex = schedule.sequence[sequenceIndex].weekIndex
+        let book = schedule.plan.weeks[weekIndex].book
+        let bookDone = schedule.plan.weeks.indices.filter { schedule.plan.weeks[$0].book == book }.allSatisfy { week in
+            schedule.sequence.indices.contains { schedule.sequence[$0].weekIndex == week && isWeekComplete($0, ticks: ticks, schedule: schedule) }
+        }
+        return bookDone ? .book : .week
+    }
+
+    /// A practice day has a recorded session or at least one tick counting toward it.
+    public static func practiceDays(ticks: [PlanTick], sessionDays: [Date], calendar: Calendar) -> Set<Date> {
+        var days = Set(sessionDays.map(calendar.startOfDay(for:)))
+        for tick in ticks {
+            if let day = PlanDayKey.date(tick.countsOn, calendar: calendar) { days.insert(day) }
+        }
+        return days
+    }
 }
+

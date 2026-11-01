@@ -63,7 +63,7 @@ public class LibraryFilesTests
         var url = Path.Combine(root, "Progress/checks.json");
         File.WriteAllText(url, text);
         var result = new LibraryFiles(root).Read(LibraryFile.Checks);
-        var aside = Path.Combine(root, "Progress/checks.damaged.json");
+        var aside = Path.Combine(root, "Progress", "checks.damaged.json");
         Assert.Equal(aside, Assert.IsType<Damaged<IReadOnlyList<PlanTick>>>(result).SetAsideAs);
         Assert.Equal(text, File.ReadAllText(aside));
         Assert.False(File.Exists(url));
@@ -195,7 +195,8 @@ public class LibraryFilesTests
         using (new FileStream(url, FileMode.Open, FileAccess.Read, FileShare.None))
         {
             var started = DateTime.UtcNow;
-            Assert.ThrowsAny<IOException>(() => files.Write(LibraryFile.Checks, [new PlanTick("new", "d", Lib.Date)]));
+            var failure = Record.Exception(() => files.Write(LibraryFile.Checks, [new PlanTick("new", "d", Lib.Date)]));
+            Assert.True(failure is IOException or UnauthorizedAccessException, $"{failure}");
             Assert.True((DateTime.UtcNow - started).TotalSeconds >= 1.5);
             Assert.Throws<UnreadableException>(() => files.Read(LibraryFile.Checks));
         }

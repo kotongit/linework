@@ -192,6 +192,12 @@ public static class Ui
     public const string MoonIcon = "M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z";
     public const string CheckIcon = "M5 12.5l4.5 4.5L19 7.5";
     public const string EllipsisIcon = "M5 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3zM12 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3zM19 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3z";
+    public const string PlusIcon = "M12 5V19M5 12H19";
+    public const string ResizeIcon = "M14 4h6v6M10 20H4v-6M20 4L4 20";
+    public const string RotateIcon = "M20 11a8 8 0 1 0-2.3 6.3M20 5v6h-6";
+    public const string FlipIcon = "M12 3v18M8 7L3 17h5zM16 7l5 10h-5z";
+    public const string CropIcon = "M6 2v16h16M2 6h16v16";
+    public const string TrashIcon = "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13";
     public const string StarIcon = "M12 3l2.7 5.8 6.3.8-4.6 4.3 1.2 6.3L12 17l-5.6 3.2 1.2-6.3L3 9.6l6.3-.8z";
     public const string ChevronLeftIcon = "M15 5L8 12L15 19";
     public const string ChevronRightIcon = "M9 5L16 12L9 19";
@@ -258,6 +264,17 @@ public static class Ui
             panel.HorizontalAlignment = HorizontalAlignment.Left;
         }
         return (panel, box);
+    }
+
+    /// <summary>A label with minus and plus, as a SwiftUI Stepper.</summary>
+    public static FrameworkElement Stepper(string label, Action minus, Action plus)
+    {
+        var dock = new DockPanel();
+        var buttons = Row(4, Capsule("−", minus, 26), Capsule("+", plus, 26)).Margin(10);
+        DockPanel.SetDock(buttons, Dock.Right);
+        dock.Children.Add(buttons);
+        dock.Children.Add(Text(label, 13).Align(HorizontalAlignment.Left, VerticalAlignment.Center));
+        return dock;
     }
 
     public static CheckBox Toggle(string title, bool isOn, Action<bool> changed)

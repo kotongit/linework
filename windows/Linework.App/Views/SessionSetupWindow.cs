@@ -139,17 +139,6 @@ public sealed class SessionSetupWindow : GlassWindow
         return dock;
     }
 
-    /// <summary>A label with minus and plus, as a SwiftUI Stepper.</summary>
-    static FrameworkElement Stepper(string label, Action minus, Action plus)
-    {
-        var dock = new DockPanel();
-        var buttons = Ui.Row(4, Ui.Capsule("−", minus, 26), Ui.Capsule("+", plus, 26));
-        DockPanel.SetDock(buttons, Dock.Right);
-        dock.Children.Add(buttons);
-        dock.Children.Add(Ui.Text(label).Align(HorizontalAlignment.Left, VerticalAlignment.Center));
-        return dock;
-    }
-
     FrameworkElement SimpleSection()
     {
         var panel = Ui.Column(12, Ui.Text("Time per pose", 12, null, Tokens.Muted));
@@ -159,13 +148,13 @@ public sealed class SessionSetupWindow : GlassWindow
         Ui.Add(panel, presets, 12);
         var seconds = V.SetupSeconds;
         var step = seconds < 60 ? 5 : 15;
-        Ui.Add(panel, Stepper($"Custom: {DurationFormat.Short(seconds)}",
+        Ui.Add(panel, Ui.Stepper($"Custom: {DurationFormat.Short(seconds)}",
             () => Set(v => v with { SetupSeconds = Math.Max(seconds - step, 5) }),
             () => Set(v => v with { SetupSeconds = Math.Min(seconds + step, 3600) })), 12);
         if (_source is not SourceToday)
         {
             var max = V.SetupMaxPoses;
-            Ui.Add(panel, Stepper(max == 0 ? "Poses: all images" : $"Poses: {max}",
+            Ui.Add(panel, Ui.Stepper(max == 0 ? "Poses: all images" : $"Poses: {max}",
                 () => Set(v => v with { SetupMaxPoses = Math.Max(max - 1, 0) }),
                 () => Set(v => v with { SetupMaxPoses = Math.Min(max + 1, 500) })), 12);
         }
@@ -179,7 +168,7 @@ public sealed class SessionSetupWindow : GlassWindow
             ? "No images imported today yet — the session uses random images from your library."
             : $"Today’s {todayCount} {(todayCount == 1 ? "image plays" : "images play")} first, then random images from your library fill the rest.";
         return Ui.Column(8,
-            Stepper($"Session length: {minutes} min",
+            Ui.Stepper($"Session length: {minutes} min",
                 () => Set(v => v with { SetupTargetMinutes = Math.Max(minutes - 5, 5) }),
                 () => Set(v => v with { SetupTargetMinutes = Math.Min(minutes + 5, 180) })),
             Ui.Text(text, 13, null, Tokens.Muted, wrap: true));

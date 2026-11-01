@@ -93,6 +93,36 @@ public static class PhotoChecks
         await ImportService.ImportAsync([sourceA], c, host, null);
         check("Importing can't take a missing photo's name", c.Photos.Select(p => p.FileName).Distinct().Count() == 2);
 
+        // Benchmarks.
+        var m = Fresh("benchmarks");
+        await ImportService.ImportAsync(sources, m, host, null);
+        var marked = m.VisiblePhotos[0];
+        m.ToggleBenchmark(marked.Id);
+        check("A benchmark isn't due straight away", m.DueBenchmarks().Count == 0);
+        m.UpdateBenchmark(marked.Id, interval: 1);
+        m.RecordSession(new SessionRecord(Guid.NewGuid(), host.Now.AddHours(1), 60, 1, [marked.Id]));
+        var due = m.DueBenchmarks();
+        check("It's due after its interval", due.Count == 1 && due[0].Number == 1);
+        var queue = Linework.Core.Session.QueueBuilder.Build(m.VisiblePhotos.Select(p => p.Id).ToList(), [], new Linework.Core.Session.SimpleMode(30, null), true, due, new Random(1));
+        check("A due benchmark plays first", queue.Poses[0].ImageID == marked.Id && queue.Poses[0].BenchmarkNumber == 1 && queue.Poses.Count(p => p.ImageID == marked.Id) == 1);
+        // Skip records nothing, so it stays due.
+        check("Skip leaves it due", m.DueBenchmarks().Count == 1 && m.Attempts(marked.Id).Count == 0);
+        m.AddAttempt(marked.Id, Guid.NewGuid(), null);
+        check("Later records the attempt without a drawing", m.Attempts(marked.Id).Count == 1 && m.Attempts(marked.Id)[0].DrawingFileName == null);
+        m.AttachDrawing(m.Attempts(marked.Id)[0].Id, sourceB);
+        var attached = m.Attempts(marked.Id)[0].DrawingFileName;
+        check("A drawing can be added later", attached != null && File.Exists(m.DrawingPath(attached)));
+        m.AddAttempt(marked.Id, Guid.NewGuid(), sourceB);
+        check("Save copies the drawing under its own name", m.Attempts(marked.Id).Select(a => a.DrawingFileName).Distinct().Count() == 2);
+        var refused = false;
+        try { m.AddAttempt(marked.Id, Guid.NewGuid(), Path.Combine(path, "not-there.txt")); } catch (InvalidDataException) { refused = true; }
+        check("A file that isn't an image is refused", refused && m.Attempts(marked.Id).Count == 2);
+        m.ToggleBenchmark(marked.Id);
+        check("Unmarking keeps attempts", m.Attempts(marked.Id).Count == 2);
+        var drawings = m.Attempts(marked.Id).Select(a => m.DrawingPath(a.DrawingFileName!)).ToList();
+        m.DeletePhoto(marked.Id);
+        check("Deleting a photo takes its attempts' drawings", drawings.All(d => !File.Exists(d)) && m.BenchmarkData.Attempts.Count == 0);
+
         // A photo stored in decomposed Unicode, from a Mac.
         var d = Fresh("nfd");
         File.Copy(sourceA, Path.Combine(d.PhotosDir, "José.jpg"));

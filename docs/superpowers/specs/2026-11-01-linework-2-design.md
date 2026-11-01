@@ -16,6 +16,7 @@ Rebuild Linework as a clean new version with the same features, in a new repo, w
 - Deleting the app and reinstalling it, then choosing the same folder, restores everything except per-machine preferences.
 - A fresh user can install from the `.dmg`, create a library, import photos and run a session.
 - The word `GestureDrawing` appears nowhere in the code, the app or the library. The import script (§7) is the one exception, because it reads the old data.
+- Any lesson can be ticked at any time, and the plan never names a calendar date (§4A).
 
 ## Out of scope
 
@@ -76,8 +77,8 @@ Linework Library/
     benchmarks.json   Benchmark settings and attempts
     sets.json
     presets.json
+    plan.json         The library's plan start and repeated weeks
     checks.json       Plan ticks
-    repeats.json      Repeated weeks
     sessions.json     Session history
 ```
 
@@ -140,6 +141,47 @@ Deleting a photo or canvas inside the app moves its files to the Trash rather th
 - Behaviour inside a canvas is unchanged: tools, zoom limits, greyscale, damaged-file handling and notes from s.e.a.
 - Canvas folders added or renamed in Finder appear in the menu at the next check.
 
+## 4A. Plan timing and ticking
+
+The plan is defined by week and weekday, not by calendar date. The artist's knowledge doesn't have to line up with the schedule, so nothing is locked.
+
+### No hardcoded dates
+
+- `startDate` leaves the plan data, and a plan is "Week 3, Monday: Gestures", never "9 Nov".
+- The "Your plan starts Monday 2 Nov" state and its copy are removed. There is no "not started" state.
+- Plan text is rewritten wherever it names a date (31 items, plus the guide's schedule table):
+  - "side by side with Nov 14" becomes a reference to the plan, such as "side by side with your Week 2 benchmark".
+  - "Save as 2026-11-14 · gesture benchmark" becomes "Save as YYYY-MM-DD · gesture benchmark".
+  - "the same photo as Jan 4" names the week of that benchmark.
+  - Personal dates such as "your Sep 2024 WIP" become "an old work in progress", and "the Aug 2024 light study" becomes "an old light study".
+  - The guide's "Dates" column becomes week ranges, such as "Weeks 2–5".
+  - "Day 29" and "Day 30" stay, because they count within a book rather than naming a date.
+- A test fails the build if plan text contains a month with a number, or a year.
+- The rewrites live in `plan-summaries.json` and the generator, so regenerating the plan keeps them. The original PDF isn't changed.
+
+### Where the calendar still applies
+
+- Each library's `plan.json` stores when Week 1 began, always a Monday. It's a data value, never shown as plan text.
+- A new library's Week 1 is the week the library is created. Earlier days that week can simply be ticked or ignored.
+- Today maps the current date to its week and weekday, and the card says "Week 3 · Monday". A library whose start is still ahead shows Week 1, Monday.
+- After the last week, the forever week repeats by weekday.
+- The Calendar stays a calendar of real dates, because it's a record of what happened. Clicking a day opens the lesson scheduled for it, or says there was none for days before Week 1.
+- Path circles show the weekday (M, T, W…) under week headings rather than a date number.
+
+### Ticking any lesson
+
+- Every lesson can be ticked, unticked and started at any time: past, today or future, from Today, Path or Calendar. The "You can tick this on the day" rule is removed.
+- A tick belongs to the **lesson**: week, weekday, block and repeat pass. It doesn't move if the schedule shifts. Forever-week ticks use the date, since those lessons repeat indefinitely.
+- Each tick also stores the day it counts toward, which is the lesson's scheduled date or today, **whichever is earlier**:
+  - Ticking today's lesson counts today.
+  - Ticking a missed lesson from last week counts on its own day, so a missed day can be filled in and the streak mended, as it can now.
+  - Ticking a future lesson counts today, so working ahead keeps a streak going and never fills future squares.
+- Streak and the heatmap read that day.
+- A future day with ticks shows as done or partly done on the Path, like any other.
+- Finishing a whole week or book still celebrates, however far ahead it is.
+- Celebration wording says "today" only when the finished lesson is today's. Otherwise it says "You finished that day."
+- Timed sessions tick their lesson the same way. The session itself is recorded on the real date it ran.
+
 ## 5. Architecture
 
 ### 5.1 Storage
@@ -183,6 +225,7 @@ The Library gets an **Import** button, with File > Import Photos and ⌘I, openi
 
 - It only reads the old data, and opens the old database in read-only mode, so the old app keeps working.
 - **Source formats, checked on a copy:** IDs are 16-byte blobs, session image IDs are `NSKeyedArchiver` property lists, preset steps are JSON, and dates are seconds since 2001.
+- It sets the library's Week 1 to Monday 2 November 2026 and converts each dated tick to its lesson, keeping that date as the day it counts toward. Repeats convert to `plan.json`.
 - It copies photos, drawings, the canvas (as "Canvas") and all records, and generates hashes.
 - It offers to copy the name, clock, transparency and session preferences to the new app.
 - It refuses to write into a folder that already has a library unless told to replace one it created earlier, so it can be re-run just before switching.
@@ -209,6 +252,8 @@ The Library gets an **Import** button, with File > Import Photos and ⌘I, openi
 - Choosing a folder: library, empty, other contents, missing.
 - Canvas folders: naming, duplicates, rename, duplicate, deleting the last.
 - Moved plan, streak and session logic, now fed by the new data types.
+- Plan timing: weekday and week mapping from any start, a start still ahead, repeats, forever week, no dates in plan text.
+- Ticking: past, today and future; the "counts toward" rule; ticks staying with their lesson after a repeat; streak and heatmap never using a future day.
 
 **Debug harness:** the existing screen renders and behaviour checks, updated, against scratch folders only, plus a real offscreen session confirming that the keep-awake hold, ticks and session recording all reach the files.
 
@@ -237,6 +282,9 @@ The Library gets an **Import** button, with File > Import Photos and ⌘I, openi
 | Deleting | Goes to the Trash rather than being erased |
 | Freehand | Named canvases instead of one |
 | XP and levels | Removed, as nothing showed them |
+| Plan | Named by week and weekday, with no calendar dates in its text |
+| Ticking | Any lesson, any time, including future ones |
+| Path circles | Show the weekday rather than a date number |
 
 Nothing else about how the app looks or behaves changes.
 
@@ -248,5 +296,6 @@ Nothing else about how the app looks or behaves changes.
 | A Finder scan misreads an unavailable folder as deleted photos | Missing photos only ever get marked, never erased, and an empty or absent `Photos/` changes nothing. |
 | Data loss when switching | The old app and its data are never written to. Counts are compared, and the script can be re-run. |
 | The plan started on 2 Nov 2026, so old-app ticks accumulate during the rebuild | The script's re-run brings them over at the switch. |
+| Rewriting plan text changes the author's wording | Rewrites are listed in `plan-summaries.json` and shown to the user for review before they ship. |
 | Live window behaviour can't be seen from the build environment | Listed as user checks. Offscreen renders aren't claimed as proof of it. |
 | Gatekeeper's steps change in a future macOS | The note and README are easy to update. Signing remains available. |

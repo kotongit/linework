@@ -31,13 +31,15 @@ public sealed class WpfHost : ILibraryHost
     {
         foreach (var path in paths)
         {
-            if (!File.Exists(path)) continue;
+            var isFolder = Directory.Exists(path);
+            if (!File.Exists(path) && !isFolder) continue;
             if (RecycleBin.TryMove(path)) continue;
             var name = Path.GetFileName(path);
             if (AlertWindow.Ask($"“{name}” can't go to the Recycle Bin.", "The drive it's on may not have a Recycle Bin. Deleting it now can't be undone.",
                     "Delete Permanently", "Cancel") != 0)
                 throw new OperationCanceledException();
-            File.Delete(path);
+            if (isFolder) Directory.Delete(path, true);
+            else File.Delete(path);
         }
     }
 
@@ -56,6 +58,8 @@ public sealed class WpfHost : ILibraryHost
             return false;
         }
     }
+
+    public (double Width, double Height)? OrientedPixelSize(string path) => ImageRendering.OrientedSize(path);
 
     public (Linework.Core.Crop.NormalizedRect Rect, bool Found) AutoCrop(string path) => AutoCropper.Crop(path);
 
@@ -116,6 +120,6 @@ public static class RecycleBin
             pFrom = full + "\0\0",
             fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI | FOF_WANTNUKEWARNING,
         };
-        return SHFileOperation(ref op) == 0 && op.fAnyOperationsAborted == 0 && !File.Exists(full);
+        return SHFileOperation(ref op) == 0 && op.fAnyOperationsAborted == 0 && !File.Exists(full) && !Directory.Exists(full);
     }
 }

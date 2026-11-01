@@ -4,5 +4,5 @@ namespace Linework.App.Library;
 public static class FeatureFlags
 {
     public static readonly bool Plan = true;
-    public static readonly bool BenchmarksAndFreehand = false;
+    public static readonly bool BenchmarksAndFreehand = true;
 }

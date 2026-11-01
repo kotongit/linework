@@ -56,9 +56,14 @@ public sealed class MainWindow : GlassWindow
         {
             Session.RefreshToday();
             App.Library?.ReloadIfChanged();
+            App.Freehand?.RefreshList();
             Scan();
         };
-        Deactivated += (_, _) => App.Library?.Flush();
+        Deactivated += (_, _) =>
+        {
+            App.Library?.Flush();
+            App.Freehand?.Flush();
+        };
         Closing += (_, e) => e.Cancel = !App.SaveOrConfirmLosing();
         PreviewKeyDown += OnKey;
         _dayTimer.Tick += (_, _) => Session.RefreshToday();
@@ -301,6 +306,8 @@ public sealed class MainWindow : GlassWindow
         AppSection.Path => new PathView(_context, library),
         AppSection.Calendar => new CalendarHeatmapView(_context, library),
         AppSection.Library => new LibraryView(_context, library),
+        AppSection.Progress => new BenchmarkProgressView(_context, library),
+        AppSection.Freehand => new FreehandView(_context, library, App.Freehand!),
         _ => new Grid(),
     };
 }

@@ -23,11 +23,16 @@ public sealed class FakeHost : ILibraryHost
 
     public void MoveToRecycleBin(IReadOnlyList<string> paths)
     {
-        foreach (var path in paths) if (File.Exists(path)) File.Delete(path);
+        foreach (var path in paths)
+        {
+            if (File.Exists(path)) File.Delete(path);
+            else if (Directory.Exists(path)) Directory.Delete(path, true);
+        }
     }
 
     public bool ConfirmLosingChanges() => AllowLosing;
-    public bool IsReadableImage(string path) => PhotoScan.IsImageName(path) && new FileInfo(path).Length > 0;
+    public bool IsReadableImage(string path) => PhotoScan.IsImageName(path) && File.Exists(path) && new FileInfo(path).Length > 0;
+    public (double Width, double Height)? OrientedPixelSize(string path) => IsReadableImage(path) ? (640, 480) : null;
     public (Linework.Core.Crop.NormalizedRect Rect, bool Found) AutoCrop(string path) => (Linework.Core.Crop.CropMath.Unit, false);
     public DateTimeOffset Now => new(2026, 11, 4, 12, 0, 0, TimeSpan.Zero);
     public DateOnly Today => new(2026, 11, 4);
@@ -63,6 +68,14 @@ public class StoreTests
     {
         var failures = new List<string>();
         SessionChecks.Run(Path.Combine(Lib.Temp(), "library"), new FakeHost(), (name, ok) => { if (!ok) failures.Add(name); });
+        Assert.Empty(failures);
+    }
+
+    [Fact]
+    public async Task CanvasChecksPass()
+    {
+        var failures = new List<string>();
+        await CanvasChecks.RunAsync(Lib.Temp(), new FakeHost(), Repo.Fixture("sample-person.jpg"), (name, ok) => { if (!ok) failures.Add(name); });
         Assert.Empty(failures);
     }
 

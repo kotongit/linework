@@ -16,6 +16,8 @@ public sealed class Settings : ObservableObject
         public bool Notes { get; init; } = true;
         public double Transparency { get; init; } = Glass.DefaultTransparency;
         public string? Library { get; init; }
+        /// <summary>The canvas each library last had open.</summary>
+        public Dictionary<string, string> LastCanvas { get; init; } = [];
         public bool Sound { get; init; } = true;
         public bool SetupGrayscale { get; init; }
         public bool SetupClassMode { get; init; }

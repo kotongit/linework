@@ -15,6 +15,8 @@ public sealed class AppModel(ILibraryHost host, Settings settings) : ObservableO
     public LibraryLocation Location { get; } = new(settings);
 
     public LibraryStore? Library { get; private set; }
+    /// <summary>One per library, so there's only ever one over a canvas folder; it deletes copies no item uses.</summary>
+    public FreehandStore? Freehand { get; private set; }
     public ChooserMessage? Message { get; set; }
     /// <summary>A folder with other things in it, waiting for the user to agree before Linework adds to it.</summary>
     public string? PendingAdoption { get; set; }
@@ -70,12 +72,15 @@ public sealed class AppModel(ILibraryHost host, Settings settings) : ObservableO
     public bool SaveOrConfirmLosing()
     {
         var saved = Library?.Flush() ?? true;
-        return saved || Host.ConfirmLosingChanges();
+        var canvasSaved = Freehand?.Flush() ?? true;
+        return (saved && canvasSaved) || Host.ConfirmLosingChanges();
     }
 
     public void CloseForSwitch()
     {
         if (!SaveOrConfirmLosing()) return;
+        Freehand?.Leave();
+        Freehand = null;
         Library = null;
         Message = null;
         NotifyChanged();
@@ -86,6 +91,7 @@ public sealed class AppModel(ILibraryHost host, Settings settings) : ObservableO
         try
         {
             Library = new LibraryStore(path, Host);
+            Freehand = new FreehandStore(new Linework.Core.Freehand.CanvasDirectory(Library.CanvasesDir), Library.Manifest.Id, Host, Settings);
             Location.Remember(path);
             Message = null;
         }

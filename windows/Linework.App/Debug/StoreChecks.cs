@@ -142,7 +142,7 @@ public static class StoreChecks
     }
 
     /// <summary>Makes a file unreadable: a lock on Windows, its mode elsewhere.</summary>
-    static IDisposable Lock(string path)
+    public static IDisposable Lock(string path)
     {
         if (OperatingSystem.IsWindows()) return new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
         var mode = File.GetUnixFileMode(path);

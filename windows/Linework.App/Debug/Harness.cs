@@ -52,6 +52,7 @@ public static partial class Harness
             Check("Inter Tight loads", Tokens.Font.GetTypefaces().Count() >= 3);
             StoreChecks.Run(Path.Combine(path, "checks", "library"), new WpfHost(), Check);
             SessionChecks.Run(Path.Combine(path, "session-checks", "library"), new WpfHost(), Check);
+            await CanvasChecks.RunAsync(Path.Combine(path, "canvas-checks"), new WpfHost(), Fixture("sample-person.jpg"), Check);
             await Stages(path);
         }
         catch (Exception e)
@@ -149,6 +150,7 @@ public static partial class Harness
         await Shoot("topbar", new TopBar(context, library, () => { }), 1280, 52);
         await PhotoStages(path, context, library);
         await PlanStages(context, library);
+        await ProgressStages(context, library);
         await SessionStages(context, library);
         await ShellStage(context);
         Check("Screenshots were written", Directory.GetFiles(_shots, "*.png").Length >= 12);

@@ -240,6 +240,7 @@ enum DebugSnapshots {
     /// Writes a canvas of generated images: one plain, one rotated, one cropped and flipped, one over the clock.
     private static func seedFreehand(sources: [URL], greyscale: Bool = false) {
         let files = FreehandFiles(root: canvasDir)
+        try? files.prepareImagesDir()
         let places: [(center: CGPoint, rotation: Double, flipped: Bool, crop: CGRect)] = [
             (CGPoint(x: 220, y: 200), 0, false, CropMath.unit),
             (CGPoint(x: 980, y: 220), 20, false, CropMath.unit),

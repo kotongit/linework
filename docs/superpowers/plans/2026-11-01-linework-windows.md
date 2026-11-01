@@ -116,7 +116,7 @@ Tests of locking, long paths and reserved names that only mean something on Wind
 **Interfaces:**
 - Produces: `ImportService.ImportAsync(urls, store, setId)`, `PhotoScanner.RunAsync(store)`, `ImageRendering.RenderAsync(request)` with an LRU cache capped at 256 MB, `AutoCropper.CropAsync(path) -> (NormalizedRect, bool found)`.
 
-- [ ] **Step 1:** Choose the model: small, person class, CPU, Apache or MIT licensed. Record its name, source, hash and license in `LICENSES/`. If nothing suitable is under 25 MB, ruling required.
+- [ ] **Step 1:** Choose the model: small, person class, CPU, Apache or MIT licensed. Record its name, source, hash and license in `LICENSES/`. If nothing suitable is under 25 MB, ship manual crop only: no ONNX Runtime or model, every import arrives as the full frame with no "no figure found" badge, the crop editor's Auto button is hidden, and this is reported to the user. The user decided this.
 - [ ] **Step 2:** Add Core tests for detection post-processing: `UnionOfPersonBoxesIsPadded`, `NoPersonFallsBack`. Run, watch fail, implement in Core, pass.
 - [ ] **Step 3:** Implement the rest. Images keep the EXIF orientation. Unreadable formats get a placeholder and a notice.
 - [ ] **Step 4:** Port the photo checks from `DebugLibraryChecks` to the harness, and add `ModelFindsAPersonInTheSample`, using a redistributable test image. Add library, preview and crop shots.

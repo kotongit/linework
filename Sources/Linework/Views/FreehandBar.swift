@@ -14,6 +14,7 @@ struct FreehandBar: View {
 
     var body: some View {
         HStack(spacing: 10) {
+            CanvasMenu(store: store)
             Toggle("Greyscale", isOn: Binding(get: { store.document.greyscale }, set: { store.setGreyscale($0) }))
                 .toggleStyle(CapsuleToggleStyle(height: Self.controlHeight))
             Button("\(Int((store.document.camera.zoom * 100).rounded()))%") { store.fit() }

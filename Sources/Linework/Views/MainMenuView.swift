@@ -1,5 +1,4 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 /// The home screen: a live clock, a greeting, section links and today's facts.
@@ -9,9 +8,7 @@ struct MainMenuView: View {
 
     @Environment(SessionStore.self) private var store
     @Environment(\.openWindow) private var openWindow
-    @Query private var checks: [PlanCheck]
-    @Query private var repeatRecords: [PlanRepeatRecord]
-    @Query private var images: [RefImage]
+    @Environment(LibraryStore.self) private var library
     @AppStorage("linework.name") private var name = ""
 
     private var calendar: Calendar { PlanStore.calendar }
@@ -27,7 +24,7 @@ struct MainMenuView: View {
     }
 
     private func content(_ now: Date) -> some View {
-        let schedule = PlanStore.schedule(repeatRecords)
+        let schedule = library.schedule
         return VStack(alignment: .leading, spacing: 0) {
             header(schedule)
             Spacer(minLength: 24)
@@ -60,11 +57,9 @@ struct MainMenuView: View {
     }
 
     private func startNext(_ schedule: PlanSchedule) {
-        let dayKey = PlanDayKey.key(store.today, calendar: calendar)
-        let ticked = PlanStore.checksByDay(checks)[dayKey] ?? []
-        if let block = schedule.nextTimedBlock(on: store.today, checked: ticked),
-           !images.isEmpty,
-           PlanStore.start(block: block, dayKey: dayKey, images: images, store: store, openWindow: openWindow) {
+        let ref = schedule.todayRef(store.today)
+        if let block = schedule.nextTimedBlock(ref, ticks: library.tickKeys),
+           PlanStore.start(block: block, ref: ref, library: library, store: store, openWindow: openWindow) {
             return
         }
         onOpen(.today)
@@ -120,7 +115,7 @@ struct MainMenuView: View {
                 Text(calendar.timeZone.identifier.replacingOccurrences(of: "_", with: " "))
             }
             column("Today's practice") {
-                Text(schedule.practiceLine(on: store.today)).lineLimit(2)
+                Text(schedule.practiceLine(schedule.todayRef(store.today))).lineLimit(2)
             }
         }
     }

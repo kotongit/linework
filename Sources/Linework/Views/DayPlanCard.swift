@@ -1,5 +1,4 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 extension PlanBlockKind {
@@ -16,41 +15,27 @@ extension PlanBlockKind {
     }
 }
 
-/// One date's practice: what the plan says, with a checkmark per block.
+/// One day's practice: what the plan says, with a checkmark per block. Any lesson can be ticked at any time.
 struct DayPlanCard: View {
-    let date: Date
+    let ref: PlanDayRef
     /// Off where the card already sits in a frame of its own, like a popover.
     var bordered = true
     /// Today's list: just the blocks, for reading at a glance. The full card stays in the Path and Calendar.
     var glance = false
-    @Environment(\.modelContext) private var context
-    @Query private var checks: [PlanCheck]
-    @Query private var repeatRecords: [PlanRepeatRecord]
-    @Query private var images: [RefImage]
+    @Environment(LibraryStore.self) private var library
     @Environment(SessionStore.self) private var store
     @Environment(\.openWindow) private var openWindow
 
-    private var calendar: Calendar { PlanStore.calendar }
-    private var dayKey: String { PlanDayKey.key(date, calendar: calendar) }
-
     var body: some View {
-        let schedule = PlanStore.schedule(repeatRecords)
-        let scheduled = schedule.scheduled(on: date)
-        let checked = Set(checks.filter { $0.dayKey == dayKey }.map(\.blockKey))
+        let schedule = library.schedule
+        let day = schedule.day(for: ref)
         VStack(alignment: .leading, spacing: 20) {
-            if !glance || scheduled == .notStarted { header(scheduled, schedule: schedule) }
-            switch scheduled {
-            case .notStarted:
-                preview(schedule)
-            default:
-                if let day = schedule.day(on: date) {
-                    if day.isRest {
-                        if !glance { rule }
-                        Text(LineworkCopy.restDay).font(Theme.font(20, .medium))
-                    } else {
-                        rows(day, checked: checked, editable: PlanStore.canEdit(dayKey: dayKey, today: store.today))
-                    }
-                }
+            header(schedule)
+            if day.isRest {
+                if !glance { rule }
+                Text(LineworkCopy.restDay).font(Theme.font(20, .medium))
+            } else {
+                rows(day)
             }
         }
         .padding(glance ? 0 : bordered ? 28 : 8)
@@ -66,69 +51,61 @@ struct DayPlanCard: View {
     }
 
     @ViewBuilder
-    private func header(_ scheduled: ScheduledDay, schedule: PlanSchedule) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(date, format: .dateTime.weekday(.wide).day().month(.wide))
-                .font(Theme.font(26, .medium))
-                .padding(.bottom, 4)
-            switch scheduled {
-            case let .day(_, weekIndex, _, isRepeat):
-                let week = schedule.plan.weeks[weekIndex]
-                HStack(spacing: 10) {
-                    Text("Book \(String(format: "%02d", week.book)) · Week \(week.weekOfBook) of \(week.weeksInBook) · \(week.theme)")
-                        .font(Theme.font(14, .semibold))
-                    if isRepeat { PillLabel("Repeat") }
-                }
-                Group {
-                    Text(week.bookTitle)
-                    Text("Read: \(week.readingShort)")
-                }
+    private func header(_ schedule: PlanSchedule) -> some View {
+        if glance {
+            Text(schedule.title(for: ref))
                 .font(Theme.font(14))
                 .foregroundStyle(Theme.muted)
-            case .forever:
-                Text("Forever week · your focus is your current weakest skill")
-                    .font(Theme.font(14, .semibold))
-            case .notStarted:
-                Text(LineworkCopy.planStarts)
-                    .font(Theme.font(14, .semibold))
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(schedule.title(for: ref))
+                    .font(Theme.font(26, .medium))
+                    .padding(.bottom, 4)
+                if case let .plan(sequenceIndex, _) = ref {
+                    let entry = schedule.sequence[sequenceIndex]
+                    let week = schedule.plan.weeks[entry.weekIndex]
+                    HStack(spacing: 10) {
+                        Text("Book \(String(format: "%02d", week.book)) · Week \(week.weekOfBook) of \(week.weeksInBook) · \(week.theme)")
+                            .font(Theme.font(14, .semibold))
+                        if entry.isRepeat { PillLabel("Repeat") }
+                    }
+                    Group {
+                        Text(week.bookTitle)
+                        Text("Read: \(week.readingShort)")
+                    }
+                    .font(Theme.font(14))
+                    .foregroundStyle(Theme.muted)
+                } else {
+                    Text("Your focus is your current weakest skill")
+                        .font(Theme.font(14, .semibold))
+                }
             }
         }
     }
 
-    private func rows(_ day: PlanDay, checked: Set<String>, editable: Bool) -> some View {
+    private func rows(_ day: PlanDay) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(day.blocks, id: \.kind) { block in
                 if !glance || block.kind != day.blocks.first?.kind { rule }
-                PlanBlockRow(block: block, isChecked: checked.contains(block.kind.rawValue), editable: editable, glance: glance,
-                             hasImages: !images.isEmpty, onToggle: { toggle(block) }, onStart: { start(block) })
+                PlanBlockRow(block: block, isChecked: library.isTicked(ref, block.kind), glance: glance,
+                             hasImages: !library.visiblePhotos.isEmpty, onToggle: { toggle(block) }, onStart: { start(block) })
                     .padding(.top, glance && block.kind == day.blocks.first?.kind ? 0 : 18)
                     .padding(.bottom, block.kind == day.blocks.last?.kind ? 0 : 18)
             }
         }
-        // A new date starts with every row collapsed.
-        .id(dayKey)
-    }
-
-    /// Before the start date: what the first day looks like. Nothing can be ticked.
-    @ViewBuilder
-    private func preview(_ schedule: PlanSchedule) -> some View {
-        if let first = schedule.plan.weeks.first?.days.first {
-            Text("First up, on 2 Nov:")
-                .font(Theme.font(14))
-                .foregroundStyle(Theme.muted)
-            rows(first, checked: [], editable: false)
-        }
+        // A new day starts with every row collapsed.
+        .id(ref)
     }
 
     private func toggle(_ block: PlanBlock) {
-        if PlanStore.toggle(dayKey: dayKey, kind: block.kind, in: context),
-           let celebration = PlanStore.celebration(dayKey: dayKey, in: context) {
-            store.celebrate(celebration, dayKey: dayKey)
+        guard library.toggleTick(ref, block.kind) else { return }
+        if let celebration = PlanProgress.celebration(for: ref, ticks: library.tickKeys, schedule: library.schedule) {
+            store.celebrate(celebration, isToday: ref == library.schedule.todayRef(store.today))
         }
     }
 
     private func start(_ block: PlanBlock) {
-        PlanStore.start(block: block, dayKey: dayKey, images: images, store: store, openWindow: openWindow)
+        PlanStore.start(block: block, ref: ref, library: library, store: store, openWindow: openWindow)
     }
 }
 
@@ -136,7 +113,6 @@ struct DayPlanCard: View {
 private struct PlanBlockRow: View {
     let block: PlanBlock
     let isChecked: Bool
-    let editable: Bool
     let glance: Bool
     let hasImages: Bool
     let onToggle: () -> Void
@@ -160,9 +136,7 @@ private struct PlanBlockRow: View {
                 .contentShape(Circle())
             }
             .buttonStyle(.plain)
-            .disabled(!editable)
-            .opacity(editable || isChecked ? 1 : 0.4)
-            .help(editable ? (isChecked ? "Untick" : "Tick") : "You can tick this on the day")
+            .help(isChecked ? "Untick" : "Tick")
 
             VStack(alignment: .leading, spacing: 6) {
                 if glance {
@@ -203,7 +177,7 @@ private struct PlanBlockRow: View {
 
     @ViewBuilder
     private var actions: some View {
-        if editable, let timed = block.timed {
+        if let timed = block.timed {
             Button("Start \(stepsLabel(timed))", action: onStart)
                 .buttonStyle(CapsuleButtonStyle(height: 30))
                 .fixedSize()

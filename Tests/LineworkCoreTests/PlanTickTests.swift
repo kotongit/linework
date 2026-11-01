@@ -112,3 +112,35 @@ import Testing
         }
     }
 }
+
+@Suite struct PlanTickSummaryTests {
+    private var cal: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "America/Mexico_City")!
+        return c
+    }
+
+    @Test func ticksAddUpByTheDayTheyCountOn() {
+        let start = PlanDayKey.date("2026-11-02", calendar: cal)!
+        let s = PlanSchedule(plan: .shared, start: start, repeats: [], calendar: cal)
+        let ref = PlanDayRef.plan(sequenceIndex: 1, weekday: 0)
+        let ticks = s.day(for: ref).blocks.map { PlanTick(key: s.tickKey(ref, $0.kind), countsOn: "2026-11-09", checkedAt: start) }
+        let summary = PlanProgress.tickSummary(ticks, schedule: s)
+        #expect(summary["2026-11-09"]?.count == ticks.count)
+        #expect(summary["2026-11-09"]?.minutes == s.day(for: ref).blocks.reduce(0) { $0 + $1.minutes })
+    }
+
+    @Test func foreverTicksHaveMinutesToo() {
+        let s = PlanSchedule(plan: .shared, start: PlanDayKey.date("2026-11-02", calendar: cal)!, repeats: [], calendar: cal)
+        let ref = PlanDayRef.forever(day: "2027-08-02")
+        let tick = PlanTick(key: s.tickKey(ref, .warmup), countsOn: "2027-08-02", checkedAt: .now)
+        #expect(PlanProgress.tickSummary([tick], schedule: s)["2027-08-02"]?.minutes == 5)
+    }
+
+    @Test func nextTimedBlockUsesLessonKeys() {
+        let s = PlanSchedule(plan: .shared, start: PlanDayKey.date("2026-11-02", calendar: cal)!, repeats: [], calendar: cal)
+        let ref = PlanDayRef.plan(sequenceIndex: 0, weekday: 1)
+        #expect(s.nextTimedBlock(ref, ticks: [])?.kind == .warmup)
+        #expect(s.nextTimedBlock(ref, ticks: [s.tickKey(ref, .warmup)]) == nil)
+    }
+}

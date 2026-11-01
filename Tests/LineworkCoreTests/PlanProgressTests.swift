@@ -9,7 +9,7 @@ import Testing
         return c
     }()
     let plan = PracticePlan.shared
-    var schedule: PlanSchedule { PlanSchedule(plan: plan, repeats: [], calendar: cal) }
+    var schedule: PlanSchedule { PlanSchedule(plan: plan, start: PlanDayKey.date("2026-11-02", calendar: cal)!, repeats: [], calendar: cal) }
 
     func date(_ y: Int, _ m: Int, _ d: Int) -> Date {
         cal.startOfDay(for: cal.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!)
@@ -59,22 +59,14 @@ import Testing
         #expect(PlanProgress.longestStreak(practiceDays: bridged, calendar: cal) == 3)
     }
 
-    @Test func celebrationLevels() {
+    @Test func finishingABookIsTheBiggestCelebration() {
         let s = schedule
-        func tick(_ key: String, _ checks: [String: Set<String>]) -> PlanProgress.Celebration? {
-            PlanProgress.celebration(on: PlanDayKey.date(key, calendar: cal)!, schedule: s, checksByDay: checks, calendar: cal)
+        var keys = Set<String>()
+        for weekday in 0..<7 {
+            let ref = PlanDayRef.plan(sequenceIndex: 0, weekday: weekday)
+            for block in s.day(for: ref).blocks { keys.insert(s.tickKey(ref, block.kind)) }
         }
-        #expect(tick("2026-11-09", ["2026-11-09": ["warmup"]]) == nil)
-        #expect(tick("2026-11-09", ["2026-11-09": ["warmup", "focus", "check"]]) == .day)
-        #expect(tick("2026-10-01", ["2026-10-01": ["warmup"]]) == nil)
-
-        var checks: [String: Set<String>] = [:]
-        completeWeek(s, sequenceIndex: 1, into: &checks)
-        #expect(tick("2026-11-14", checks) == .week)
-
-        var book: [String: Set<String>] = [:]
-        completeWeek(s, sequenceIndex: 0, into: &book)
-        #expect(tick("2026-11-07", book) == .book)
+        #expect(PlanProgress.celebration(for: .plan(sequenceIndex: 0, weekday: 0), ticks: keys, schedule: s) == .book)
     }
 
     @Test func heatmapMax() {

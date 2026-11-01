@@ -208,14 +208,16 @@ struct CropEditorView: View {
 }
 
 extension CropEditorView {
-    /// The Library's editor: writes the result back to the image, clearing "no figure found" once cropped.
-    init(image: RefImage) {
-        self.init(imageURL: Storage.imageURL(fileName: image.fileName),
-                  initial: CropEdit(crop: image.cropRect, rotation: image.rotation, flipped: image.flipped)) { edit in
-            image.cropRect = edit.crop
-            image.rotation = edit.rotation
-            image.flipped = edit.flipped
-            if edit.crop != CropMath.unit { image.noFigureFound = false }
+    /// The Library's editor: writes the result back to the photo, clearing "no figure found" once cropped.
+    init(photo: PhotoRecord, store: LibraryStore) {
+        self.init(imageURL: store.photoURL(photo),
+                  initial: CropEdit(crop: photo.crop.cgRect, rotation: photo.rotation, flipped: photo.flipped)) { edit in
+            store.update(photo.id) { record in
+                record.crop = NormalizedRect(edit.crop)
+                record.rotation = edit.rotation
+                record.flipped = edit.flipped
+                if edit.crop != CropMath.unit { record.noFigureFound = false }
+            }
         }
     }
 }

@@ -1,34 +1,19 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 @main
 struct LineworkApp: App {
-    let container: ModelContainer = {
-        do {
-            return try ModelContainer(for: RefImage.self, ImageSet.self, ClassPreset.self, SessionRecord.self, BenchmarkAttempt.self,
-                                      PlanCheck.self, PlanRepeatRecord.self,
-                                      configurations: ModelConfiguration(url: Storage.root.appending(path: "Library.store")))
-        } catch {
-            fatalError("Could not open library: \(error)")
-        }
-    }()
-
     init() {
         Theme.registerFonts()
-        _ = Storage.imagesDir
-        DebugSnapshots.container = container
-        let context = container.mainContext
-        if (try? context.fetchCount(FetchDescriptor<ClassPreset>())) == 0 {
-            context.insert(ClassPreset(name: "Default class", steps: QueueBuilder.defaultClass))
-            try? context.save()
-        }
     }
 
-    @State private var app = AppModel()
+    @State private var app = {
+        #if DEBUG
+        if !Set(CommandLine.arguments).isDisjoint(with: ["--snapshots", "--print-counts"]) { return DebugSnapshots.app }
+        #endif
+        return AppModel()
+    }()
     @State private var store = SessionStore()
-    /// Here so there's only ever one over the folder: it deletes copies no item uses, and the canvas outlives windows and sections.
-    @State private var freehand = FreehandStore()
     @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
 
     var body: some Scene {
@@ -36,9 +21,7 @@ struct LineworkApp: App {
             AppShell()
                 .environment(app)
                 .environment(store)
-                .environment(freehand)
         }
-        .modelContainer(container)
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1280, height: 800)
         .commands {
@@ -48,10 +31,12 @@ struct LineworkApp: App {
         }
 
         Window("Session", id: "session") {
-            SessionPlayerView()
-                .environment(store)
+            if let library = app.library {
+                SessionPlayerView()
+                    .environment(library)
+                    .environment(store)
+            }
         }
-        .modelContainer(container)
         .windowStyle(.hiddenTitleBar)
         .restorationBehavior(.disabled)
 
@@ -82,10 +67,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if DEBUG
         if CommandLine.arguments.contains("--library-checks") {
-            Task { @MainActor in DebugLibraryChecks.run() }
+            Task { @MainActor in
+                let i = CommandLine.arguments.firstIndex(of: "--library-checks")!
+                await DebugLibraryChecks.run(sources: CommandLine.arguments[(i + 1)...].map { URL(fileURLWithPath: $0) })
+            }
             return
         }
         #endif
+        #if DEBUG
         if CommandLine.arguments.contains("--print-counts") {
             Task { @MainActor in DebugSnapshots.printCounts() }
         } else if let i = CommandLine.arguments.firstIndex(of: "--snapshots"), CommandLine.arguments.count > i + 1 {
@@ -94,6 +83,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                                          sources: CommandLine.arguments[(i + 2)...].map { URL(fileURLWithPath: $0) })
             }
         }
+        #endif
     }
 }
 
@@ -109,6 +99,14 @@ private struct LibraryCommands: Commands {
                 if let root = app.library?.root { NSWorkspace.shared.activateFileViewerSelecting([root]) }
             }
             .disabled(app.library == nil)
+            Divider()
+            Button("Import Photos…") {
+                store.route = .section(.library)
+                // After the Library appears, if it wasn't showing.
+                Task { @MainActor in NotificationCenter.default.post(name: .importPhotosRequested, object: nil) }
+            }
+            .keyboardShortcut("i", modifiers: .command)
+            .disabled(app.library == nil || store.isSessionActive)
         }
     }
 }

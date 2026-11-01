@@ -14,7 +14,7 @@ import Testing
         cal.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!
     }
 
-    var schedule: PlanSchedule { PlanSchedule(plan: plan, repeats: [], calendar: cal) }
+    var schedule: PlanSchedule { PlanSchedule(plan: plan, start: PlanDayKey.date("2026-11-02", calendar: cal)!, repeats: [], calendar: cal) }
 
     @Test func everyBlockSummarized() {
         let days = plan.weeks.flatMap(\.days) + plan.foreverWeek
@@ -55,25 +55,28 @@ import Testing
 
     @Test func practiceLine() {
         let s = schedule
-        #expect(s.practiceLine(on: date(2026, 11, 1)) == "Starts Monday 2 Nov")
-        #expect(s.practiceLine(on: date(2026, 11, 8)) == "Rest")
-        #expect(s.practiceLine(on: date(2026, 11, 3)).contains("Brush kit"))
-        let day = s.day(on: date(2026, 11, 9))!
+        let sunday = s.todayRef(date(2026, 11, 8))
+        #expect(s.practiceLine(sunday) == "Rest")
+        #expect(s.practiceLine(s.todayRef(date(2026, 11, 3))).contains("Brush kit"))
+        let monday = s.todayRef(date(2026, 11, 9))
         var titles: [String] = []
-        for b in day.blocks where !titles.contains(b.title) { titles.append(b.title) }
-        #expect(s.practiceLine(on: date(2026, 11, 9)) == titles.joined(separator: ", "))
+        for b in s.day(for: monday).blocks where !titles.contains(b.title) { titles.append(b.title) }
+        #expect(s.practiceLine(monday) == titles.joined(separator: ", "))
+    }
+
+    @Test func aPlanNotYetBegunShowsItsFirstDay() {
+        let s = schedule
+        #expect(s.practiceLine(s.todayRef(date(2026, 11, 1))).contains("Set up Procreate"))
     }
 
     @Test func nextTimed() {
         let s = schedule
-        let week2Monday = date(2026, 11, 9)
-        let focus = s.day(on: week2Monday)!.blocks.first { $0.kind == .focus }
+        let monday = s.todayRef(date(2026, 11, 9))
+        let focus = s.day(for: monday).blocks.first { $0.kind == .focus }
         #expect(focus?.timed != nil)
-        #expect(s.nextTimedBlock(on: week2Monday, checked: []) == focus)
-        #expect(s.nextTimedBlock(on: week2Monday, checked: ["focus"]) == nil)
-        let tuesday = date(2026, 11, 3)
-        #expect(s.nextTimedBlock(on: tuesday, checked: [])?.kind == .warmup)
-        #expect(s.nextTimedBlock(on: date(2026, 11, 8), checked: []) == nil)
-        #expect(s.nextTimedBlock(on: date(2026, 11, 1), checked: []) == nil)
+        #expect(s.nextTimedBlock(monday, ticks: []) == focus)
+        #expect(s.nextTimedBlock(monday, ticks: [s.tickKey(monday, .focus)]) == nil)
+        #expect(s.nextTimedBlock(s.todayRef(date(2026, 11, 3)), ticks: [])?.kind == .warmup)
+        #expect(s.nextTimedBlock(s.todayRef(date(2026, 11, 8)), ticks: []) == nil)
     }
 }

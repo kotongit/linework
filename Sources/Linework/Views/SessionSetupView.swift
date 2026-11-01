@@ -1,11 +1,10 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 enum SessionSource: Hashable {
     /// Images imported today first, the rest of the session filled from the library, sized to a target length.
     case today
-    case all, benchmarks, set(ImageSet)
+    case all, benchmarks, set(UUID)
 }
 
 /// A class step with a stable identity so rows can be removed and reordered safely.
@@ -22,12 +21,8 @@ enum SetupMode: String, CaseIterable, Identifiable {
 struct SessionSetupView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.modelContext) private var context
+    @Environment(LibraryStore.self) private var library
     @Environment(SessionStore.self) private var store
-    @Query(sort: \RefImage.importedAt) private var images: [RefImage]
-    @Query(sort: \ImageSet.createdAt) private var sets: [ImageSet]
-    @Query(sort: \ClassPreset.name) private var presets: [ClassPreset]
-    @Query private var sessions: [SessionRecord]
 
     @AppStorage("linework.setup.mode") private var mode = SetupMode.simple
     @AppStorage("linework.setup.seconds") private var seconds = 60
@@ -46,6 +41,9 @@ struct SessionSetupView: View {
     static let presetSeconds = [30, 60, 120, 300]
     static let stepDurations = [15, 30, 45, 60, 90, 120, 180, 300, 600, 900, 1200]
 
+    private var images: [PhotoRecord] { library.visiblePhotos.sorted { $0.importedAt < $1.importedAt } }
+    private var presets: [PresetRecord] { library.presets.sorted { $0.name < $1.name } }
+
     var body: some View {
         // Due benchmarks and the preview queue are derived once per redraw.
         let due = dueBenchmarks
@@ -63,9 +61,9 @@ struct SessionSetupView: View {
                         Text("Today’s Images (\(todayCount))").tag(SessionSource.today)
                         Divider()
                         Text("All Images (\(images.count))").tag(SessionSource.all)
-                        Text("Benchmarks (\(images.count(where: \.isBenchmark)))").tag(SessionSource.benchmarks)
-                        ForEach(sets) { set in
-                            Text("\(set.name) (\(set.images.count))").tag(SessionSource.set(set))
+                        Text("Benchmarks (\(images.count { library.isBenchmark($0.id) }))").tag(SessionSource.benchmarks)
+                        ForEach(library.sets) { set in
+                            Text("\(set.name) (\(setImages(set).count))").tag(SessionSource.set(set.id))
                         }
                     }
 
@@ -137,9 +135,7 @@ struct SessionSetupView: View {
             Button("Save") {
                 let name = presetName.trimmingCharacters(in: .whitespaces)
                 guard !name.isEmpty else { return }
-                let preset = ClassPreset(name: name, steps: steps.map(\.step))
-                context.insert(preset)
-                presetID = preset.id
+                presetID = library.addPreset(name: name, steps: steps.map(\.step)).id
             }
             Button("Cancel", role: .cancel) {}
         }
@@ -229,6 +225,11 @@ struct SessionSetupView: View {
         }
     }
 
+    private func setImages(_ set: SetRecord) -> [PhotoRecord] {
+        let members = Set(set.photoIDs)
+        return images.filter { members.contains($0.id) }
+    }
+
     private var todayIDs: [UUID] {
         images.filter { Calendar.current.isDateInToday($0.importedAt) }.map(\.id)
     }
@@ -237,17 +238,12 @@ struct SessionSetupView: View {
         switch source {
         case .today: todayIDs
         case .all: images.map(\.id)
-        case .benchmarks: images.filter(\.isBenchmark).map(\.id)
-        case let .set(set): set.images.map(\.id)
+        case .benchmarks: images.filter { library.isBenchmark($0.id) }.map(\.id)
+        case let .set(id): library.sets.first { $0.id == id }.map { setImages($0).map(\.id) } ?? []
         }
     }
 
-    private var dueBenchmarks: [DueBenchmark] {
-        let dates = sessions.map(\.startedAt)
-        return images
-            .filter { $0.isBenchmark && BenchmarkSchedule.isDue(since: $0.benchmarkSince, interval: $0.benchmarkInterval, sessionDates: dates) }
-            .map { DueBenchmark(imageID: $0.id, seconds: $0.benchmarkSeconds, number: $0.attempts.count + 1) }
-    }
+    private var dueBenchmarks: [DueBenchmark] { library.dueBenchmarks() }
 
     /// The rest of the library, used to fill a Today session.
     private var fillIDs: [UUID] {

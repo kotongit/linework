@@ -5,7 +5,7 @@ public enum LineworkCopy {
     public static let underGreeting = "A few minutes of practice a day keeps s.e.a. growing — and your hand steady."
     public static let freehandEmpty = "Your canvas is empty. Drag your images here."
     public static let restDay = "Rest today. You've earned it."
-    public static let planStarts = "Your plan starts Monday 2 Nov."
+    public static let noLessonThatDay = "No lesson that day."
     public static let emptyLibrary = "Drag your photos here"
     public static let emptyBenchmarks = "Right-click a photo to make it your benchmark."
     public static let sessionTooShort = "That one was too short to count on your calendar."

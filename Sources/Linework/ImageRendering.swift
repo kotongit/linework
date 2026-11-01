@@ -67,6 +67,7 @@ final class RenderCache: @unchecked Sendable {
     @concurrent
     func image(for request: RenderRequest) async -> CGImage? {
         if let hit = self[request.key] { return hit }
+        if let source = request.thumbnailSource, let hash = request.thumbnailHash { ThumbnailCache.ensure(hash: hash, source: source) }
         guard let image = ImageRendering.render(url: request.url, rotation: request.rotation, flipped: request.flipped,
                                                 crop: request.crop, maxPixel: request.maxPixel)
         else { return nil }
@@ -133,19 +134,23 @@ actor DecodeGate {
 /// Everything needed to render one reference image, captured as plain values so it can leave the main actor.
 struct RenderRequest: Sendable, Hashable {
     let url: URL
+    /// Where a thumbnail comes from, if it hasn't been made yet.
+    var thumbnailSource: URL? = nil
+    var thumbnailHash: String? = nil
     let rotation: Int
     let flipped: Bool
     let crop: CGRect
     let maxPixel: Int
 
-    var key: String { "\(url.lastPathComponent)|\(rotation)|\(flipped)|\(crop.debugDescription)|\(maxPixel)" }
+    var key: String { "\(url.path)|\(rotation)|\(flipped)|\(crop.debugDescription)|\(maxPixel)" }
 }
 
-extension RefImage {
-    /// `useThumbnail` renders from the 400px thumbnail file; otherwise from the original. `showCrop: false` shows the whole frame.
-    @MainActor
-    func renderRequest(maxPixel: Int, useThumbnail: Bool = false, showCrop: Bool = true) -> RenderRequest {
-        RenderRequest(url: useThumbnail ? Storage.thumbnailURL(id: id) : Storage.imageURL(fileName: fileName),
-                      rotation: rotation, flipped: flipped, crop: showCrop ? cropRect : CropMath.unit, maxPixel: maxPixel)
+extension LibraryStore {
+    /// `useThumbnail` renders from the cached 400px thumbnail; otherwise from the original. `showCrop: false` shows the whole frame.
+    func renderRequest(_ photo: PhotoRecord, maxPixel: Int, useThumbnail: Bool = false, showCrop: Bool = true) -> RenderRequest {
+        let original = photoURL(photo)
+        return RenderRequest(url: useThumbnail ? ThumbnailCache.url(forHash: photo.sha256) : original,
+                             thumbnailSource: useThumbnail ? original : nil, thumbnailHash: useThumbnail ? photo.sha256 : nil,
+                             rotation: photo.rotation, flipped: photo.flipped, crop: showCrop ? photo.crop.cgRect : CropMath.unit, maxPixel: maxPixel)
     }
 }

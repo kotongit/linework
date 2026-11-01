@@ -52,10 +52,6 @@ public struct PlanSchedule: Sendable {
     public let sequence: [(weekIndex: Int, isRepeat: Bool, repeatNumber: Int)]
     private let start: Date
 
-    public init(plan: PracticePlan, repeats: [PlanRepeat], calendar: Calendar) {
-        self.init(plan: plan, start: PlanDayKey.date("2026-11-02", calendar: calendar) ?? .distantPast, repeats: repeats, calendar: calendar)
-    }
-
     public init(plan: PracticePlan, start: Date, repeats: [PlanRepeat], calendar: Calendar) {
         self.plan = plan
         self.repeats = repeats

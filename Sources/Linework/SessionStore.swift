@@ -6,7 +6,7 @@ import Observation
 
 /// Hands the configured session from the setup sheet to the player window.
 struct PlanBlockRef: Equatable, Sendable {
-    let dayKey: String
+    let ref: PlanDayRef
     let kind: PlanBlockKind
 }
 
@@ -28,8 +28,9 @@ final class SessionStore {
     /// Today, for plan views. Kept current so an app left open overnight moves on to the new day.
     var today = PlanClock.now
 
-    func celebrate(_ celebration: PlanProgress.Celebration, dayKey: String) {
-        pendingCelebrationIsToday = dayKey == PlanDayKey.key(today, calendar: PlanStore.calendar)
+    /// `isToday` says whether the finished lesson is today's, which sets the wording.
+    func celebrate(_ celebration: PlanProgress.Celebration, isToday: Bool) {
+        pendingCelebrationIsToday = isToday
         pendingCelebration = celebration
     }
 

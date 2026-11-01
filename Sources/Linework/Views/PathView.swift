@@ -1,18 +1,16 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 /// The whole plan as one straight line of day circles, grouped by book.
 struct PathView: View {
-    @Query private var checks: [PlanCheck]
-    @Query private var repeatRecords: [PlanRepeatRecord]
+    @Environment(LibraryStore.self) private var library
     @Environment(SessionStore.self) private var store
 
     private static let foreverID = -1
 
     var body: some View {
-        let schedule = PlanStore.schedule(repeatRecords)
-        let checked = PlanStore.checksByDay(checks)
+        let schedule = library.schedule
+        let ticks = library.tickKeys
         let today = store.today
         ScrollViewReader { proxy in
             ScrollView {
@@ -21,10 +19,10 @@ struct PathView: View {
                         let week = schedule.plan.weeks[schedule.sequence[index].weekIndex]
                         let previousBook = index > 0 ? schedule.plan.weeks[schedule.sequence[index - 1].weekIndex].book : nil
                         WeekPathSection(schedule: schedule, sequenceIndex: index, week: week,
-                                        startsBook: week.book != previousBook, checked: checked, today: today)
+                                        startsBook: week.book != previousBook, ticks: ticks, today: today)
                             .id(index)
                     }
-                    ForeverNode(date: schedule.date(sequenceIndex: schedule.sequence.count, weekday: 0))
+                    ForeverNode(ref: .forever(day: PlanDayKey.key(schedule.date(sequenceIndex: schedule.sequence.count, weekday: 0), calendar: schedule.calendar)))
                         .id(Self.foreverID)
                 }
                 .padding(.vertical, 24)
@@ -36,9 +34,8 @@ struct PathView: View {
 
     /// The week containing today, the first week before the start, the forever node after the end.
     private func anchor(_ schedule: PlanSchedule, today: Date) -> Int {
-        switch schedule.scheduled(on: today) {
-        case .notStarted: 0
-        case let .day(sequenceIndex, _, _, _): sequenceIndex
+        switch schedule.todayRef(today) {
+        case let .plan(sequenceIndex, _): sequenceIndex
         case .forever: Self.foreverID
         }
     }
@@ -49,7 +46,7 @@ private struct WeekPathSection: View {
     let sequenceIndex: Int
     let week: PlanWeek
     let startsBook: Bool
-    let checked: [String: Set<String>]
+    let ticks: Set<String>
     let today: Date
 
     private static let rowHeight: CGFloat = 52
@@ -80,10 +77,10 @@ private struct WeekPathSection: View {
                 Rectangle().fill(Theme.muted).frame(width: 1)
                 VStack(spacing: 0) {
                     ForEach(0..<7, id: \.self) { weekday in
-                        let date = schedule.date(sequenceIndex: sequenceIndex, weekday: weekday)
-                        DayNode(date: date, day: week.days[weekday],
-                                checked: checked[PlanDayKey.key(date, calendar: schedule.calendar)] ?? [],
-                                today: today, calendar: schedule.calendar)
+                        let ref = PlanDayRef.plan(sequenceIndex: sequenceIndex, weekday: weekday)
+                        DayNode(ref: ref, status: PlanProgress.status(for: ref, ticks: ticks, schedule: schedule),
+                                isToday: ref == schedule.todayRef(today), isFuture: schedule.date(of: ref) > today, weekday: weekday,
+                                help: schedule.title(for: ref))
                             .frame(height: Self.rowHeight)
                     }
                 }
@@ -95,28 +92,28 @@ private struct WeekPathSection: View {
 }
 
 private struct DayNode: View {
-    let date: Date
-    let day: PlanDay
-    let checked: Set<String>
-    let today: Date
-    let calendar: Calendar
+    let ref: PlanDayRef
+    let status: PlanProgress.DayStatus
+    let isToday: Bool
+    let isFuture: Bool
+    /// 0 for Monday.
+    let weekday: Int
+    let help: String
     @State private var showing = false
 
-    private var isToday: Bool { calendar.isDate(date, inSameDayAs: today) }
-    private var isFuture: Bool { !isToday && date > today }
+    private static let initials = ["M", "T", "W", "T", "F", "S", "S"]
 
     var body: some View {
-        let status = PlanProgress.status(of: day, checked: checked)
         Button {
             showing = true
         } label: {
             node(status)
         }
         .buttonStyle(.plain)
-        .help(date.formatted(.dateTime.weekday(.wide).day().month(.wide)))
+        .help(help)
         .popover(isPresented: $showing) {
             ScrollView {
-                DayPlanCard(date: date, bordered: false).padding(12)
+                DayPlanCard(ref: ref, bordered: false).padding(12)
             }
             .frame(width: 520, height: 460)
         }
@@ -125,7 +122,7 @@ private struct DayNode: View {
     @ViewBuilder
     private func node(_ status: PlanProgress.DayStatus) -> some View {
         let size: CGFloat = isToday ? 44 : 32
-        // Future days are drawn in hairline rather than faded, so their numbers stay readable on glass.
+        // Future days are drawn in hairline rather than faded, so their letters stay readable on glass.
         let outline = isFuture ? Theme.hairline : Theme.muted
         ZStack {
             switch status {
@@ -137,10 +134,10 @@ private struct DayNode: View {
                 Image(systemName: "checkmark").font(.system(size: isToday ? 18 : 13, weight: .bold)).foregroundStyle(.white)
             case .partial:
                 Circle().strokeBorder(Color.teal, lineWidth: 2)
-                Text(date, format: .dateTime.day()).font(Theme.font(13, .semibold)).foregroundStyle(Theme.ink)
+                Text(Self.initials[weekday]).font(Theme.font(13, .semibold)).foregroundStyle(Theme.ink)
             case .empty:
                 Circle().strokeBorder(isToday ? Color.teal : outline, lineWidth: isToday ? 2 : 1)
-                Text(date, format: .dateTime.day())
+                Text(Self.initials[weekday])
                     .font(Theme.font(13, isToday ? .semibold : .regular))
                     .foregroundStyle(isToday ? Theme.ink : Theme.muted)
             }
@@ -153,7 +150,7 @@ private struct DayNode: View {
 }
 
 private struct ForeverNode: View {
-    let date: Date
+    let ref: PlanDayRef
     @State private var showing = false
 
     var body: some View {
@@ -169,7 +166,7 @@ private struct ForeverNode: View {
         .buttonStyle(.plain)
         .popover(isPresented: $showing) {
             ScrollView {
-                DayPlanCard(date: date, bordered: false).padding(12)
+                DayPlanCard(ref: ref, bordered: false).padding(12)
             }
             .frame(width: 520, height: 400)
         }

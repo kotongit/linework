@@ -13,6 +13,8 @@ final class AppModel {
     }
 
     private(set) var library: LibraryStore?
+    /// One per library, so there's only ever one over a canvas folder; it deletes copies no item uses.
+    private(set) var freehand: FreehandStore?
     var message: ChooserMessage?
     /// A folder with other things in it, waiting for the user to agree before Linework adds to it.
     var pendingAdoption: URL?
@@ -23,7 +25,10 @@ final class AppModel {
         let center = NotificationCenter.default
         for name in [NSApplication.didResignActiveNotification, NSApplication.willTerminateNotification] {
             observers.append(center.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
-                MainActor.assumeIsolated { self?.library?.flush() }
+                MainActor.assumeIsolated {
+                    self?.library?.flush()
+                    self?.freehand?.flush()
+                }
             })
         }
         openRemembered()
@@ -67,15 +72,28 @@ final class AppModel {
         }
     }
 
+    #if DEBUG
+    /// The harness writes canvases directly, then wants them read afresh.
+    func reloadFreehand() {
+        guard let library else { return }
+        freehand = FreehandStore(canvases: CanvasDirectory(canvasesRoot: library.canvasesDir), libraryID: library.manifest.id)
+        freehand?.loadIfNeeded()
+    }
+    #endif
+
     func closeForSwitch() {
         library?.flush()
+        freehand?.leave()
+        freehand = nil
         library = nil
         message = nil
     }
 
     private func load(_ url: URL) {
         do {
-            library = try LibraryStore(root: url)
+            let opened = try LibraryStore(root: url)
+            library = opened
+            freehand = FreehandStore(canvases: CanvasDirectory(canvasesRoot: opened.canvasesDir), libraryID: opened.manifest.id)
             LibraryLocation.remember(url)
             message = nil
         } catch LibraryError.newerFormat {

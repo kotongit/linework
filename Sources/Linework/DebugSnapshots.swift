@@ -1,6 +1,6 @@
+#if DEBUG
 import AppKit
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 /// Debug-only: `Linework --snapshots <outDir> <image>...` (with LINEWORK_LIBRARY set to a scratch folder)
@@ -10,27 +10,36 @@ enum DebugSnapshots {
     static var active = false
     /// What the snapshot harness draws in place of the blur. Nil outside a transparency render.
     static var backdrop: Color?
-    static var container: ModelContainer?
+    /// The one model the harness runs on, over the scratch library in LINEWORK_LIBRARY.
+    static let app = AppModel()
+    static var library: LibraryStore { app.library! }
+
+    static func freehandStore() -> FreehandStore {
+        let store = FreehandStore(canvases: CanvasDirectory(canvasesRoot: library.canvasesDir), libraryID: library.manifest.id)
+        store.loadIfNeeded()
+        return store
+    }
+
+    /// The canvas every debug store opens.
+    static var canvasDir: URL {
+        let directory = CanvasDirectory(canvasesRoot: library.canvasesDir)
+        return directory.url(of: (try? directory.ensureOne()) ?? "Untitled")
+    }
 
     /// `Linework --print-counts`: row counts for every model, for checking a library upgrade.
     static func printCounts() {
-        #if DEBUG
-        guard let context = container?.mainContext else { return }
-        func count<T: PersistentModel>(_: T.Type) -> Int { (try? context.fetchCount(FetchDescriptor<T>())) ?? -1 }
-        print("images", count(RefImage.self), "sets", count(ImageSet.self), "presets", count(ClassPreset.self),
-              "sessions", count(SessionRecord.self), "attempts", count(BenchmarkAttempt.self),
-              "checks", count(PlanCheck.self), "repeats", count(PlanRepeatRecord.self))
+        let l = library
+        print("photos", l.photos.count, "sets", l.sets.count, "presets", l.presets.count, "sessions", l.sessions.count,
+              "benchmarks", l.benchmarkData.benchmarks.count, "attempts", l.benchmarkData.attempts.count,
+              "ticks", l.ticks.count, "repeats", l.plan.repeats.count)
         exit(0)
-        #endif
     }
 
     static func run(outDir: URL, sources: [URL]) async {
-        #if DEBUG
-        guard let container else { return }
         active = true
         NSApp.windows.forEach { $0.orderOut(nil) }
         try? FileManager.default.createDirectory(at: outDir, withIntermediateDirectories: true)
-        let context = container.mainContext
+        let library = library
 
         let store = SessionStore()
         // LINEWORK_TRANSPARENCY sets the glass, over a mid-grey that stands in for the blur offscreen.
@@ -50,7 +59,8 @@ enum DebugSnapshots {
         func shoot(_ name: String, size: CGSize, wait: Double = 1.5, scheme: ColorScheme = .light, _ view: some View) async {
             if let only, !only.contains(name) { return }
             // The shell's own store, loaded afresh; views that bring their own store override it.
-            let root = view.modelContainer(container).environment(store).environment(FreehandStore()).environment(\.colorScheme, scheme)
+            app.reloadFreehand()
+            let root = view.environment(app).environment(library).environment(store).environment(app.freehand!).environment(\.colorScheme, scheme)
                 .background(Color(nsColor: .windowBackgroundColor))
             let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: size.width, height: size.height),
                                   styleMask: [.titled, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
@@ -79,7 +89,7 @@ enum DebugSnapshots {
         await shoot("freehand-images", size: large, shell(.section(.freehand)))
         await shoot("freehand-images-dark", size: large, scheme: .dark, shell(.section(.freehand)))
         await shoot("freehand-images-1100", size: small, shell(.section(.freehand)))
-        let selecting = FreehandStore()
+        let selecting = freehandStore()
         selecting.loadIfNeeded()
         selecting.selectedID = selecting.document.items.first(where: { $0.rotation != 0 })?.id
         await shoot("freehand-selected", size: large, ZStack { GlassBackground(); FreehandView().padding(.top, 52) }.ignoresSafeArea().environment(selecting))
@@ -102,18 +112,18 @@ enum DebugSnapshots {
         func noteShot(_ name: String, size: CGSize, scheme: ColorScheme = .light, line: String) async {
             SeaNoteView.debugTiming = SeaNoteTiming(first: .zero, interval: { .seconds(3600) }, visible: .seconds(3600))
             SeaNoteView.debugLine = line
-            await shoot(name, size: size, scheme: scheme, ZStack { GlassBackground(); FreehandView().padding(.top, 52) }.ignoresSafeArea().environment(FreehandStore()))
+            await shoot(name, size: size, scheme: scheme, ZStack { GlassBackground(); FreehandView().padding(.top, 52) }.ignoresSafeArea().environment(freehandStore()))
             SeaNoteView.debugTiming = nil
             SeaNoteView.debugLine = nil
         }
-        await shoot("freehand-bar", size: large, ZStack { GlassBackground(); FreehandView().padding(.top, 52) }.ignoresSafeArea().environment(FreehandStore()))
+        await shoot("freehand-bar", size: large, ZStack { GlassBackground(); FreehandView().padding(.top, 52) }.ignoresSafeArea().environment(freehandStore()))
         await noteShot("freehand-note", size: large, line: "Look at it upside down. Trust me.")
         await noteShot("freehand-note-dark", size: large, scheme: .dark, line: "Look at it upside down. Trust me.")
         await noteShot("freehand-1100", size: small, line: "You've been drawing for 1 hour 10 minutes. That's longer than your usual practice.")
         seedFreehand(sources: sources, greyscale: true)
         // cacheDisplay leaves SwiftUI's .grayscale out, so these go through ImageRenderer. It can't draw
         // AppKit views or run .task, hence the layers without the input view, decoded ahead of time.
-        let grey = FreehandStore()
+        let grey = freehandStore()
         grey.loadIfNeeded()
         for item in grey.document.items {
             _ = await RenderCache.shared.image(for: RenderRequest(url: grey.files.imageURL(item.fileName), rotation: 0, flipped: false,
@@ -141,30 +151,27 @@ enum DebugSnapshots {
         if only?.contains("freehand-checks") ?? true { await freehandChecks(sources: sources); await freehandToolChecks(sources: sources) }
         if ProcessInfo.processInfo.environment["LINEWORK_FREEHAND_ONLY"] != nil { exit(0) }
 
-        let set = ImageSet(name: "Figures")
-        context.insert(set)
-        let result = await ImportService.importURLs(sources, into: context, set: set)
+        let set = library.createSet(name: "Figures")
+        let result = await ImportService.importURLs(sources, into: library, setID: set.id)
         print("imported \(result.imported) skipped \(result.skipped)")
-        let refs = (try? context.fetch(FetchDescriptor<RefImage>(sortBy: [SortDescriptor(\.importedAt)]))) ?? []
+        let refs = library.visiblePhotos.sorted { $0.importedAt < $1.importedAt }
         for ref in refs {
-            print("crop", ref.fileName, ref.noFigureFound, ref.cropRect)
+            print("crop", ref.fileName, ref.noFigureFound, ref.crop)
         }
 
         // Sample history: sessions on scattered days, one benchmark with two attempts.
         let cal = Calendar.current
         for daysAgo in stride(from: 200, through: 0, by: -1) where daysAgo % 3 == 0 || daysAgo < 6 {
-            let start = cal.date(byAdding: .day, value: -daysAgo, to: .now)!
+            let start = cal.date(byAdding: .day, value: -daysAgo, to: PlanClock.now)!
             let seconds = [45, 420, 900, 1500, 3000][daysAgo % 5]
-            context.insert(SessionRecord(id: UUID(), startedAt: start, drawingSeconds: seconds, poseCount: 10, imageIDs: []))
+            library.recordSession(SessionRecord(id: UUID(), startedAt: start, drawingSeconds: seconds, poseCount: 10, photoIDs: []))
         }
         if let bench = refs.first {
-            bench.isBenchmark = true
-            bench.benchmarkMarkedAt = cal.date(byAdding: .day, value: -60, to: .now)
-            let drawing = try? Storage.copyDrawing(Storage.imageURL(fileName: refs.last!.fileName))
-            context.insert(BenchmarkAttempt(image: bench, date: cal.date(byAdding: .day, value: -30, to: .now)!, sessionID: UUID(), drawingFileName: drawing))
-            context.insert(BenchmarkAttempt(image: bench, date: cal.date(byAdding: .day, value: -2, to: .now)!, sessionID: UUID(), drawingFileName: nil))
+            library.toggleBenchmark(bench.id)
+            try? library.addAttempt(photoID: bench.id, sessionID: UUID(), drawing: library.photoURL(refs.last!))
+            try? library.addAttempt(photoID: bench.id, sessionID: UUID(), drawing: nil)
         }
-        try? context.save()
+        library.flush()
 
         await shoot("welcome", size: CGSize(width: 1100, height: 700), ZStack { GlassBackground(); WelcomeView {} }.frame(width: 1100, height: 700))
         let defaults = UserDefaults.standard
@@ -182,14 +189,13 @@ enum DebugSnapshots {
         await shoot("settings", size: CGSize(width: 420, height: 290), LineworkSettingsView())
         await shoot("about", size: CGSize(width: 420, height: 240), AboutView())
 
-        let todayKey = PlanDayKey.key(PlanClock.now, calendar: cal)
-        context.insert(PlanCheck(dayKey: todayKey, blockKey: "warmup"))
+        let todayRef = library.schedule.todayRef(PlanClock.now)
+        library.ensureTick(todayRef, library.schedule.day(for: todayRef).blocks.first?.kind ?? .focus)
         // Ticks on recent days with no sessions behind them, to show them on the heatmap.
         for back in 1...9 where back % 2 == 1 {
-            let key = PlanDayKey.key(cal.date(byAdding: .day, value: -back, to: PlanClock.now)!, calendar: cal)
-            for block in ["warmup", "focus", "check"] { context.insert(PlanCheck(dayKey: key, blockKey: block)) }
+            guard let ref = library.schedule.ref(on: cal.date(byAdding: .day, value: -back, to: PlanClock.now)!) else { continue }
+            for block in library.schedule.day(for: ref).blocks { library.ensureTick(ref, block.kind) }
         }
-        try? context.save()
         await shoot("calendar-today", size: CGSize(width: 1100, height: 900), shell(.section(.calendar)))
         await shoot("today", size: CGSize(width: 1100, height: 760), shell(.section(.today)))
         await shoot("path", size: CGSize(width: 1100, height: 800), wait: 2, shell(.section(.path)))
@@ -199,7 +205,7 @@ enum DebugSnapshots {
         store.pendingCelebration = nil
         await shoot("today-dark", size: CGSize(width: 1100, height: 760), scheme: .dark, shell(.section(.today)))
         await shoot("card-popover", size: CGSize(width: 520, height: 460), scheme: .light,
-                    ScrollView { DayPlanCard(date: PlanClock.now, bordered: false).padding(12) })
+                    ScrollView { DayPlanCard(ref: todayRef, bordered: false).padding(12) })
         await shoot("guide", size: CGSize(width: 640, height: 640), PlanGuideSheet())
         await shoot("library", size: CGSize(width: 1100, height: 700), shell(.section(.library)))
         await shoot("library-dark", size: CGSize(width: 1100, height: 700), scheme: .dark, shell(.section(.library)))
@@ -207,17 +213,17 @@ enum DebugSnapshots {
         await shoot("calendar-dark", size: CGSize(width: 1100, height: 800), scheme: .dark, shell(.section(.calendar)))
         await shoot("progress", size: CGSize(width: 1100, height: 800), shell(.section(.progress)))
         if let ref = refs.first {
-            await shoot("crop-editor", size: CGSize(width: 900, height: 700), wait: 3, CropEditorView(image: ref))
+            await shoot("crop-editor", size: CGSize(width: 900, height: 700), wait: 3, CropEditorView(photo: ref, store: library))
             await shoot("preview", size: CGSize(width: 1000, height: 760), wait: 2.5,
-                        ImagePreviewView(images: refs, startIndex: 0) { _ in })
-            await shoot("attempt", size: CGSize(width: 520, height: 420), AttemptSheet(image: ref, number: 3, sessionID: UUID()) {})
+                        ImagePreviewView(ids: refs.map(\.id), startIndex: 0) { _ in })
+            await shoot("attempt", size: CGSize(width: 520, height: 420), AttemptSheet(photo: ref, number: 3, sessionID: UUID()) {})
         }
         await shoot("setup", size: CGSize(width: 520, height: 640), SessionSetupView())
         defaults.set("Class", forKey: "linework.setup.mode")
         await shoot("setup-class", size: CGSize(width: 520, height: 640), SessionSetupView())
         defaults.removeObject(forKey: "linework.setup.mode")
         // Pretend all but one image were imported earlier, then show the Today source.
-        for ref in refs.dropFirst() { ref.importedAt = cal.date(byAdding: .day, value: -3, to: ref.importedAt)! }
+        for ref in refs.dropFirst() { library.update(ref.id) { $0.importedAt = cal.date(byAdding: .day, value: -3, to: $0.importedAt)! } }
         UserDefaults.standard.set(true, forKey: "linework.setup.today")
         await shoot("setup-today", size: CGSize(width: 520, height: 640), SessionSetupView())
         UserDefaults.standard.removeObject(forKey: "linework.setup.today")
@@ -229,13 +235,11 @@ enum DebugSnapshots {
         await shoot("player-getready", size: CGSize(width: 1200, height: 800), wait: 1.2, scheme: .dark, SessionPlayerView())
         await shoot("player-pose", size: CGSize(width: 1200, height: 800), wait: 5, scheme: .dark, SessionPlayerView())
         exit(0)
-        #endif
     }
 
-    #if DEBUG
     /// Writes a canvas of generated images: one plain, one rotated, one cropped and flipped, one over the clock.
     private static func seedFreehand(sources: [URL], greyscale: Bool = false) {
-        let files = FreehandFiles(root: Storage.freehandDir)
+        let files = FreehandFiles(root: canvasDir)
         let places: [(center: CGPoint, rotation: Double, flipped: Bool, crop: CGRect)] = [
             (CGPoint(x: 220, y: 200), 0, false, CropMath.unit),
             (CGPoint(x: 980, y: 220), 20, false, CropMath.unit),
@@ -244,7 +248,7 @@ enum DebugSnapshots {
         ]
         var items: [FreehandItem] = []
         for (place, source) in zip(places, sources) {
-            guard let size = Storage.orientedPixelSize(source) else { continue }
+            guard let size = ImageFiles.orientedPixelSize(source) else { continue }
             let fileName = "\(UUID().uuidString).\(source.pathExtension.lowercased())"
             try? FileManager.default.copyItem(at: source, to: files.imageURL(fileName))
             let scale = 340 / max(size.width, size.height)
@@ -258,11 +262,11 @@ enum DebugSnapshots {
     /// `LINEWORK_SHOTS=freehand-import`: drops every source on a live canvas and prints how long the import and decodes
     /// took and the longest the main actor went without running. Run under `/usr/bin/time -l` for peak memory.
     private static func freehandImportProbe(sources: [URL], outDir: URL) async {
-        let canvas = FreehandStore()
+        let canvas = freehandStore()
         let size = CGSize(width: 1280, height: 800)
         let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: size.width, height: size.height),
                               styleMask: [.titled, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
-        let host = NSHostingView(rootView: FreehandView().ignoresSafeArea().environment(canvas))
+        let host = NSHostingView(rootView: FreehandView().ignoresSafeArea().environment(canvas).environment(library).environment(app))
         window.contentView = host
         window.orderFrontRegardless()
         try? await Task.sleep(for: .seconds(0.5))
@@ -307,19 +311,19 @@ enum DebugSnapshots {
     private static func freehandChecks(sources: [URL]) async {
         guard sources.count >= 2 else { return print("check FAIL needs two images") }
         func check(_ name: String, _ ok: Bool) { print("check", ok ? "pass" : "FAIL", name) }
-        let files = FreehandFiles(root: Storage.freehandDir)
-        let canvasURL = Storage.freehandDir.appending(path: "canvas.json")
+        let files = FreehandFiles(root: canvasDir)
+        let canvasURL = canvasDir.appending(path: "canvas.json")
         func savedDocument() -> FreehandDocument? {
             (try? Data(contentsOf: canvasURL)).flatMap { try? JSONDecoder().decode(FreehandDocument.self, from: $0) }
         }
         func imageCount() -> Int { ((try? FileManager.default.contentsOfDirectory(atPath: files.imagesDir.path)) ?? []).count }
 
-        let canvas = FreehandStore()
+        let canvas = freehandStore()
         let size = CGSize(width: 1000, height: 700)
         let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: size.width, height: size.height),
                               styleMask: [.titled, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
         window.isMovableByWindowBackground = true
-        let host = NSHostingView(rootView: FreehandView().ignoresSafeArea().environment(canvas))
+        let host = NSHostingView(rootView: FreehandView().ignoresSafeArea().environment(canvas).environment(library).environment(app))
         window.contentView = host
         window.orderFrontRegardless()
         window.makeKey()
@@ -469,7 +473,7 @@ enum DebugSnapshots {
 
         // Failed saves show until one works, and a removal keeps its file until then.
         let attributes: (Int) -> [FileAttributeKey: Any] = { [.posixPermissions: $0] }
-        try? FileManager.default.setAttributes(attributes(0o555), ofItemAtPath: Storage.freehandDir.path)
+        try? FileManager.default.setAttributes(attributes(0o555), ofItemAtPath: canvasDir.path)
         let keptFile = canvas.document.items.last!
         canvas.remove(keptFile.id)
         check("failed save shows", canvas.status != nil)
@@ -477,7 +481,7 @@ enum DebugSnapshots {
         check("failure outlasts the skip note", canvas.status == "Couldn't save your canvas")
         check("removal keeps the file when the save failed",
               FileManager.default.fileExists(atPath: files.imageURL(keptFile.fileName).path))
-        try? FileManager.default.setAttributes(attributes(0o755), ofItemAtPath: Storage.freehandDir.path)
+        try? FileManager.default.setAttributes(attributes(0o755), ofItemAtPath: canvasDir.path)
         canvas.flush()
         check("a later save clears it", canvas.status == nil)
 
@@ -487,12 +491,12 @@ enum DebugSnapshots {
         check("quit flushes the last edit", savedDocument()?.greyscale == true)
 
         // Reloading finds the same canvas, and cleans up the file the failed save left behind.
-        let reloaded = FreehandStore()
+        let reloaded = freehandStore()
         reloaded.loadIfNeeded()
         check("reload matches", reloaded.document == canvas.document)
         check("orphan is gone after a good load", imageCount() == canvas.document.items.count)
         window.orderOut(nil)
         try? FileManager.default.removeItem(at: scratch)
     }
-    #endif
 }
+#endif

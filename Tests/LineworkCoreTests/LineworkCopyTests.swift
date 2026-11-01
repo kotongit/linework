@@ -43,7 +43,6 @@ import Testing
 
     @Test func fixedStrings() {
         #expect(LineworkCopy.restDay == "Rest today. You've earned it.")
-        #expect(LineworkCopy.planStarts == "Your plan starts Monday 2 Nov.")
         #expect(LineworkCopy.emptyLibrary == "Drag your photos here")
         #expect(LineworkCopy.emptyBenchmarks == "Right-click a photo to make it your benchmark.")
         #expect(LineworkCopy.sessionTooShort == "That one was too short to count on your calendar.")

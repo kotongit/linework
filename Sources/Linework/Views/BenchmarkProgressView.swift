@@ -1,12 +1,14 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
 struct BenchmarkProgressView: View {
-    @Query(filter: #Predicate<RefImage> { $0.isBenchmark }, sort: \RefImage.importedAt) private var benchmarks: [RefImage]
-    @Query private var sessions: [SessionRecord]
-    @State private var comparing: BenchmarkAttempt?
+    @Environment(LibraryStore.self) private var library
+    @State private var comparing: AttemptRecord?
+
+    private var benchmarks: [PhotoRecord] {
+        library.visiblePhotos.filter { library.isBenchmark($0.id) }.sorted { $0.importedAt < $1.importedAt }
+    }
 
     var body: some View {
         ScrollView {
@@ -20,7 +22,7 @@ struct BenchmarkProgressView: View {
             } else {
                 LazyVStack(alignment: .leading, spacing: 44) {
                     ForEach(benchmarks) { ref in
-                        BenchmarkRow(ref: ref, sessionDates: sessions.map(\.startedAt)) { comparing = $0 }
+                        BenchmarkRow(ref: ref, sessionDates: library.sessions.map(\.startedAt)) { comparing = $0 }
                     }
                 }
                 .padding(.horizontal, 72)
@@ -34,15 +36,18 @@ struct BenchmarkProgressView: View {
 }
 
 private struct BenchmarkRow: View {
-    @Bindable var ref: RefImage
+    let ref: PhotoRecord
     let sessionDates: [Date]
-    let onCompare: (BenchmarkAttempt) -> Void
-    @Environment(\.modelContext) private var context
-    @State private var attaching: BenchmarkAttempt?
+    let onCompare: (AttemptRecord) -> Void
+    @Environment(LibraryStore.self) private var library
+    @State private var attaching: AttemptRecord?
     @State private var attachFailed = false
 
+    private var record: BenchmarkRecord { library.benchmark(ref.id) ?? BenchmarkRecord(photoID: ref.id, seconds: 120, interval: 10, markedAt: .now) }
+    private var attempts: [AttemptRecord] { library.attempts(of: ref.id) }
+
     private var dueText: String {
-        let left = max(ref.benchmarkInterval, 1) - BenchmarkSchedule.sessionsSince(ref.benchmarkSince, sessionDates: sessionDates)
+        let left = max(record.interval, 1) - BenchmarkSchedule.sessionsSince(library.benchmarkSince(record), sessionDates: sessionDates)
         return left <= 0 ? "Due next session" : "Next in \(left) session\(left == 1 ? "" : "s")"
     }
 
@@ -51,22 +56,24 @@ private struct BenchmarkRow: View {
             HStack(spacing: 24) {
                 Text(dueText).font(Theme.font(20, .medium))
                 Spacer(minLength: 0)
-                Stepper("Duration \(DurationFormat.short(ref.benchmarkSeconds))", value: $ref.benchmarkSeconds, in: 15...1800, step: 15)
+                Stepper("Duration \(DurationFormat.short(record.seconds))",
+                        value: Binding(get: { record.seconds }, set: { library.updateBenchmark(ref.id, seconds: $0) }), in: 15...1800, step: 15)
                     .fixedSize()
-                Stepper("Every \(ref.benchmarkInterval) sessions", value: $ref.benchmarkInterval, in: 1...100)
+                Stepper("Every \(record.interval) sessions",
+                        value: Binding(get: { record.interval }, set: { library.updateBenchmark(ref.id, interval: $0) }), in: 1...100)
                     .fixedSize()
             }
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 16) {
                     VStack(spacing: 6) {
-                        ThumbnailView(ref: ref).frame(width: 150, height: 190)
+                        ThumbnailView(photo: ref, store: library).frame(width: 150, height: 190)
                         Text("Reference").font(Theme.font(12, .semibold))
                     }
                     Rectangle().fill(Theme.hairline).frame(width: 1, height: 190)
-                    if ref.attempts.isEmpty {
+                    if attempts.isEmpty {
                         Text("No attempts yet").foregroundStyle(Theme.muted).frame(height: 190)
                     }
-                    ForEach(ref.sortedAttempts) { attempt in
+                    ForEach(attempts) { attempt in
                         VStack(spacing: 6) {
                             attemptTile(attempt)
                             Text(attempt.date, format: .dateTime.month(.abbreviated).day().year())
@@ -85,10 +92,9 @@ private struct BenchmarkRow: View {
             guard case let .success(url) = result, let attempt = attaching else { return }
             let access = url.startAccessingSecurityScopedResource()
             defer { if access { url.stopAccessingSecurityScopedResource() } }
-            if let fileName = try? Storage.copyDrawing(url) {
-                attempt.drawingFileName = fileName
-                try? context.save()
-            } else {
+            do {
+                try library.attachDrawing(attemptID: attempt.id, from: url)
+            } catch {
                 attachFailed = true
             }
         }
@@ -96,9 +102,9 @@ private struct BenchmarkRow: View {
     }
 
     @ViewBuilder
-    private func attemptTile(_ attempt: BenchmarkAttempt) -> some View {
+    private func attemptTile(_ attempt: AttemptRecord) -> some View {
         if let name = attempt.drawingFileName {
-            DrawingImageView(url: Storage.drawingURL(fileName: name))
+            DrawingImageView(url: library.drawingURL(name))
                 .frame(width: 150, height: 190)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .contentShape(Rectangle())
@@ -121,21 +127,22 @@ private struct BenchmarkRow: View {
 }
 
 private struct ComparisonSheet: View {
-    let attempt: BenchmarkAttempt
+    let attempt: AttemptRecord
+    @Environment(LibraryStore.self) private var library
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 20) {
             HStack(spacing: 24) {
-                if let ref = attempt.image {
+                if let ref = library.photo(attempt.photoID) {
                     VStack(spacing: 10) {
-                        ThumbnailView(ref: ref, maxPixel: 1600)
+                        ThumbnailView(photo: ref, store: library, maxPixel: 1600)
                         Text("Reference").font(Theme.font(14, .semibold))
                     }
                 }
                 if let name = attempt.drawingFileName {
                     VStack(spacing: 10) {
-                        DrawingImageView(url: Storage.drawingURL(fileName: name), maxPixel: 1600)
+                        DrawingImageView(url: library.drawingURL(name), maxPixel: 1600)
                         Text(attempt.date, format: .dateTime.month(.wide).day().year()).font(Theme.font(14, .semibold))
                     }
                 }

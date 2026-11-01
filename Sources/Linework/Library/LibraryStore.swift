@@ -24,6 +24,9 @@ final class LibraryStore {
     private(set) var saveFailure: String?
     private(set) var damagedFiles: [String] = []
     var notice: String?
+    /// While these run, the Finder check waits, so it can't mistake a file mid-import for a new one.
+    var importsRunning = 0
+    var isScanning = false
 
     private enum Part: Hashable { case photos, benchmarks, sets, presets, sessions, checks, plan }
 
@@ -380,7 +383,7 @@ final class LibraryStore {
 
     // MARK: Finder changes
 
-    func applyScan(_ result: PhotoScanResult, added: [PhotoRecord]) {
+    func applyScan(_ result: PhotoScanResult, added: [PhotoRecord], folderExists: Bool) {
         guard !result.folderUnavailable else {
             notice = "Your Photos folder is out of reach, so nothing was changed."
             return

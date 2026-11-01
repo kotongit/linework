@@ -17,7 +17,7 @@ private func makeCalendar(_ zone: String) -> Calendar {
     }
 
     func schedule(_ repeats: [PlanRepeat] = []) -> PlanSchedule {
-        PlanSchedule(plan: plan, repeats: repeats, calendar: cal)
+        PlanSchedule(plan: plan, start: PlanDayKey.date("2026-11-02", calendar: cal)!, repeats: repeats, calendar: cal)
     }
 
     @Test func beforeStart() {
@@ -111,7 +111,7 @@ private func makeCalendar(_ zone: String) -> Calendar {
 
     @Test func dstStable() {
         let ny = makeCalendar("America/New_York")
-        let s = PlanSchedule(plan: plan, repeats: [], calendar: ny)
+        let s = PlanSchedule(plan: plan, start: PlanDayKey.date("2026-11-02", calendar: ny)!, repeats: [], calendar: ny)
         for (y, m, d) in [(2026, 11, 2), (2027, 3, 14), (2027, 3, 15)] {
             let early = date(y, m, d, 0, 30, calendar: ny), late = date(y, m, d, 23, 30, calendar: ny)
             #expect(s.scheduled(on: early) == s.scheduled(on: late), "\(y)-\(m)-\(d)")

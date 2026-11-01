@@ -1,10 +1,9 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 struct SessionPlayerView: View {
     @Environment(SessionStore.self) private var store
-    @Environment(\.modelContext) private var context
+    @Environment(LibraryStore.self) private var library
     @Environment(\.dismissWindow) private var dismissWindow
     @State private var runner: SessionRunner?
     @State private var sessionID = UUID()
@@ -15,10 +14,10 @@ struct SessionPlayerView: View {
     @State private var showHints = true
     @State private var recorded = false
     @State private var saved = false
-    @State private var attemptFor: RefImage?
+    @State private var attemptFor: PhotoRecord?
     @State private var window: NSWindow?
-    /// The session's images, fetched once at start rather than observing the whole library.
-    @State private var imagesByID: [UUID: RefImage] = [:]
+    /// The session's images, taken once at start, so a change in the library can't disturb a running session.
+    @State private var imagesByID: [UUID: PhotoRecord] = [:]
     /// Captured at start, so a later Start can't change which block this session ticks.
     @State private var activeBlock: PlanBlockRef?
     @State private var tickedKind: PlanBlockKind?
@@ -48,7 +47,7 @@ struct SessionPlayerView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in finish() }
         .sheet(item: $attemptFor) { ref in
-            AttemptSheet(image: ref, number: runner?.current?.benchmarkNumber ?? 1, sessionID: sessionID) {
+            AttemptSheet(photo: ref, number: runner?.current?.benchmarkNumber ?? 1, sessionID: sessionID) {
                 attemptFor = nil
                 handle(runner?.attemptHandled() ?? [])
                 focused = true
@@ -198,8 +197,7 @@ struct SessionPlayerView: View {
         keepAwake = ProcessInfo.processInfo.beginActivity(options: [.idleDisplaySleepDisabled, .userInitiated],
                                                           reason: "Timed drawing session")
         let ids = Set(queue.poses.map(\.imageID))
-        let refs = (try? context.fetch(FetchDescriptor<RefImage>(predicate: #Predicate { ids.contains($0.id) }))) ?? []
-        imagesByID = Dictionary(refs.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        imagesByID = Dictionary(library.photos.filter { ids.contains($0.id) }.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         runner = SessionRunner(poses: queue.poses)
         sessionID = UUID()
         startedAt = .now
@@ -287,7 +285,8 @@ struct SessionPlayerView: View {
         let token = store.token
         let maxPixel = screenPixels
         for i in [index, index + 1] where runner.poses.indices.contains(i) && rendered[i] == nil {
-            guard let request = imagesByID[runner.poses[i].imageID]?.renderRequest(maxPixel: maxPixel) else { continue }
+            guard let photo = imagesByID[runner.poses[i].imageID] else { continue }
+            let request = library.renderRequest(photo, maxPixel: maxPixel)
             Task {
                 let image = await RenderCache.shared.image(for: request)
                 // Ignore late results from a previous session or a pose we've moved away from.
@@ -303,9 +302,9 @@ struct SessionPlayerView: View {
     private func tickPlanBlock(_ runner: SessionRunner) {
         guard runner.completedNaturally, let activeBlock else { return }
         tickedKind = activeBlock.kind
-        if PlanStore.ensureChecked(dayKey: activeBlock.dayKey, kind: activeBlock.kind, in: context),
-           let celebration = PlanStore.celebration(dayKey: activeBlock.dayKey, in: context) {
-            store.celebrate(celebration, dayKey: activeBlock.dayKey)
+        if library.ensureTick(activeBlock.ref, activeBlock.kind),
+           let celebration = PlanProgress.celebration(for: activeBlock.ref, ticks: library.tickKeys, schedule: library.schedule) {
+            store.celebrate(celebration, isToday: activeBlock.ref == library.schedule.todayRef(store.today))
         }
     }
 
@@ -320,9 +319,8 @@ struct SessionPlayerView: View {
         tickPlanBlock(runner)
         guard runner.shouldRecord else { return }
         let shown = zip(runner.poses, runner.poseElapsed).filter { $0.1 > 0 }.map(\.0.imageID)
-        context.insert(SessionRecord(id: sessionID, startedAt: startedAt, drawingSeconds: Int(runner.drawingSeconds),
-                                     poseCount: runner.poseElapsed.count { $0 >= 5 }, imageIDs: shown))
-        try? context.save()
+        library.recordSession(SessionRecord(id: sessionID, startedAt: startedAt, drawingSeconds: Int(runner.drawingSeconds),
+                                            poseCount: runner.poseElapsed.count { $0 >= 5 }, photoIDs: shown))
         recorded = true
     }
 

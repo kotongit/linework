@@ -1,11 +1,8 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 struct CalendarHeatmapView: View {
-    @Query private var sessions: [SessionRecord]
-    @Query private var checks: [PlanCheck]
-    @Query private var repeatRecords: [PlanRepeatRecord]
+    @Environment(LibraryStore.self) private var library
     @Environment(SessionStore.self) private var store
     @Environment(\.colorScheme) private var scheme
 
@@ -74,7 +71,7 @@ struct CalendarHeatmapView: View {
     private func square(_ day: Date?, stats: [Date: DaySummary]) -> some View {
         if let day {
             let summary = stats[day] ?? DaySummary()
-            CalendarDaySquare(day: day, cell: cell, tooltip: tooltip(day, summary)) {
+            CalendarDaySquare(ref: library.schedule.ref(on: day), cell: cell, tooltip: tooltip(day, summary)) {
                 tile(level: PracticeCalendar.level(seconds: summary.seconds))
             }
         } else {
@@ -112,7 +109,7 @@ struct CalendarHeatmapView: View {
         var parts: [String] = []
         if summary.sessions > 0 { parts.append("\(summary.sessions) session\(summary.sessions == 1 ? "" : "s")") }
         if summary.seconds > 0 { parts.append(DurationFormat.total(summary.seconds)) }
-        if summary.ticks > 0 { parts.append("\(summary.ticks) of \(summary.blocks) checks") }
+        if summary.ticks > 0 { parts.append("\(summary.ticks) \(summary.ticks == 1 ? "check" : "checks")") }
         return parts.isEmpty ? "\(date): No practice" : "\(date): \(parts.joined(separator: ", "))"
     }
 
@@ -120,19 +117,15 @@ struct CalendarHeatmapView: View {
     private func daySummaries(calendar: Calendar) -> [Date: DaySummary] {
         var sessionSeconds: [Date: Int] = [:]
         var result: [Date: DaySummary] = [:]
-        for (day, stat) in PracticeCalendar.dailyStats(sessions.map { ($0.startedAt, $0.drawingSeconds) }, calendar: calendar) {
+        for (day, stat) in PracticeCalendar.dailyStats(library.sessions.map { ($0.startedAt, $0.drawingSeconds) }, calendar: calendar) {
             sessionSeconds[day] = stat.seconds
             result[day] = DaySummary(seconds: stat.seconds, sessions: stat.sessions)
         }
-        let schedule = PlanStore.schedule(repeatRecords)
-        for (key, checked) in PlanStore.checksByDay(checks) {
-            guard let day = PlanDayKey.date(key, calendar: calendar), let plan = schedule.day(on: day) else { continue }
-            let ticked = plan.blocks.filter { checked.contains($0.kind.rawValue) }
+        for (key, ticked) in PlanProgress.tickSummary(library.ticks, schedule: library.schedule) {
+            guard let day = PlanDayKey.date(key, calendar: calendar) else { continue }
             var summary = result[day] ?? DaySummary()
             summary.ticks = ticked.count
-            summary.blocks = plan.blocks.count
-            summary.seconds = PlanProgress.heatmapSeconds(sessionSeconds: sessionSeconds[day] ?? 0,
-                                                          tickedMinutes: ticked.reduce(0) { $0 + $1.minutes })
+            summary.seconds = PlanProgress.heatmapSeconds(sessionSeconds: sessionSeconds[day] ?? 0, tickedMinutes: ticked.minutes)
             result[day] = summary
         }
         return result
@@ -152,7 +145,8 @@ struct CalendarHeatmapView: View {
 
 /// One day of the heatmap. Clicking it opens that day's card, outlined while it's open.
 private struct CalendarDaySquare<Tile: View>: View {
-    let day: Date
+    /// Nil for days before Week 1.
+    let ref: PlanDayRef?
     let cell: CGFloat
     let tooltip: String
     @ViewBuilder let tile: () -> Tile
@@ -169,10 +163,16 @@ private struct CalendarDaySquare<Tile: View>: View {
         .buttonStyle(.plain)
         .help(tooltip)
         .popover(isPresented: $showing) {
-            ScrollView {
-                DayPlanCard(date: day, bordered: false).padding(12)
+            if let ref {
+                ScrollView {
+                    DayPlanCard(ref: ref, bordered: false).padding(12)
+                }
+                .frame(width: 520, height: 460)
+            } else {
+                Text(LineworkCopy.noLessonThatDay)
+                    .font(Theme.font(14))
+                    .padding(20)
             }
-            .frame(width: 520, height: 460)
         }
     }
 }
@@ -181,5 +181,4 @@ private struct DaySummary {
     var seconds = 0
     var sessions = 0
     var ticks = 0
-    var blocks = 0
 }

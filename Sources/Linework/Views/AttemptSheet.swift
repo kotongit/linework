@@ -1,15 +1,15 @@
-import SwiftData
+import LineworkCore
 import SwiftUI
 import UniformTypeIdentifiers
 
 /// Shown after a benchmark pose; records the attempt with or without a drawing photo.
 struct AttemptSheet: View {
-    let image: RefImage
+    let photo: PhotoRecord
     let number: Int
     let sessionID: UUID
     let onDone: () -> Void
 
-    @Environment(\.modelContext) private var context
+    @Environment(LibraryStore.self) private var library
     @State private var drawingURL: URL?
     @State private var choosing = false
     @State private var targeted = false
@@ -19,7 +19,7 @@ struct AttemptSheet: View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Benchmark #\(number) done").font(Theme.font(26, .medium))
             HStack(spacing: 16) {
-                ThumbnailView(ref: image)
+                ThumbnailView(photo: photo, store: library)
                     .frame(width: 220, height: 280)
                 dropZone
                     .frame(width: 220, height: 280)
@@ -30,9 +30,9 @@ struct AttemptSheet: View {
                 Spacer()
                 Button("Skip") { onDone() }
                     .help("Don’t count this attempt; the benchmark stays due")
-                Button("Later") { record(nil) }
+                Button("Later") { save(nil) }
                     .keyboardShortcut(.cancelAction)
-                Button("Save") { save() }
+                Button("Save") { save(drawingURL) }
                     .buttonStyle(CapsuleButtonStyle(height: 30, filled: true))
                     .keyboardShortcut(.defaultAction)
                     .disabled(drawingURL == nil)
@@ -70,20 +70,14 @@ struct AttemptSheet: View {
         } isTargeted: { targeted = $0 }
     }
 
-    private func save() {
-        guard let drawingURL else { return }
-        let access = drawingURL.startAccessingSecurityScopedResource()
-        defer { if access { drawingURL.stopAccessingSecurityScopedResource() } }
+    private func save(_ drawing: URL?) {
+        let access = drawing?.startAccessingSecurityScopedResource() ?? false
+        defer { if access { drawing?.stopAccessingSecurityScopedResource() } }
         do {
-            record(try Storage.copyDrawing(drawingURL))
+            try library.addAttempt(photoID: photo.id, sessionID: sessionID, drawing: drawing)
+            onDone()
         } catch {
             self.error = "That file couldn’t be read as an image."
         }
-    }
-
-    private func record(_ fileName: String?) {
-        context.insert(BenchmarkAttempt(image: image, sessionID: sessionID, drawingFileName: fileName))
-        try? context.save()
-        onDone()
     }
 }

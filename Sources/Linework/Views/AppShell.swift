@@ -38,7 +38,7 @@ struct AppShell: View {
                 if LineworkCopy.shouldShowWelcome(name: name, welcomed: welcomed) {
                     WelcomeView { }
                 } else {
-                    routed.environment(library)
+                    routed.environment(library).environment(app.freehand!)
                 }
             } else {
                 LibraryChooserView()
@@ -60,10 +60,18 @@ struct AppShell: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             app.library?.reloadIfChanged()
+            app.freehand?.refreshList()
+            scan()
         }
+        .task(id: app.library?.root) { scan() }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)) { _ in
             showingSetup = true
         }
+    }
+
+    private func scan() {
+        guard let library = app.library else { return }
+        Task { await PhotoScanner.run(on: library) }
     }
 
     @ViewBuilder

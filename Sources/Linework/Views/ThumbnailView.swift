@@ -1,3 +1,4 @@
+import LineworkCore
 import SwiftUI
 
 /// Renders a reference image with its orientation and crop applied, off the main thread and through `RenderCache`.
@@ -5,8 +6,8 @@ struct ThumbnailView: View {
     let request: RenderRequest
     @State private var image: CGImage?
 
-    init(ref: RefImage, maxPixel: Int = 400, showCrop: Bool = true) {
-        request = ref.renderRequest(maxPixel: maxPixel, useThumbnail: maxPixel <= 400, showCrop: showCrop)
+    init(photo: PhotoRecord, store: LibraryStore, maxPixel: Int = 400, showCrop: Bool = true) {
+        request = store.renderRequest(photo, maxPixel: maxPixel, useThumbnail: maxPixel <= 400, showCrop: showCrop)
     }
 
     var body: some View {

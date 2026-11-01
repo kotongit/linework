@@ -11,15 +11,6 @@ public enum PlanProgress {
         return done == 0 ? .empty : done == day.blocks.count ? .complete : .partial
     }
 
-    private static func isWeekComplete(_ sequenceIndex: Int, schedule: PlanSchedule, checksByDay: [String: Set<String>], calendar: Calendar) -> Bool {
-        (0..<7).allSatisfy { weekday in
-            let date = schedule.date(sequenceIndex: sequenceIndex, weekday: weekday)
-            guard let day = schedule.day(on: date) else { return false }
-            if day.isRest { return true }
-            return status(of: day, checked: checksByDay[PlanDayKey.key(date, calendar: calendar)] ?? []) == .complete
-        }
-    }
-
     /// Consecutive practice days ending today, or yesterday if today has no practice yet. Sundays never break it.
     public static func currentStreak(practiceDays: Set<Date>, today: Date, calendar: Calendar) -> Int {
         var day = calendar.startOfDay(for: today)
@@ -50,22 +41,6 @@ public enum PlanProgress {
             last = day
         }
         return best
-    }
-
-    /// The biggest thing a date's ticks complete; nil unless that day itself is complete.
-    public static func celebration(on date: Date, schedule: PlanSchedule, checksByDay: [String: Set<String>], calendar: Calendar) -> Celebration? {
-        guard let day = schedule.day(on: date),
-              status(of: day, checked: checksByDay[PlanDayKey.key(date, calendar: calendar)] ?? []) == .complete
-        else { return nil }
-        guard case let .day(sequenceIndex, weekIndex, _, _) = schedule.scheduled(on: date),
-              isWeekComplete(sequenceIndex, schedule: schedule, checksByDay: checksByDay, calendar: calendar)
-        else { return .day }
-        let book = schedule.plan.weeks[weekIndex].book
-        let bookDone = schedule.plan.weeks.indices.filter { schedule.plan.weeks[$0].book == book }.allSatisfy { week in
-            schedule.sequence.indices.contains { schedule.sequence[$0].weekIndex == week
-                && isWeekComplete($0, schedule: schedule, checksByDay: checksByDay, calendar: calendar) }
-        }
-        return bookDone ? .book : .week
     }
 
     public static func heatmapSeconds(sessionSeconds: Int, tickedMinutes: Int) -> Int {
@@ -107,5 +82,31 @@ public enum PlanProgress {
         }
         return days
     }
-}
 
+    /// How much was ticked on each day ticks count toward.
+    public static func tickSummary(_ ticks: [PlanTick], schedule: PlanSchedule) -> [String: (count: Int, minutes: Int)] {
+        var minutes: [String: Int] = [:]
+        for index in schedule.sequence.indices {
+            for weekday in 0..<7 {
+                let ref = PlanDayRef.plan(sequenceIndex: index, weekday: weekday)
+                for block in schedule.day(for: ref).blocks { minutes[schedule.tickKey(ref, block.kind)] = block.minutes }
+            }
+        }
+        var summary: [String: (count: Int, minutes: Int)] = [:]
+        for tick in ticks {
+            var entry = summary[tick.countsOn] ?? (0, 0)
+            entry.count += 1
+            entry.minutes += minutes[tick.key] ?? foreverMinutes(tick.key, schedule: schedule)
+            summary[tick.countsOn] = entry
+        }
+        return summary
+    }
+
+    private static func foreverMinutes(_ key: String, schedule: PlanSchedule) -> Int {
+        // "f-yyyy-MM-dd-kind"
+        let parts = key.split(separator: "-")
+        guard parts.first == "f", parts.count == 5 else { return 0 }
+        let ref = PlanDayRef.forever(day: parts[1...3].joined(separator: "-"))
+        return schedule.day(for: ref).blocks.first { $0.kind.rawValue == parts[4] }?.minutes ?? 0
+    }
+}

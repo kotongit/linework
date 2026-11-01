@@ -1,5 +1,4 @@
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 /// Slim strip at the top of every section: menu mark, section pills, streak and Start Session.
@@ -9,12 +8,10 @@ struct TopBar: View {
     let onStartSession: () -> Void
 
     @Environment(SessionStore.self) private var store
-    @Query private var checks: [PlanCheck]
-    @Query private var sessions: [SessionRecord]
+    @Environment(LibraryStore.self) private var library
 
     private var streak: Int {
-        PlanProgress.currentStreak(practiceDays: PlanStore.practiceDays(checks: checks, sessions: sessions),
-                                   today: store.today, calendar: PlanStore.calendar)
+        PlanProgress.currentStreak(practiceDays: library.practiceDays, today: store.today, calendar: PlanStore.calendar)
     }
 
     var body: some View {

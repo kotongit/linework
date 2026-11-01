@@ -6,7 +6,7 @@ import SwiftUI
 extension DebugSnapshots {
     /// A store on the seeded canvas with the rotated, cropped image selected, for the tool snapshots.
     static func freehandToolStore(tool: FreehandStore.Tool = .none, ringAt: CGPoint? = nil) -> FreehandStore {
-        let store = FreehandStore()
+        let store = freehandStore()
         store.loadIfNeeded()
         store.selectedID = store.document.items.first(where: { $0.flipped && $0.crop != CropMath.unit })?.id
         store.tool = tool
@@ -18,11 +18,11 @@ extension DebugSnapshots {
     static func freehandToolChecks(sources: [URL]) async {
         guard let source = sources.first else { return print("check FAIL needs an image") }
         func check(_ name: String, _ ok: Bool) { print("check", ok ? "pass" : "FAIL", name) }
-        let canvas = FreehandStore()
+        let canvas = freehandStore()
         let size = CGSize(width: 1000, height: 700)
         let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: size.width, height: size.height),
                               styleMask: [.titled, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
-        let host = NSHostingView(rootView: FreehandView().ignoresSafeArea().environment(canvas))
+        let host = NSHostingView(rootView: FreehandView().ignoresSafeArea().environment(canvas).environment(library).environment(app))
         window.contentView = host
         window.orderFrontRegardless()
         window.makeKey()
@@ -303,12 +303,11 @@ extension DebugSnapshots {
     /// The crop sheet doesn't come back after leaving, and on a flipped image it frames what the canvas shows.
     private static func freehandCropSheetChecks(source: URL) async {
         func check(_ name: String, _ ok: Bool) { print("check", ok ? "pass" : "FAIL", name) }
-        guard let container else { return print("check FAIL no container for the crop sheet") }
-        let canvas = FreehandStore()
+        let canvas = freehandStore()
         let section = SectionSwitch()
         let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: 1000, height: 700),
                               styleMask: [.titled, .resizable], backing: .buffered, defer: false)
-        window.contentView = NSHostingView(rootView: SectionHost(section: section, canvas: canvas).modelContainer(container))
+        window.contentView = NSHostingView(rootView: SectionHost(section: section, canvas: canvas).environment(library).environment(app))
         window.orderFrontRegardless()
         try? await Task.sleep(for: .seconds(0.5))
         canvas.clear()
@@ -348,7 +347,7 @@ extension DebugSnapshots {
     /// The floating bar's actions on the store, and the notes' switch, deferral and timing, on a live `SeaNoteView`.
     static func freehandBarChecks(source: URL) async {
         func check(_ name: String, _ ok: Bool) { print("check", ok ? "pass" : "FAIL", name) }
-        let canvas = FreehandStore()
+        let canvas = freehandStore()
         canvas.viewport = CGSize(width: 1000, height: 700)
         canvas.clear()
         await canvas.importFiles([source], at: CGPoint(x: 500, y: 350))
@@ -372,7 +371,6 @@ extension DebugSnapshots {
         canvas.setGreyscale(false)
 
         // Notes: a note shows at once under the injected timing, waits for the ring, and the setting hides it.
-        guard let container = container else { return print("check FAIL no container for the notes") }
         let defaults = UserDefaults.standard
         defaults.set(true, forKey: "linework.notes")
         SeaNoteView.debugShown = nil
@@ -382,7 +380,7 @@ extension DebugSnapshots {
         canvas.ringAt = CGPoint(x: 100, y: 100)
         let window = NSWindow(contentRect: NSRect(x: -10000, y: -10000, width: 600, height: 300),
                               styleMask: [.titled], backing: .buffered, defer: false)
-        window.contentView = NSHostingView(rootView: SeaNoteView(store: canvas).modelContainer(container))
+        window.contentView = NSHostingView(rootView: SeaNoteView(store: canvas).environment(library).environment(app))
         window.orderFrontRegardless()
         try? await Task.sleep(for: .seconds(0.6))
         check("A due note waits while the circular menu is open", SeaNoteView.debugShown == nil)

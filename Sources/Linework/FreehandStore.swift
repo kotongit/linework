@@ -5,8 +5,7 @@ import Observation
 /// Owns the Freehand canvas: the document, its edits, the debounced save and file imports.
 /// All points are in the canvas area's top-left coordinates, in screen points.
 ///
-/// Creating one does no work: SwiftUI may build and discard `@State` initial values, and a discarded
-/// store must not run the orphan cleanup. The live one loads on first appearing, through `loadIfNeeded()`.
+/// One canvas folder is open at a time; the rest wait in `Canvases/`. Loads on first appearing, through `loadIfNeeded()`.
 @MainActor @Observable
 final class FreehandStore {
     enum Tool: Equatable { case none, resize, rotate }
@@ -39,7 +38,11 @@ final class FreehandStore {
     var status: String? { skipNote ?? (saveFailed ? "Couldn't save your canvas" : nil) }
     var isInteracting: Bool { drag != nil }
 
-    @ObservationIgnored let files = FreehandFiles(root: Storage.freehandDir)
+    @ObservationIgnored private(set) var files: FreehandFiles
+    @ObservationIgnored let canvases: CanvasDirectory
+    @ObservationIgnored private let libraryID: UUID
+    private(set) var currentName = ""
+    private(set) var names: [String] = []
 
     private var skipNote: String?
     private var saveFailed = false
@@ -61,10 +64,69 @@ final class FreehandStore {
     /// Below this, a press that wobbles is still a click, not a drag.
     private static let dragThreshold = 3.0
 
+    init(canvases: CanvasDirectory, libraryID: UUID) {
+        self.canvases = canvases
+        self.libraryID = libraryID
+        files = FreehandFiles(root: canvases.canvasesRoot)
+    }
+
+    private var lastOpenKey: String { "linework.canvas.\(libraryID.uuidString)" }
+
+    // MARK: - Canvases
+
+    func refreshList() {
+        names = canvases.list()
+    }
+
+    /// Shows a canvas, saving the current one first.
+    func open(_ name: String) {
+        if isLoaded { flush() }
+        cancelDrag()
+        ringAt = nil
+        tool = .none
+        selectedID = nil
+        cropID = nil
+        currentName = name
+        files = FreehandFiles(root: canvases.url(of: name))
+        document = files.load()
+        UserDefaults.standard.set(name, forKey: lastOpenKey)
+        refreshList()
+    }
+
+    func newCanvas() throws {
+        open(try canvases.create(name: nil))
+    }
+
+    func renameCurrent(to name: String) throws {
+        flush()
+        try canvases.rename(currentName, to: name)
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        currentName = trimmed
+        files = FreehandFiles(root: canvases.url(of: trimmed))
+        UserDefaults.standard.set(trimmed, forKey: lastOpenKey)
+        refreshList()
+    }
+
+    func duplicateCurrent() throws {
+        flush()
+        open(try canvases.duplicate(currentName))
+    }
+
+    /// Moves the current canvas to the Trash, then opens another. A library always has one.
+    func deleteCurrent() throws {
+        isDirty = false
+        saveTask?.cancel()
+        try Trash.move([canvases.url(of: currentName)])
+        open(try canvases.ensureOne())
+    }
+
     func loadIfNeeded() {
         guard !isLoaded else { return }
         isLoaded = true
-        document = files.load()
+        let remembered = UserDefaults.standard.string(forKey: lastOpenKey)
+        let list = canvases.list()
+        let name = remembered.flatMap { list.contains($0) ? $0 : nil } ?? list.first ?? (try? canvases.ensureOne()) ?? "Untitled"
+        open(name)
         // No queue: runs before the app exits, rather than being scheduled for a turn that may not come.
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil,
                                                queue: nil) { [weak self] _ in
@@ -329,12 +391,20 @@ final class FreehandStore {
         defer { scoped.forEach { $0.stopAccessingSecurityScopedResource() } }
 
         let files = files
+        // Names are settled here, so two files can't claim one.
+        var taken = Set((try? FileManager.default.contentsOfDirectory(atPath: files.imagesDir.path)) ?? [])
+        let targets = urls.map { url -> String in
+            let name = PhotoScan.uniqueName(url.lastPathComponent, taken: taken)
+            taken.insert(name)
+            return name
+        }
         var copied = [Copied?](repeating: nil, count: urls.count)
         await withTaskGroup(of: (Int, Copied?).self) { group in
             var pending = urls.enumerated().makeIterator()
             func addNext() {
                 guard let (index, url) = pending.next() else { return }
-                group.addTask { (index, await Self.copyIn(url, files: files)) }
+                let target = targets[index]
+                group.addTask { (index, await Self.copyIn(url, as: target, files: files)) }
             }
             for _ in 0..<Self.maxConcurrentImports { addNext() }
             for await (index, result) in group {
@@ -379,10 +449,8 @@ final class FreehandStore {
 
     /// Reads only the file's header for its size, so a very large image isn't decoded here.
     @concurrent
-    private nonisolated static func copyIn(_ url: URL, files: FreehandFiles) async -> Copied? {
-        guard url.isFileURL, Storage.isReadableImage(url), let size = Storage.orientedPixelSize(url) else { return nil }
-        let ext = url.pathExtension.isEmpty ? "img" : url.pathExtension.lowercased()
-        let fileName = "\(UUID().uuidString).\(ext)"
+    private nonisolated static func copyIn(_ url: URL, as fileName: String, files: FreehandFiles) async -> Copied? {
+        guard url.isFileURL, ImageFiles.isReadableImage(url), let size = ImageFiles.orientedPixelSize(url) else { return nil }
         do {
             try FileManager.default.copyItem(at: url, to: files.imageURL(fileName))
         } catch {

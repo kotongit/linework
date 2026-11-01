@@ -1,6 +1,5 @@
 import AppKit
 import LineworkCore
-import SwiftData
 import SwiftUI
 
 /// How long the notes wait. `live` is the real timing; a debug build can inject shorter ones.
@@ -26,7 +25,7 @@ struct SeaNoteView: View {
 
     @AppStorage("linework.notes") private var enabled = true
     @AppStorage("linework.name") private var name = ""
-    @Query private var sessions: [SessionRecord]
+    @Environment(LibraryStore.self) private var library
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown: String?
     @State private var restarts = 0
@@ -55,7 +54,7 @@ struct SeaNoteView: View {
             }
         }
         .allowsHitTesting(false)
-        .onChange(of: sessions.map(\.drawingSeconds), initial: true) { _, seconds in
+        .onChange(of: library.sessions.map(\.drawingSeconds), initial: true) { _, seconds in
             usual = SeaNotes.usualSeconds(sessionSeconds: seconds)
         }
         // Sleep ends the visit and hides the note; waking starts a new one.

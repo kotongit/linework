@@ -1,0 +1,53 @@
+{
+  "items" : [
+    {
+      "crop" : {
+        "height" : 1,
+        "width" : 0.5,
+        "x" : 0.1,
+        "y" : 0.30000000000000004
+      },
+      "fileName" : "pose one.png",
+      "flipped" : true,
+      "id" : "00000000-AAAA-4BBB-8CCC-000000000010",
+      "importedAt" : "2026-11-02T12:00:00Z",
+      "missing" : false,
+      "noFigureFound" : false,
+      "rotation" : 90,
+      "sha256" : "761523e5d2ef1e871b506467348fa22c24d9bf3d7466f7138712b15c5d9310bb"
+    },
+    {
+      "crop" : {
+        "height" : 1,
+        "width" : 1,
+        "x" : 0,
+        "y" : 0
+      },
+      "fileName" : "pose-two.png",
+      "flipped" : false,
+      "id" : "00000000-AAAA-4BBB-8CCC-000000000011",
+      "importedAt" : "2026-11-02T12:00:00Z",
+      "missing" : false,
+      "noFigureFound" : true,
+      "rotation" : 0,
+      "sha256" : "761523e5d2ef1e871b506467348fa22c24d9bf3d7466f7138712b15c5d9310bb"
+    },
+    {
+      "crop" : {
+        "height" : 0.333333333333,
+        "width" : 0.0625,
+        "x" : 0.25,
+        "y" : 0.125
+      },
+      "fileName" : "gone/é 日本.jpg",
+      "flipped" : false,
+      "id" : "00000000-AAAA-4BBB-8CCC-000000000012",
+      "importedAt" : "2026-11-02T12:00:00Z",
+      "missing" : true,
+      "noFigureFound" : false,
+      "rotation" : 270,
+      "sha256" : "abc"
+    }
+  ],
+  "version" : 1
+}

@@ -1,0 +1,3 @@
+# Compared byte for byte by the tests on every system.
+shared/fixtures/** -text
+windows/Linework.Core/Plan/plan.json -text

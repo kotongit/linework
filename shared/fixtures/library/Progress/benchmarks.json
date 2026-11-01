@@ -1,0 +1,28 @@
+{
+  "items" : {
+    "attempts" : [
+      {
+        "date" : "2026-11-02T12:00:00Z",
+        "drawingFileName" : "attempt.png",
+        "id" : "00000000-AAAA-4BBB-8CCC-000000000020",
+        "photoID" : "00000000-AAAA-4BBB-8CCC-000000000010",
+        "sessionID" : "00000000-AAAA-4BBB-8CCC-000000000030"
+      },
+      {
+        "date" : "2026-11-02T12:00:00Z",
+        "id" : "00000000-AAAA-4BBB-8CCC-000000000021",
+        "photoID" : "00000000-AAAA-4BBB-8CCC-000000000010",
+        "sessionID" : "00000000-AAAA-4BBB-8CCC-000000000030"
+      }
+    ],
+    "benchmarks" : [
+      {
+        "interval" : 10,
+        "markedAt" : "2026-11-02T12:00:00Z",
+        "photoID" : "00000000-AAAA-4BBB-8CCC-000000000010",
+        "seconds" : 120
+      }
+    ]
+  },
+  "version" : 1
+}

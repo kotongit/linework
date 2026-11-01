@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Linework.Core</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plan/plan.json" LogicalName="plan.json" />
+    <InternalsVisibleTo Include="Linework.Core.Tests" />
+  </ItemGroup>
+</Project>

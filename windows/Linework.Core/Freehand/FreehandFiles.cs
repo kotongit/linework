@@ -31,7 +31,8 @@ public sealed class FreehandFiles(string root)
         Directory.CreateDirectory(ImagesDir);
     }
 
-    public string ImagePath(string fileName) => Path.Combine(ImagesDir, fileName);
+    /// <summary>Where the image is, in whichever Unicode form a Mac stored its name.</summary>
+    public string ImagePath(string fileName) => PhotoScan.PathOnDisk(ImagesDir, fileName);
 
     public bool HasDamagedFile => File.Exists(DamagedPath);
 
@@ -62,7 +63,7 @@ public sealed class FreehandFiles(string root)
             return FreehandDocument.Empty;
         }
         var items = doc.Items.Where(i => File.Exists(ImagePath(i.FileName))).ToList();
-        if (!HasDamagedFile) RemoveOrphans(items.Select(i => i.FileName).ToHashSet());
+        if (!HasDamagedFile) RemoveOrphans(items.Select(i => PhotoScan.Comparable(i.FileName)).ToHashSet());
         return doc with { Camera = doc.Camera.Sanitized, Items = items };
     }
 
@@ -99,6 +100,6 @@ public sealed class FreehandFiles(string root)
     {
         if (!Directory.Exists(ImagesDir)) return;
         foreach (var path in Directory.EnumerateFileSystemEntries(ImagesDir))
-            if (!used.Contains(Path.GetFileName(path))) RemoveImage(Path.GetFileName(path));
+            if (!used.Contains(PhotoScan.Comparable(Path.GetFileName(path)))) RemoveImage(Path.GetFileName(path));
     }
 }

@@ -117,6 +117,18 @@ public class FreehandFilesTests
     }
 
     [Fact]
+    public void NfdImageOnDiskKeepsItsItem()
+    {
+        var (_, files) = Temp();
+        File.WriteAllBytes(Path.Combine(files.ImagesDir, "Jose\u0301.png"), [1]);
+        var item = new FreehandItem(Guid.NewGuid(), "Jos\u00E9.png", default, new Size2(100, 50));
+        files.Save(new FreehandDocument(Items: [item]));
+        Assert.Equal([item], files.Load().Items);
+        Assert.Single(Directory.GetFiles(files.ImagesDir));
+        Assert.Equal([1], File.ReadAllBytes(files.ImagePath(item.FileName)));
+    }
+
+    [Fact]
     public void RemovingOneOfTwoCopiesKeepsTheOther()
     {
         var (_, files) = Temp();

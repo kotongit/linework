@@ -65,6 +65,12 @@ public enum PhotoScan {
         return result
     }
 
+    /// False if a set or benchmark points at a photo with no record, which means the records were lost.
+    /// Adding files then would give them new identities and strand everything that points at the old ones.
+    public static func recordsLookComplete(records: [PhotoRecord], referenced: Set<UUID>) -> Bool {
+        referenced.isSubset(of: Set(records.map(\.id)))
+    }
+
     /// `wanted`, or "name 2.ext" and so on if it's taken. Compared the way the disk compares names.
     public static func uniqueName(_ wanted: String, taken: Set<String>) -> String {
         let used = Set(taken.map(comparable))

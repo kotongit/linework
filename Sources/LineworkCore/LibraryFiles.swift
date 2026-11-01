@@ -2,6 +2,8 @@ import Foundation
 
 public enum LibraryError: Error, Equatable {
     case newerFormat(file: String)
+    /// It's there but can't be read: an undownloaded file while offline, a disk error, a permission problem.
+    case unreadable(file: String)
     /// The library's folder isn't there, for example on an unplugged drive.
     case unavailable
 }
@@ -56,6 +58,14 @@ public struct LibraryFiles: Sendable {
         return decoder
     }
 
+    /// Beside `url`, with "damaged" in its name. Never one that's already there, so nothing set aside gets replaced.
+    public static func freeAsideURL(for url: URL) -> URL {
+        let folder = url.deletingLastPathComponent()
+        let stem = url.deletingPathExtension().lastPathComponent
+        let taken = Set((try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? [])
+        return folder.appending(path: PhotoScan.uniqueName("\(stem).damaged.json", taken: taken))
+    }
+
     private var progress: URL { root.appending(path: "Progress", directoryHint: .isDirectory) }
 
     public func url<T>(of file: LibraryFile<T>) -> URL { progress.appending(path: file.name) }
@@ -67,14 +77,13 @@ public struct LibraryFiles: Sendable {
     public func read<T>(_ file: LibraryFile<T>) throws -> LoadResult<T> {
         let url = url(of: file)
         guard FileManager.default.fileExists(atPath: url.path) else { return .missing }
-        guard let data = try? Data(contentsOf: url) else { return .missing }
+        guard let data = try? Data(contentsOf: url) else { throw LibraryError.unreadable(file: file.name) }
         let decoder = Self.decoder
         if let version = try? decoder.decode(VersionOnly.self, from: data).version, version > Self.currentVersion {
             throw LibraryError.newerFormat(file: file.name)
         }
         if let envelope = try? decoder.decode(Envelope<T>.self, from: data) { return .loaded(envelope.items) }
-        let aside = url.deletingPathExtension().appendingPathExtension("damaged.json")
-        try? FileManager.default.removeItem(at: aside)
+        let aside = LibraryFiles.freeAsideURL(for: url)
         try FileManager.default.moveItem(at: url, to: aside)
         return .damaged(setAsideAs: aside)
     }

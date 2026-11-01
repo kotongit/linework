@@ -23,11 +23,11 @@ public struct FreehandFiles: Sendable {
     private var canvasURL: URL { root.appendingPathComponent("canvas.json") }
     private var damagedURL: URL { root.appendingPathComponent("canvas.damaged.json") }
 
-    /// `Images/`, created on demand.
-    public var imagesDir: URL {
-        let url = root.appendingPathComponent("Images", isDirectory: true)
-        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-        return url
+    public var imagesDir: URL { root.appendingPathComponent("Images", isDirectory: true) }
+
+    /// Makes `Images/` if needed. Fails if the canvas has gone, rather than recreating it.
+    public func prepareImagesDir() throws {
+        try FileManager.default.createDirectory(at: imagesDir, withIntermediateDirectories: false)
     }
 
     public func imageURL(_ fileName: String) -> URL {
@@ -62,7 +62,10 @@ public struct FreehandFiles: Sendable {
 
     /// Atomic write of `canvas.json`.
     public func save(_ doc: FreehandDocument) throws {
-        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        // No intermediates: if the library has gone, this fails rather than making a new one.
+        if !FileManager.default.fileExists(atPath: root.path) {
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        }
         let data = try JSONEncoder().encode(doc)
         try data.write(to: canvasURL, options: .atomic)
     }
@@ -73,9 +76,8 @@ public struct FreehandFiles: Sendable {
 
     private func setAsideCanvas() {
         let fm = FileManager.default
-        try? fm.removeItem(at: damagedURL)
         do {
-            try fm.moveItem(at: canvasURL, to: damagedURL)
+            try fm.moveItem(at: canvasURL, to: LibraryFiles.freeAsideURL(for: canvasURL))
         } catch {
             // Could not keep the bad file: leave it where it is rather than lose it.
         }

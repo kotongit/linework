@@ -14,7 +14,9 @@ enum ImportService {
         defer { store.importsRunning -= 1 }
 
         // Names are settled here, before any copying starts, so two files can't claim one.
+        // A missing photo keeps its name, so restoring its file can't land on a different picture.
         var taken = Set((try? FileManager.default.contentsOfDirectory(atPath: store.photosDir.path)) ?? [])
+        taken.formUnion(store.photos.map(\.fileName))
         var jobs: [(source: URL, target: URL)] = []
         for url in urls {
             let name = PhotoScan.uniqueName(url.lastPathComponent, taken: taken)

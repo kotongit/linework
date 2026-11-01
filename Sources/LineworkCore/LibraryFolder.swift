@@ -38,7 +38,10 @@ public enum LibraryFolder {
                 try fm.createDirectory(at: folder, withIntermediateDirectories: true)
                 if !existed { made.append(folder) }
             }
-            try LibraryFiles(root: url).write(PlanRecord(weekOneStart: weekOneStart), to: .plan)
+            let files = LibraryFiles(root: url)
+            if !FileManager.default.fileExists(atPath: files.url(of: .plan).path) {
+                try files.write(PlanRecord(weekOneStart: weekOneStart), to: .plan)
+            }
             let manifest = try LibraryFiles.encoder.encode(LibraryManifest(createdAt: now))
             try manifest.write(to: url.appending(path: manifestName), options: .atomic)
         } catch {

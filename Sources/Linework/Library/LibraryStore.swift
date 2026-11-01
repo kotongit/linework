@@ -23,7 +23,19 @@ final class LibraryStore {
     /// A save that failed, for the user to see. Clears when a save succeeds.
     private(set) var saveFailure: String?
     private(set) var damagedFiles: [String] = []
-    var notice: String?
+    /// A passing message. Clears itself, so an old one can't hide a newer problem.
+    var notice: String? {
+        didSet {
+            noticeTask?.cancel()
+            guard notice != nil else { return }
+            noticeTask = Task { [weak self] in
+                try? await Task.sleep(for: .seconds(Self.noticeSeconds))
+                guard !Task.isCancelled else { return }
+                self?.notice = nil
+            }
+        }
+    }
+    static let noticeSeconds = 8.0
     /// While these run, the Finder check waits, so it can't mistake a file mid-import for a new one.
     var importsRunning = 0
     var isScanning = false
@@ -33,6 +45,8 @@ final class LibraryStore {
     @ObservationIgnored private var dirty: Set<Part> = []
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var loadedDates: [Part: Date] = [:]
+    @ObservationIgnored private var noticeTask: Task<Void, Never>?
+    @ObservationIgnored private var isReloading = false
 
     private static let saveDelay: Duration = .milliseconds(500)
     private static let defaultPreset = "Default class"
@@ -65,7 +79,9 @@ final class LibraryStore {
         case .missing: return fallback
         case let .loaded(value): return value
         case .damaged:
-            damagedFiles.append(file.name)
+            if !damagedFiles.contains(file.name) { damagedFiles.append(file.name) }
+            // What's in memory is good, so a reload keeps it rather than taking the fallback.
+            if isReloading { throw LibraryError.unreadable(file: file.name) }
             return fallback
         }
     }
@@ -103,6 +119,8 @@ final class LibraryStore {
             plan = try value(.plan, default: plan)
             schedule = Self.makeSchedule(plan, calendar: calendar)
             loadedDates[part] = files.modificationDate(of: .plan)
+            // Without a saved start, Week 1 would drift to the current week on every launch.
+            if loadedDates[part] == nil { markDirty(.plan) }
         }
     }
 
@@ -122,7 +140,17 @@ final class LibraryStore {
     func reloadIfChanged() {
         for part in [Part.photos, .benchmarks, .sets, .presets, .sessions, .checks, .plan] where !dirty.contains(part) {
             guard let onDisk = diskDate(part), onDisk != loadedDates[part] else { continue }
-            try? load(part)
+            isReloading = true
+            do {
+                try load(part)
+            } catch LibraryError.unreadable where diskDate(part) == nil {
+                // The damaged file was set aside, so what's in memory goes back in its place.
+                markDirty(part)
+            } catch {
+                // Out of reach or from a newer app: leave the file and memory alone.
+                loadedDates[part] = onDisk
+            }
+            isReloading = false
         }
     }
 
@@ -138,9 +166,12 @@ final class LibraryStore {
         }
     }
 
-    func flush() {
+    /// Returns false if anything couldn't be saved.
+    @discardableResult
+    func flush() -> Bool {
         saveTask?.cancel()
         for part in dirty { save(part) }
+        return dirty.isEmpty
     }
 
     private func save(_ part: Part) {
@@ -202,6 +233,11 @@ final class LibraryStore {
         save(.checks)
     }
 
+    /// Dates map to lessons in the local time zone, so a change has to reach the schedule.
+    func refreshCalendar() {
+        if schedule.calendar.timeZone != calendar.timeZone { schedule = Self.makeSchedule(plan, calendar: calendar) }
+    }
+
     var practiceDays: Set<Date> {
         PlanProgress.practiceDays(ticks: ticks, sessionDays: sessions.map(\.startedAt), calendar: calendar)
     }
@@ -220,7 +256,7 @@ final class LibraryStore {
     func undoLastRepeat() {
         guard let last = plan.repeats.popLast() else { return }
         let suffix = "-r\(last.number)"
-        ticks.removeAll { $0.key.hasSuffix(suffix) }
+        ticks.removeAll { $0.key.hasSuffix(suffix) || $0.key.contains("\(suffix)c") }
         tickKeys = Set(ticks.map(\.key))
         schedule = Self.makeSchedule(plan, calendar: calendar)
         dirty.formUnion([.plan, .checks])
@@ -260,7 +296,8 @@ final class LibraryStore {
     func deletePhoto(_ id: UUID) {
         guard let record = photo(id) else { return }
         let attempts = benchmarkData.attempts.filter { $0.photoID == id }
-        let urls = [photoURL(record)] + attempts.compactMap { $0.drawingFileName.map(drawingURL) }
+        // The photo goes last, so a failure part-way can't leave its record without a file.
+        let urls = attempts.compactMap { $0.drawingFileName.map(drawingURL) } + [photoURL(record)]
         do {
             try Trash.move(urls)
         } catch {
@@ -346,7 +383,10 @@ final class LibraryStore {
         guard ImageFiles.isReadableImage(source) else { throw StorageError.unreadableImage }
         let existing = Set((try? FileManager.default.contentsOfDirectory(atPath: drawingsDir.path)) ?? [])
         let name = PhotoScan.uniqueName(source.lastPathComponent, taken: existing)
-        try FileManager.default.createDirectory(at: drawingsDir, withIntermediateDirectories: true)
+        // No intermediates: if the library has gone, this fails rather than making a new one.
+        if !FileManager.default.fileExists(atPath: drawingsDir.path) {
+            try FileManager.default.createDirectory(at: drawingsDir, withIntermediateDirectories: false)
+        }
         try FileManager.default.copyItem(at: source, to: drawingURL(name))
         return name
     }
@@ -383,7 +423,13 @@ final class LibraryStore {
 
     // MARK: Finder changes
 
-    func applyScan(_ result: PhotoScanResult, added: [PhotoRecord], folderExists: Bool) {
+    /// False if the photo records can't be trusted, in which case the Finder check must wait.
+    var photoRecordsLookComplete: Bool {
+        let referenced = Set(sets.flatMap(\.photoIDs) + benchmarkData.benchmarks.map(\.photoID) + benchmarkData.attempts.map(\.photoID))
+        return !damagedFiles.contains(LibraryFile.photos.name) && PhotoScan.recordsLookComplete(records: photos, referenced: referenced)
+    }
+
+    func applyScan(_ result: PhotoScanResult, added: [PhotoRecord]) {
         guard !result.folderUnavailable else {
             notice = "Your Photos folder is out of reach, so nothing was changed."
             return

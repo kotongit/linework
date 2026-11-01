@@ -8,7 +8,9 @@ private func withTempRoot(_ body: (URL, FreehandFiles) throws -> Void) throws {
         .appendingPathComponent("freehand-files-\(UUID().uuidString)", isDirectory: true)
     try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: root) }
-    try body(root, FreehandFiles(root: root))
+    let files = FreehandFiles(root: root)
+    try files.prepareImagesDir()
+    try body(root, files)
 }
 
 private func makeItem(_ files: FreehandFiles, name: String = "\(UUID().uuidString).png",
@@ -65,12 +67,13 @@ private func exists(_ url: URL) -> Bool { FileManager.default.fileExists(atPath:
         }
     }
 
-    @Test func damagedReplacesEarlierDamaged() throws {
+    @Test func damagedKeepsEarlierDamaged() throws {
         try withTempRoot { root, files in
             try Data("first".utf8).write(to: root.appendingPathComponent("canvas.damaged.json"))
             try Data("second".utf8).write(to: root.appendingPathComponent("canvas.json"))
             #expect(files.load() == .empty)
-            #expect(try Data(contentsOf: root.appendingPathComponent("canvas.damaged.json")) == Data("second".utf8))
+            #expect(try Data(contentsOf: root.appendingPathComponent("canvas.damaged.json")) == Data("first".utf8))
+            #expect(try Data(contentsOf: root.appendingPathComponent("canvas.damaged 2.json")) == Data("second".utf8))
         }
     }
 
@@ -152,5 +155,29 @@ private func exists(_ url: URL) -> Bool { FileManager.default.fileExists(atPath:
             #expect(FreehandCamera(offset: .zero, zoom: .infinity).sanitized == .home)
             #expect(FreehandCamera(offset: CGPoint(x: 0, y: -.infinity), zoom: 2).sanitized == .home)
         }
+    }
+
+    @Test func askingForTheImagesPathCreatesNothing() {
+        let root = FileManager.default.temporaryDirectory.appending(path: "gone-\(UUID().uuidString)")
+        _ = FreehandFiles(root: root.appending(path: "Canvases/A")).imagesDir
+        #expect(!FileManager.default.fileExists(atPath: root.path))
+    }
+
+    @Test func savingCantRecreateAMissingLibrary() {
+        let root = FileManager.default.temporaryDirectory.appending(path: "gone-\(UUID().uuidString)")
+        #expect(throws: (any Error).self) { try FreehandFiles(root: root.appending(path: "Canvases/A")).save(.empty) }
+        #expect(!FileManager.default.fileExists(atPath: root.path))
+    }
+
+    @Test func aSecondDamagedCanvasDoesNotReplaceTheFirst() throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: "dm-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        let files = FreehandFiles(root: root)
+        try Data("first".utf8).write(to: root.appending(path: "canvas.json"))
+        _ = files.load()
+        try Data("second".utf8).write(to: root.appending(path: "canvas.json"))
+        _ = files.load()
+        #expect(try Data(contentsOf: root.appending(path: "canvas.damaged.json")) == Data("first".utf8))
+        #expect(try Data(contentsOf: root.appending(path: "canvas.damaged 2.json")) == Data("second".utf8))
     }
 }

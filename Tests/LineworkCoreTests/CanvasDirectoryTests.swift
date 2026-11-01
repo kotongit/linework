@@ -83,4 +83,11 @@ import Testing
         #expect(throws: CanvasNameError.duplicate) { try d.rename("B", to: "a") }
         #expect(d.list() == ["A", "B"])
     }
+
+    @Test func createFailsRatherThanRecreatingAMissingLibrary() throws {
+        let root = fm.temporaryDirectory.appending(path: "gone-\(UUID().uuidString)")
+        let d = CanvasDirectory(canvasesRoot: root.appending(path: "Canvases"))
+        #expect(throws: (any Error).self) { _ = try d.create(name: "A") }
+        #expect(!fm.fileExists(atPath: root.path))
+    }
 }

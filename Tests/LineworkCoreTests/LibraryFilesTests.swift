@@ -95,4 +95,26 @@ import Testing
         #expect(throws: LibraryError.unavailable) { try LibraryFiles(root: root).write([photo()], to: .photos) }
         #expect(!FileManager.default.fileExists(atPath: root.path))
     }
+
+    @Test func unreadableFileThrowsAndIsLeftAlone() throws {
+        let root = tempRoot()
+        let url = root.appending(path: "Progress/checks.json")
+        try Data(#"{"version":1,"items":[]}"#.utf8).write(to: url)
+        try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: url.path)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: url.path) }
+        #expect(throws: LibraryError.unreadable(file: "checks.json")) { try LibraryFiles(root: root).read(.checks) }
+        #expect(FileManager.default.fileExists(atPath: url.path))
+    }
+
+    @Test func aSecondDamagedFileDoesNotReplaceTheFirst() throws {
+        let root = tempRoot()
+        let url = root.appending(path: "Progress/checks.json")
+        let files = LibraryFiles(root: root)
+        try Data("first".utf8).write(to: url)
+        _ = try files.read(.checks)
+        try Data("second".utf8).write(to: url)
+        guard case let .damaged(aside) = try files.read(.checks) else { Issue.record("expected damaged"); return }
+        #expect(try Data(contentsOf: root.appending(path: "Progress/checks.damaged.json")) == Data("first".utf8))
+        #expect(try Data(contentsOf: aside) == Data("second".utf8))
+    }
 }

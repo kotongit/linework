@@ -80,7 +80,7 @@ final class FreehandStore {
 
     /// Shows a canvas, saving the current one first.
     func open(_ name: String) {
-        if isLoaded { flush() }
+        guard name != currentName, flush() else { return }
         cancelDrag()
         ringAt = nil
         tool = .none
@@ -98,7 +98,7 @@ final class FreehandStore {
     }
 
     func renameCurrent(to name: String) throws {
-        flush()
+        guard flush() else { throw LibraryError.unavailable }
         try canvases.rename(currentName, to: name)
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         currentName = trimmed
@@ -108,15 +108,17 @@ final class FreehandStore {
     }
 
     func duplicateCurrent() throws {
-        flush()
+        guard flush() else { throw LibraryError.unavailable }
         open(try canvases.duplicate(currentName))
     }
 
     /// Moves the current canvas to the Trash, then opens another. A library always has one.
     func deleteCurrent() throws {
+        try Trash.move([canvases.url(of: currentName)])
+        // It's gone, so nothing is left to save. A name it can't reopen forces the load below.
         isDirty = false
         saveTask?.cancel()
-        try Trash.move([canvases.url(of: currentName)])
+        currentName = ""
         open(try canvases.ensureOne())
     }
 
@@ -348,9 +350,11 @@ final class FreehandStore {
 
     // MARK: - Saving
 
-    func flush() {
-        guard isDirty else { return }
-        saveNow()
+    /// Returns false if the canvas couldn't be saved.
+    @discardableResult
+    func flush() -> Bool {
+        guard isDirty else { return true }
+        return saveNow()
     }
 
     private func scheduleSave() {
@@ -391,6 +395,8 @@ final class FreehandStore {
         defer { scoped.forEach { $0.stopAccessingSecurityScopedResource() } }
 
         let files = files
+        let startedIn = currentName
+        try? files.prepareImagesDir()
         // Names are settled here, so two files can't claim one.
         var taken = Set((try? FileManager.default.contentsOfDirectory(atPath: files.imagesDir.path)) ?? [])
         let targets = urls.map { url -> String in
@@ -411,6 +417,11 @@ final class FreehandStore {
                 copied[index] = result
                 addNext()
             }
+        }
+        // The canvas changed while copying. Its document is no longer the one these belong to.
+        guard currentName == startedIn else {
+            for copy in copied.compactMap({ $0 }) { files.removeImage(copy.fileName) }
+            return
         }
         place(copied.compactMap { $0 }, at: point)
         noteSkipped(urls.count - copied.compactMap { $0 }.count)

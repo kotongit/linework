@@ -6,18 +6,22 @@ import LineworkCore
 enum PhotoScanner {
     static func run(on store: LibraryStore) async {
         guard store.importsRunning == 0, !store.isScanning else { return }
+        guard store.photoRecordsLookComplete else {
+            store.notice = "Your photo records couldn't be read, so Linework isn't changing anything in Photos."
+            return
+        }
         store.isScanning = true
         defer { store.isScanning = false }
         let folder = store.photosDir
         let records = store.photos
-        let (result, exists) = await decide(records: records, folder: folder)
+        let result = await decide(records: records, folder: folder)
         guard store.importsRunning == 0 else { return }
         let added = await ImportService.records(forExisting: result.added.map { folder.appending(path: $0) })
-        store.applyScan(result, added: added, folderExists: exists)
+        store.applyScan(result, added: added)
     }
 
     @concurrent
-    private nonisolated static func decide(records: [PhotoRecord], folder: URL) async -> (PhotoScanResult, Bool) {
+    private nonisolated static func decide(records: [PhotoRecord], folder: URL) async -> PhotoScanResult {
         let keys: Set<URLResourceKey> = [.fileSizeKey, .ubiquitousItemDownloadingStatusKey]
         let exists = FileManager.default.fileExists(atPath: folder.path)
         let urls = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: Array(keys))) ?? []
@@ -26,9 +30,8 @@ enum PhotoScanner {
             let status = values?.ubiquitousItemDownloadingStatus
             return ScannedFile(name: url.lastPathComponent, size: values?.fileSize ?? 0, isPlaceholder: status == .notDownloaded)
         }
-        let result = PhotoScan.decide(records: records, files: files, folderExists: exists) { name in
+        return PhotoScan.decide(records: records, files: files, folderExists: exists) { name in
             try FileHash.sha256(of: folder.appending(path: name))
         }
-        return (result, exists)
     }
 }

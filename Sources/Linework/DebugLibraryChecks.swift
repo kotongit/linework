@@ -75,7 +75,122 @@ enum DebugLibraryChecks {
         ticking(store)
         await sessions(store)
         canvases(store)
+        await reviewFindings(root: root, sources: sources)
         exit(0)
+    }
+
+    /// The failure cases found in review, each against a real library and real files.
+    private static func reviewFindings(root: URL, sources: [URL]) async {
+        let fm = FileManager.default
+        let base = root.deletingLastPathComponent()
+        func fresh(_ name: String) throws -> LibraryStore {
+            let url = base.appending(path: "\(name)-\(UUID().uuidString)", directoryHint: .isDirectory)
+            try fm.createDirectory(at: url, withIntermediateDirectories: true)
+            try LibraryFolder.create(at: url, weekOneStart: "2026-11-02", now: .now)
+            return try LibraryStore(root: url)
+        }
+        do {
+            // A file that's there but can't be read must stop the library opening, not empty it.
+            let a = try fresh("unreadable")
+            let ref = a.schedule.todayRef(PlanClock.now)
+            a.toggleTick(ref, .focus)
+            a.flush()
+            let ticks = a.files.url(of: .checks)
+            let bytes = try Data(contentsOf: ticks)
+            try fm.setAttributes([.posixPermissions: 0o000], ofItemAtPath: ticks.path)
+            check("An unreadable file stops the library opening", (try? LibraryStore(root: a.root)) == nil)
+            a.reloadIfChanged()
+            check("Reloading keeps what's in memory", a.isTicked(ref, .focus))
+            try fm.setAttributes([.posixPermissions: 0o644], ofItemAtPath: ticks.path)
+            check("The unreadable file is untouched", try Data(contentsOf: ticks) == bytes)
+
+            // A file damaged while open must not empty memory, and memory saves back.
+            try Data("junk".utf8).write(to: ticks)
+            try fm.setAttributes([.modificationDate: Date(timeIntervalSinceNow: 5)], ofItemAtPath: ticks.path)
+            a.reloadIfChanged()
+            check("A file damaged while open doesn't empty memory", a.isTicked(ref, .focus))
+            check("It's reported", a.damagedFiles.contains("checks.json"))
+
+            // Lost photo records must not make every file a new photo.
+            let b = try fresh("lost-records")
+            _ = await ImportService.importURLs(Array(sources.prefix(2)), into: b, setID: nil)
+            let keep = b.visiblePhotos[0]
+            b.toggleBenchmark(keep.id)
+            let set = b.createSet(name: "Set")
+            b.setPhoto(keep.id, inSet: set.id, true)
+            b.flush()
+            try Data("junk".utf8).write(to: b.files.url(of: .photos))
+            let damaged = try LibraryStore(root: b.root)
+            await PhotoScanner.run(on: damaged)
+            check("Lost photo records don't turn files into new photos", damaged.photos.isEmpty && damaged.notice != nil)
+            damaged.flush()
+            let again = try LibraryStore(root: b.root)
+            check("The set and benchmark still point at the old photo", again.sets.first?.photoIDs == [keep.id] && again.isBenchmark(keep.id))
+
+            // A name held by a missing record isn't free.
+            let c = try fresh("shared-name")
+            _ = await ImportService.importURLs([sources[0]], into: c, setID: nil)
+            let first = c.visiblePhotos[0]
+            try fm.moveItem(at: c.photoURL(first), to: base.appending(path: "aside-\(UUID().uuidString)"))
+            await PhotoScanner.run(on: c)
+            _ = await ImportService.importURLs([sources[0]], into: c, setID: nil)
+            check("Importing can't take a missing photo's name", Set(c.photos.map(\.fileName)).count == 2)
+
+            // A missing plan file is saved, so Week 1 can't drift.
+            let e = try fresh("plan")
+            try fm.removeItem(at: e.files.url(of: .plan))
+            let replanned = try LibraryStore(root: e.root)
+            replanned.flush()
+            check("A missing plan is written back", fm.fileExists(atPath: e.files.url(of: .plan).path))
+
+            // Time zone changes while the app is open.
+            let f = try fresh("zone")
+            let original = NSTimeZone.default
+            NSTimeZone.default = TimeZone(identifier: "Asia/Tokyo")!
+            f.refreshCalendar()
+            check("The schedule follows a time zone change", f.schedule.calendar.timeZone.identifier == "Asia/Tokyo")
+            NSTimeZone.default = original
+            f.refreshCalendar()
+
+            // Notices don't stay forever.
+            f.notice = "Hello"
+            try? await Task.sleep(for: .seconds(LibraryStore.noticeSeconds + 0.5))
+            check("A notice clears itself", f.notice == nil)
+
+            // The library goes away with a canvas open.
+            let g = try fresh("gone")
+            let directory = CanvasDirectory(canvasesRoot: g.canvasesDir)
+            let canvas = FreehandStore(canvases: directory, libraryID: g.manifest.id)
+            canvas.loadIfNeeded()
+            canvas.flush()
+            let away = g.root.appendingPathExtension("away")
+            try fm.moveItem(at: g.root, to: away)
+            _ = canvas.files.imagesDir
+            canvas.setGreyscale(!canvas.document.greyscale)
+            check("A failed canvas save says so", canvas.flush() == false && canvas.status != nil)
+            check("The library isn't recreated by a canvas", !fm.fileExists(atPath: g.root.path))
+            let name = canvas.currentName
+            canvas.open("Elsewhere")
+            check("A failed save stops a canvas switch", canvas.currentName == name)
+            try fm.moveItem(at: away, to: g.root)
+            check("The save succeeds once it's back", canvas.flush())
+
+            // An import that outlives a canvas switch.
+            let h = try fresh("import-switch")
+            let directoryH = CanvasDirectory(canvasesRoot: h.canvasesDir)
+            let moving = FreehandStore(canvases: directoryH, libraryID: h.manifest.id)
+            moving.loadIfNeeded()
+            let startedIn = moving.currentName
+            let importing = Task { await moving.importFiles(Array(sources.prefix(2)), at: .zero) }
+            await Task.yield()  // Lets the import start, so the switch happens while it's copying.
+            try moving.newCanvas()
+            await importing.value
+            check("An import doesn't land on another canvas", moving.document.items.isEmpty)
+            let leftovers = (try? fm.contentsOfDirectory(atPath: directoryH.url(of: startedIn).appending(path: "Images").path)) ?? []
+            check("An abandoned import leaves no copies", leftovers.isEmpty)
+        } catch {
+            check("Review checks ran (\(error))", false)
+        }
     }
 
     private static func photos(_ store: LibraryStore, sources: [URL]) async {

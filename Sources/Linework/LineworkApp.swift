@@ -27,7 +27,7 @@ struct LineworkApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
             LibraryCommands(app: app, store: store)
-            GoCommands(store: store)
+            GoCommands(app: app, store: store)
         }
 
         Window("Session", id: "session") {
@@ -64,6 +64,10 @@ private struct AboutMenuButton: View {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        AppModel.current?.saveOrConfirmLosing() ?? true ? .terminateNow : .terminateCancel
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if DEBUG
         if let i = CommandLine.arguments.firstIndex(of: "--perf"), CommandLine.arguments.count > i + 1 {
@@ -116,11 +120,12 @@ private struct LibraryCommands: Commands {
 }
 
 private struct GoCommands: Commands {
+    let app: AppModel
     let store: SessionStore
     @AppStorage("linework.name") private var name = ""
     @AppStorage("linework.welcomed") private var welcomed = false
 
-    private var welcoming: Bool { LineworkCopy.shouldShowWelcome(name: name, welcomed: welcomed) }
+    private var welcoming: Bool { app.library == nil || LineworkCopy.shouldShowWelcome(name: name, welcomed: welcomed) }
 
     var body: some Commands {
         CommandMenu("Go") {

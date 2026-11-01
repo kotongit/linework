@@ -38,6 +38,16 @@ import Testing
         #expect(s.tickKey(.plan(sequenceIndex: 2, weekday: 0), .focus) == "w02-mon-focus-r3")
     }
 
+    @Test func aRepeatOfARepeatKeepsLessonsApart() {
+        // Week 5 repeated, then during that repeat "this week and last" copies Week 5 twice under one repeat number.
+        let s = schedule(repeats: [PlanRepeat(number: 1, afterSequenceIndex: 4, weekCount: 1), PlanRepeat(number: 2, afterSequenceIndex: 5, weekCount: 2)])
+        let keys = (4...7).map { s.tickKey(.plan(sequenceIndex: $0, weekday: 0), .focus) }
+        #expect(Set(keys).count == 4)
+        #expect(keys[0] == "w05-mon-focus")
+        #expect(keys[2] == "w05-mon-focus-r2")
+        #expect(keys[3] == "w05-mon-focus-r2c2")
+    }
+
     @Test func anyStartMondayMapsWeeks() {
         let s = schedule(start: "2030-03-04")
         #expect(s.ref(on: d("2030-03-04")) == .plan(sequenceIndex: 0, weekday: 0))

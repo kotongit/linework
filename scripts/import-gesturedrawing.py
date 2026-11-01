@@ -69,6 +69,9 @@ def tick_key(day, block, weeks):
         return f"f-{day}-{block}"
     week, number = weeks[index]
     pass_part = f"-r{number}" if number else ""
+    copy = 1 + sum(1 for entry in weeks[:index] if entry == (week, number))
+    if copy > 1:
+        pass_part += f"c{copy}"
     return f"w{week:02d}-{WEEKDAYS[weekday]}-{block}{pass_part}"
 
 
@@ -77,21 +80,46 @@ def write_progress(library, name, value):
     (library / "Progress" / name).write_text(text + "\n")
 
 
-def prepare_library(library, replace):
-    if library.exists() and any(p.name != ".DS_Store" for p in library.iterdir()):
-        if not replace:
-            sys.exit(f"{library} already has things in it. Use --replace to redo a library this script made.")
-        if not (library / MARKER).exists():
-            sys.exit(f"{library} wasn't made by this script, so it won't be replaced.")
-        shutil.rmtree(library)
-    for folder in ["Photos", "Drawings", "Canvases", "Progress"]:
-        (library / folder).mkdir(parents=True, exist_ok=True)
-    (library / MARKER).write_text("Made by import-gesturedrawing.py. Safe to delete after switching.\n")
+def progress_digest(library):
+    """What the library's progress files held when this script made them, so later use can be noticed."""
+    digest = hashlib.sha256()
+    for path in sorted((library / "Progress").glob("*.json")):
+        digest.update(path.name.encode() + path.read_bytes())
+    return digest.hexdigest()
+
+
+def check_destination(library, replace):
+    if not library.exists() or not any(p.name != ".DS_Store" for p in library.iterdir()):
+        return
+    if not replace:
+        sys.exit(f"{library} already has things in it. Use --replace to redo a library this script made.")
+    marker = library / MARKER
+    if not marker.exists():
+        sys.exit(f"{library} wasn't made by this script, so it won't be replaced.")
+    if marker.read_text().strip() != progress_digest(library):
+        sys.exit(f"{library} has been used since it was imported, so it won't be replaced.")
+
+
+def swap_in(built, library):
+    """The new library takes the old one's place. Any old copy is kept beside it, never deleted."""
+    if library.exists():
+        stamp = dt.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        library.rename(library.with_name(f"{library.name}.before-import-{stamp}"))
+    built.rename(library)
 
 
 def run(source, library, replace=False):
     source, library = Path(source), Path(library)
-    prepare_library(library, replace)
+    # Everything that can fail happens first, in a separate folder, so a bad run leaves the library as it was.
+    if not (source / "Library.store").exists():
+        sys.exit(f"No old library found at {source}.")
+    check_destination(library, replace)
+    destination = library
+    library = library.with_name(f".{library.name}.importing")
+    if library.exists():
+        shutil.rmtree(library)
+    for folder in ["Photos", "Drawings", "Canvases", "Progress"]:
+        (library / folder).mkdir(parents=True)
     db = sqlite3.connect(f"file:{source / 'Library.store'}?mode=ro", uri=True)
     db.row_factory = sqlite3.Row
     rows = lambda table: db.execute(f"SELECT * FROM {table}").fetchall()
@@ -168,14 +196,17 @@ def run(source, library, replace=False):
     (library / "library.json").write_text(json.dumps({
         "createdAt": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "format": 1, "id": str(uuid.uuid4()).upper()}, indent=2, sort_keys=True) + "\n")
 
+    (library / MARKER).write_text(progress_digest(library) + "\n")
     copied = sum(1 for p in photos if not p["missing"])
-    return {
+    counts = {
         "photos": (len(photo_rows), len(photos)), "photo files": (len(photo_rows), copied), "sets": (totals["ZIMAGESET"], len(sets)),
         "presets": (totals["ZCLASSPRESET"], len(presets)), "sessions": (totals["ZSESSIONRECORD"], len(sessions)),
         "benchmarks": (sum(1 for r in photo_rows if r["ZISBENCHMARK"]), len(benchmarks)), "attempts": (totals["ZBENCHMARKATTEMPT"], len(attempts)),
         "ticks": (len(check_rows), len(ticks)), "repeats": (len(repeat_rows), len(repeats)),
         "canvas images": (canvas_items, len(json.loads((library / "Canvases/Canvas/canvas.json").read_text()).get("items", [])) if canvas_items else 0),
     }
+    swap_in(library, destination)
+    return counts
 
 
 def copy_preferences():

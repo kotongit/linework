@@ -172,7 +172,10 @@ public struct PlanSchedule: Sendable {
             let entry = sequence[sequenceIndex]
             let week = String(format: "%02d", plan.weeks[entry.weekIndex].number)
             let name = Self.weekdayNames[weekday].prefix(3).lowercased()
-            let pass = entry.repeatNumber == 0 ? "" : "-r\(entry.repeatNumber)"
+            var pass = entry.repeatNumber == 0 ? "" : "-r\(entry.repeatNumber)"
+            // "This week and last", run during a repeat, can copy one week twice under one repeat.
+            let copy = 1 + sequence[..<sequenceIndex].count { $0.weekIndex == entry.weekIndex && $0.repeatNumber == entry.repeatNumber }
+            if copy > 1 { pass += "c\(copy)" }
             return "w\(week)-\(name)-\(kind.rawValue)\(pass)"
         case let .forever(day):
             return "f-\(day)-\(kind.rawValue)"

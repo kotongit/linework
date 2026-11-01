@@ -47,7 +47,8 @@ public struct CanvasDirectory: Sendable {
     public func create(name: String?) throws -> String {
         let chosen = try name.map(clean) ?? nextFree("Untitled")
         if list().contains(where: { same($0, chosen) }) { throw CanvasNameError.duplicate }
-        try FileManager.default.createDirectory(at: url(of: chosen), withIntermediateDirectories: true)
+        // No intermediates: if the library has gone, this fails rather than making a new one.
+        try FileManager.default.createDirectory(at: url(of: chosen), withIntermediateDirectories: false)
         return chosen
     }
 

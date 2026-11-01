@@ -80,4 +80,13 @@ import Testing
         #expect(throws: (any Error).self) { try LibraryFolder.create(at: url, weekOneStart: "2026-11-02", now: now) }
         #expect(try fm.contentsOfDirectory(atPath: url.path) == ["Progress"])
     }
+
+    @Test func createKeepsAnExistingPlan() throws {
+        let url = temp()
+        try fm.createDirectory(at: url.appending(path: "Progress"), withIntermediateDirectories: true)
+        let plan = PlanRecord(weekOneStart: "2026-11-02", repeats: [PlanRepeat(number: 1, afterSequenceIndex: 2, weekCount: 1)])
+        try LibraryFiles(root: url).write(plan, to: .plan)
+        try LibraryFolder.create(at: url, weekOneStart: "2030-01-07", now: now)
+        #expect(try LibraryFiles(root: url).read(.plan) == .loaded(plan))
+    }
 }

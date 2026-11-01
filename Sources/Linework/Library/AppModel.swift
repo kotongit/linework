@@ -20,8 +20,11 @@ final class AppModel {
     var pendingAdoption: URL?
 
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
+    /// For the app delegate, which SwiftUI creates apart from the scenes.
+    @ObservationIgnored private(set) static weak var current: AppModel?
 
     init() {
+        Self.current = self
         let center = NotificationCenter.default
         for name in [NSApplication.didResignActiveNotification, NSApplication.willTerminateNotification] {
             observers.append(center.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
@@ -81,8 +84,24 @@ final class AppModel {
     }
     #endif
 
+    /// Saves everything. If that fails, asks before anything unsaved is left behind. Returns true if it's fine to go.
+    func saveOrConfirmLosing() -> Bool {
+        let saved = library?.flush() ?? true
+        let canvasSaved = freehand?.flush() ?? true
+        if saved && canvasSaved { return true }
+        #if DEBUG
+        if DebugSnapshots.active { return false }
+        #endif
+        let alert = NSAlert()
+        alert.messageText = "Some changes couldn't be saved."
+        alert.informativeText = "Your library's folder may be unavailable. If you continue, those changes will be lost."
+        alert.addButton(withTitle: "Stay")
+        alert.addButton(withTitle: "Continue Anyway")
+        return alert.runModal() == .alertSecondButtonReturn
+    }
+
     func closeForSwitch() {
-        library?.flush()
+        guard saveOrConfirmLosing() else { return }
         freehand?.leave()
         freehand = nil
         library = nil
@@ -98,6 +117,8 @@ final class AppModel {
             message = nil
         } catch LibraryError.newerFormat {
             message = .newerFormat
+        } catch LibraryError.unreadable {
+            message = .failed("Some of that library's files can't be read right now, so it wasn't opened. If it's in a synced folder, check that it has finished downloading.")
         } catch {
             message = .failed("Linework couldn't open that library.")
         }

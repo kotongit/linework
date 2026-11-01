@@ -47,7 +47,10 @@ struct AppShell: View {
         .frame(minWidth: 1100, minHeight: 700)
         .ignoresSafeArea(.container, edges: .top)
         .lineworkWindow()
-        .onReceive(SessionStore.dayChanges) { _ in store.refreshToday() }
+        .onReceive(SessionStore.dayChanges) { _ in
+            store.refreshToday()
+            app.library?.refreshCalendar()
+        }
         .overlay {
             // Waits for the session window to close, so it's seen rather than played behind it.
             if let celebration = store.pendingCelebration, !store.isSessionActive {
@@ -76,7 +79,7 @@ struct AppShell: View {
         }
         .task(id: app.library?.root) { scan() }
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)) { _ in
-            showingSetup = true
+            showingSetup = app.library != nil
         }
     }
 

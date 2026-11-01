@@ -135,6 +135,30 @@ class ImportTests(unittest.TestCase):
         self.assertFalse((self.library / "Photos/extra.jpg").exists())
         self.assertEqual(len(items(self.library, "photos.json")), 1)
 
+    def test_replace_refuses_once_the_library_has_been_used(self):
+        self.run_import()
+        checks = self.library / "Progress/checks.json"
+        checks.write_text(checks.read_text() + " ")
+        with self.assertRaises(SystemExit):
+            self.run_import(replace=True, make=False)
+        self.assertTrue(checks.read_text().endswith(" "))
+
+    def test_bad_source_leaves_the_library_alone(self):
+        self.run_import()
+        with self.assertRaises(SystemExit):
+            importer.run(self.root / "nowhere", self.library, replace=True)
+        self.assertEqual(len(items(self.library, "photos.json")), 1)
+
+    def test_replace_keeps_the_old_copy_aside(self):
+        self.run_import()
+        self.run_import(replace=True, make=False)
+        self.assertTrue(list(self.root.glob("Linework Library.before-import-*")))
+
+    def test_a_repeat_of_a_repeat_keeps_lessons_apart(self):
+        self.run_import(checks=[("2026-12-14", "focus"), ("2026-12-21", "focus")], repeats=[(4, 1), (5, 2)])
+        keys = [t["key"] for t in items(self.library, "checks.json")]
+        self.assertEqual(keys, ["w05-mon-focus-r2", "w05-mon-focus-r2c2"])
+
     def test_names_keep_extension_and_skip_thumbnails(self):
         self.run_import()
         self.assertEqual([p.name for p in (self.library / "Photos").iterdir()], ["photo-001.jpg"])

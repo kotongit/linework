@@ -27,7 +27,10 @@ public sealed class TodayView : StoreView
         {
             _shownRef = r;
             _shownRepeats = _library.Schedule.Repeats.Count;
-            var grid = new Grid { Margin = new Thickness(72, 40, 72, 40), MaxWidth = 956, HorizontalAlignment = HorizontalAlignment.Left };
+            var grid = new Grid { Margin = new Thickness(72, 40, 72, 40) };
+            // Up to 956 wide, from the left.
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1000, GridUnitType.Star), MaxWidth = 956 });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.Children.Add(new DayPlanCard(_context, _library, r, glance: true));
             var options = Ui.Circle(Ui.Icon(Ui.EllipsisIcon, 16), () => { }, "Plan options", 30).Align(HorizontalAlignment.Right, VerticalAlignment.Top);
             options.Click += (_, _) => ShowOptions(options);

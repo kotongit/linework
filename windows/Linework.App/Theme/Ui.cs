@@ -29,7 +29,14 @@ public static class Ui
     }
 
     /// <summary>Long text the reader can select and copy.</summary>
-    public static TextBox SelectableText(string text, double size = 14, Brush? color = null) => new()
+    public static TextBox SelectableText(string text, double size = 14, Brush? color = null)
+    {
+        var box = PlainText(text, size, color);
+        TextBlock.SetLineHeight(box, size * 1.4);
+        return box;
+    }
+
+    static TextBox PlainText(string text, double size, Brush? color) => new()
     {
         Style = new Style(typeof(TextBox)),
         Text = text,

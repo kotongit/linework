@@ -113,6 +113,8 @@ public static partial class Harness
     /// <summary>The real main window, opened and routed, so nothing in it can fail only when it's seen.</summary>
     static async Task ShellStage(LineworkContext context)
     {
+        // The menus follow the system's theme, so the tokens have to match it here.
+        Tokens.Apply(Tokens.SystemIsDark());
         var window = new MainWindow(context) { Left = 40, Top = 40, WindowStartupLocation = WindowStartupLocation.Manual };
         window.Show();
         await Settle(1);

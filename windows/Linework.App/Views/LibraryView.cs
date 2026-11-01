@@ -50,6 +50,7 @@ public sealed class LibraryView : UserControl
         var scroller = new FrameworkElementFactory(typeof(ScrollViewer));
         scroller.SetValue(ScrollViewer.CanContentScrollProperty, true);
         scroller.SetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty, ScrollBarVisibility.Disabled);
+        scroller.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
         scroller.SetValue(FocusableProperty, false);
         scroller.AppendChild(new FrameworkElementFactory(typeof(ItemsPresenter)));
         _grid.Template = new ControlTemplate(typeof(ItemsControl)) { VisualTree = scroller };

@@ -12,6 +12,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        // Menus, dropdowns, checkboxes and scroll bars follow the system's light or dark.
+        ThemeMode = ThemeMode.System;
         Tokens.Apply(Tokens.SystemIsDark());
 #if DEBUG
         if (e.Args.Contains("--harness"))

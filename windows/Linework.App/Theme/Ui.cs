@@ -214,6 +214,8 @@ public static class Ui
     {
         var box = new TextBox
         {
+            // An empty style keeps this plain, without the system theme's box.
+            Style = new Style(typeof(TextBox)),
             FontFamily = Tokens.Font,
             FontSize = size,
             FontWeight = Medium,

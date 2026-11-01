@@ -99,7 +99,7 @@ public sealed class MainWindow : GlassWindow
 
     static MenuItem Item(string title, Action click, string? gesture = null, Func<bool>? enabled = null)
     {
-        var item = new MenuItem { Header = title, InputGestureText = gesture ?? "", Foreground = Brushes.Black };
+        var item = new MenuItem { Header = title, InputGestureText = gesture ?? "" };
         item.Click += (_, _) => click();
         if (enabled != null) item.Loaded += (_, _) => item.IsEnabled = enabled();
         return item;

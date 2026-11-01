@@ -102,7 +102,7 @@ public static partial class Harness
         using (var dc = layer.RenderOpen())
         {
             dc.DrawRectangle(Brushes.Black, null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
-            dc.DrawRectangle(new VisualBrush(content), null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
+            dc.DrawRectangle(new VisualBrush(content) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top }, null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
         }
         bitmap.Render(layer);
         var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();

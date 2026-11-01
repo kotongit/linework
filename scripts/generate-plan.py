@@ -237,11 +237,44 @@ def reflow(ls):
 
 
 SUMMARIES = Path(__file__).with_name("plan-summaries.json")
+REWRITES = json.loads(Path(__file__).with_name("plan-rewrites.json").read_text())
+
+
+def undated(text):
+    """The plan runs on weeks and weekdays, so its text never names a calendar date."""
+    for old, new in sorted(REWRITES, key=lambda r: -len(r[0])):
+        text = text.replace(old, new)
+    return text
+
+
+def undate_all(value):
+    if isinstance(value, str):
+        return undated(value)
+    if isinstance(value, list):
+        return [undate_all(v) for v in value]
+    if isinstance(value, dict):
+        return {undate_all(k): undate_all(v) for k, v in value.items()}
+    return value
+
+
+def week_ranges(guide, weeks):
+    """Turns the guide's book table from date ranges into plan weeks."""
+    first = {}
+    for week in weeks:
+        first.setdefault(week["book"], [week["number"], week["number"]])[1] = week["number"]
+    ranges = iter(sorted(first.values()))
+
+    def label(_):
+        a, b = next(ranges)
+        return f"Week {a}" if a == b else f"Weeks {a}–{b}"
+
+    guide = re.sub(r"\b\d{1,2} [A-Z][a-z]{2} – \d{1,2} [A-Z][a-z]{2} \d{4}", label, guide)
+    return re.sub(r"(?m)^Dates$", "Plan weeks", guide)
 
 
 def merge_summaries(plan):
     """Adds title, bullets, readingShort and monthlyRitualBullets. Returns the texts that have no entry."""
-    summaries = json.loads(SUMMARIES.read_text()) if SUMMARIES.exists() else {}
+    summaries = undate_all(json.loads(SUMMARIES.read_text())) if SUMMARIES.exists() else {}
     blocks, reading = summaries.get("blocks", {}), summaries.get("reading", {})
     missing = {"blocks": [], "reading": [], "ritual": []}
     for week in plan["weeks"]:
@@ -272,8 +305,8 @@ def main(pdf, output):
             titles[int(m.group(1))] = m.group(2)
     weeks = [parse_week(p, titles) for p in pages if re.search(r"^WEEK \d+ · BOOK", p.extract_text(), re.M)]
     forever, ritual = parse_forever(pages[41])
-    plan = {"startDate": "2026-11-02", "weeks": weeks, "foreverWeek": forever,
-            "monthlyRitual": ritual, "guideText": guide(pages[1:3])}
+    plan = undate_all({"weeks": weeks, "foreverWeek": forever, "monthlyRitual": ritual})
+    plan["guideText"] = undated(week_ranges(guide(pages[1:3]), weeks))
     missing = merge_summaries(plan)
     if output == "--list-missing":
         print(json.dumps(missing, ensure_ascii=False, indent=1))

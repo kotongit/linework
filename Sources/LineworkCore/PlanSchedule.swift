@@ -45,7 +45,7 @@ public struct PlanSchedule: Sendable {
         self.plan = plan
         self.repeats = repeats
         self.calendar = calendar
-        start = PlanDayKey.date(plan.startDate, calendar: calendar) ?? .distantPast
+        start = PlanDayKey.date("2026-11-02", calendar: calendar) ?? .distantPast
         var sequence = plan.weeks.indices.map { (weekIndex: $0, isRepeat: false) }
         for r in repeats where sequence.indices.contains(r.afterSequenceIndex) {
             let first = max(r.afterSequenceIndex - r.weekCount + 1, 0)

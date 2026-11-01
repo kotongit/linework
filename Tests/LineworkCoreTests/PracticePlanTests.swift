@@ -11,7 +11,6 @@ import Testing
     }
 
     @Test func shape() {
-        #expect(plan.startDate == "2026-11-02")
         #expect(plan.weeks.count == 38)
         #expect(plan.weeks.allSatisfy { $0.days.count == 7 })
         #expect(plan.foreverWeek.count == 7)
@@ -102,6 +101,36 @@ import Testing
         for week in plan.weeks {
             #expect(week.dailyCheck.hasSuffix(".") || week.dailyCheck.hasSuffix("?"), "week \(week.number): \(week.dailyCheck)")
         }
+    }
+
+    static func everyPlanString() -> [String] {
+        let plan = PracticePlan.shared
+        var out = [plan.guideText, plan.monthlyRitual] + plan.monthlyRitualBullets
+        let days = plan.weeks.flatMap(\.days) + plan.foreverWeek
+        for week in plan.weeks { out += [week.theme, week.reading, week.readingShort, week.dailyCheck] }
+        for day in days {
+            out += day.restText.map { [$0] } ?? []
+            for block in day.blocks { out += [block.text, block.title] + block.bullets }
+        }
+        return out
+    }
+
+    @Test func planNamesNoCalendarDates() throws {
+        let months = "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
+        let dated = try Regex("\\b(\(months))[a-z]* \\d{1,4}\\b|\\b\\d{1,2} (\(months))\\b|\\b20\\d\\d\\b")
+        let strings = Self.everyPlanString()
+        for text in strings { #expect(text.firstMatch(of: dated) == nil, "\(text.prefix(80))") }
+        #expect(strings.contains { $0.contains("Day 29") })
+    }
+
+    @Test func benchmarkRedrawsNameTheirWeek() {
+        #expect(block(5, 5, .exercise)?.text.contains("Week 2") == true)
+        #expect(block(9, 5, .exercise)?.text.contains("Week 6") == true || block(9, 5, .blockA)?.text.contains("Week 6") == true)
+    }
+
+    @Test func guideUsesWeekRanges() {
+        #expect(plan.guideText.contains("Weeks 2–5"))
+        #expect(plan.guideText.contains("Weeks 37–38"))
     }
 
     @Test func wordedCountsAreTimed() {

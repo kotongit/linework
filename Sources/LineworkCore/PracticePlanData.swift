@@ -3,7 +3,6 @@
 enum PracticePlanData {
     static let json = ##"""
 {
- "startDate": "2026-11-02",
  "weeks": [
   {
    "number": 1,
@@ -492,7 +491,7 @@ enum PracticePlanData {
       },
       {
        "kind": "exercise",
-       "text": "Benchmark (30 min). Pick ONE pose set of ten photos and save it in an album named \"Gesture benchmark\". Ten 1-min poses. Save as 2026-11-14 · gesture benchmark. Then run the Book 00 move-on test (two weeks in): streak 12 of 14 days, every session had warm-up/focus/check, a rule after each session, every drill saved, a benchmark exists.",
+       "text": "Benchmark (30 min). Pick ONE pose set of ten photos and save it in an album named \"Gesture benchmark\". Ten 1-min poses. Save as YYYY-MM-DD · gesture benchmark. Then run the Book 00 move-on test (two weeks in): streak 12 of 14 days, every session had warm-up/focus/check, a rule after each session, every drill saved, a benchmark exists.",
        "minutes": 30,
        "title": "Gesture benchmark",
        "bullets": [
@@ -1400,12 +1399,12 @@ enum PracticePlanData {
       },
       {
        "kind": "exercise",
-       "text": "Benchmark redraw + rebuild (60 min). 1) Redraw the same ten benchmark photos at 1 min each and put them side by side with Nov 14. 2) Book 02 Ch. 5 Saturday drill: take an old piece with a weak pose, make three new gesture options in 5 min, rebuild the strongest with the gesture layer visible, then compare silhouettes. 3) Move-on test: line of action visible in every 30-s gesture · 10 gestures in 5 min without stopping · one stroke per line · plumb check passes · the 5-min drawings keep the first curve.",
+       "text": "Benchmark redraw + rebuild (60 min). 1) Redraw the same ten benchmark photos at 1 min each and put them side by side with Week 2. 2) Book 02 Ch. 5 Saturday drill: take an old piece with a weak pose, make three new gesture options in 5 min, rebuild the strongest with the gesture layer visible, then compare silhouettes. 3) Move-on test: line of action visible in every 30-s gesture · 10 gestures in 5 min without stopping · one stroke per line · plumb check passes · the 5-min drawings keep the first curve.",
        "minutes": 60,
        "title": "Benchmark and rebuild",
        "bullets": [
         "Redraw 10 benchmark photos, 1 min each",
-        "Compare with Nov 14, side by side",
+        "Compare with Week 2, side by side",
         "Rebuild a weak old pose, then test"
        ]
       }
@@ -2021,11 +2020,11 @@ enum PracticePlanData {
       },
       {
        "kind": "focus",
-       "text": "Four depth cues (Ch. 5). Redraw the reaching hand from your Sep 2024 WIP (or a photo of a hand reaching at the camera) using overlap, size, ellipse degree and line weight together.",
+       "text": "Four depth cues (Ch. 5). Redraw the reaching hand from an old work in progress (or a photo of a hand reaching at the camera) using overlap, size, ellipse degree and line weight together.",
        "minutes": 20,
        "title": "Four depth cues",
        "bullets": [
-        "Redraw the reaching hand, Sep 2024 WIP",
+        "Redraw the reaching hand, old WIP",
         "Or use a photo of a hand reaching out",
         "Overlap, size, ellipse, line weight"
        ]
@@ -2449,11 +2448,11 @@ enum PracticePlanData {
       },
       {
        "kind": "exercise",
-       "text": "Benchmark redraw (25 min) with the same photo as Dec 12, then compare side by side. Move-on test: boxes converge · minor axes line up with cylinders · confident cross-contours · mannequin in about 8 min with correct joins · rotation still reads · overlaps clear. Rotation only needs to be \"readable\".",
+       "text": "Benchmark redraw (25 min) with the same photo as Week 6, then compare side by side. Move-on test: boxes converge · minor axes line up with cylinders · confident cross-contours · mannequin in about 8 min with correct joins · rotation still reads · overlaps clear. Rotation only needs to be \"readable\".",
        "minutes": 25,
        "title": "Mannequin benchmark redraw",
        "bullets": [
-        "Redraw the Dec 12 photo, 25 min",
+        "Redraw the Week 6 photo, 25 min",
         "Compare side by side",
         "Run the move-on test"
        ]
@@ -3573,11 +3572,11 @@ enum PracticePlanData {
       },
       {
        "kind": "exercise",
-       "text": "DAY 27: benchmark redraw. The same photo as Jan 4, 25 min, same rules. Put the two side by side and check both with Difference. That comparison is your score.",
+       "text": "DAY 27: benchmark redraw. The same photo as Week 10, 25 min, same rules. Put the two side by side and check both with Difference. That comparison is your score.",
        "minutes": 25,
        "title": "Benchmark redraw",
        "bullets": [
-        "Redraw the Jan 4 photo, 25 min",
+        "Redraw the Week 10 photo, 25 min",
         "Same rules, side by side",
         "Check both with Difference"
        ]
@@ -4502,11 +4501,11 @@ enum PracticePlanData {
       },
       {
        "kind": "focus",
-       "text": "Your light study. 10 min: redraw the neck and jaw of the Aug 2024 light study with these shapes (the jaw underside in shadow). 10 min: five more neck studies.",
+       "text": "Your light study. 10 min: redraw the neck and jaw of an old light study with these shapes (the jaw underside in shadow). 10 min: five more neck studies.",
        "minutes": 20,
        "title": "Neck and jaw light study",
        "bullets": [
-        "10 min: redraw Aug 2024 neck and jaw",
+        "10 min: redraw an old neck and jaw",
         "Put the jaw underside in shadow",
         "10 min: 5 more neck studies"
        ]
@@ -4625,11 +4624,11 @@ enum PracticePlanData {
       },
       {
        "kind": "blockA",
-       "text": "Redraw the shoulder area of the Sep 2024 WIP, 30 min: the clavicle lifting toward the raised arm, the deltoid capping the joint, the arm emerging from under it and overlapping the chest.",
+       "text": "Redraw the shoulder area of an old work in progress, 30 min: the clavicle lifting toward the raised arm, the deltoid capping the joint, the arm emerging from under it and overlapping the chest.",
        "minutes": 30,
        "title": "Shoulder redraw",
        "bullets": [
-        "Redraw the Sep 2024 WIP shoulder, 30 min",
+        "Redraw an old WIP's shoulder, 30 min",
         "Clavicle, deltoid cap, arm over chest"
        ]
       },
@@ -5149,22 +5148,22 @@ enum PracticePlanData {
       },
       {
        "kind": "blockA",
-       "text": "Benchmark redraw: the same portrait and torso photos as Feb 13, 25 min total, side by side. Move-on test: ball-and-jaw head in about 2 min · correct 3-value planar head · six torso landmarks found quickly · arms plug in under the deltoid · torso front and back from memory · 20 heads + 10 torsos done.",
+       "text": "Benchmark redraw: the same portrait and torso photos as Week 15, 25 min total, side by side. Move-on test: ball-and-jaw head in about 2 min · correct 3-value planar head · six torso landmarks found quickly · arms plug in under the deltoid · torso front and back from memory · 20 heads + 10 torsos done.",
        "minutes": 25,
        "title": "Benchmark redraw",
        "bullets": [
-        "Redraw the Feb 13 portrait and torso",
+        "Redraw the Week 15 portrait and torso",
         "25 min total, side by side",
         "Run the move-on test"
        ]
       },
       {
        "kind": "blockB",
-       "text": "30 min · Book 09 S5: benchmark redraw. Repaint the Feb 13 lit-portrait photo in 25 min. Move-on test: 3-5 clear value groups (squint) · families separate · seven zones placeable · one key light · thumbnails before every piece.",
+       "text": "30 min · Book 09 S5: benchmark redraw. Repaint the Week 15 lit-portrait photo in 25 min. Move-on test: 3-5 clear value groups (squint) · families separate · seven zones placeable · one key light · thumbnails before every piece.",
        "minutes": 30,
        "title": "Value benchmark redraw",
        "bullets": [
-        "Repaint the Feb 13 lit portrait, 25 min",
+        "Repaint the Week 15 lit portrait, 25 min",
         "Run the move-on test"
        ]
       }
@@ -6178,11 +6177,11 @@ enum PracticePlanData {
       },
       {
        "kind": "blockA",
-       "text": "Redraw the reaching hand from your Sep 2024 WIP using a photo of your own hand in the same pose. 30 min.",
+       "text": "Redraw the reaching hand from an old work in progress using a photo of your own hand in the same pose. 30 min.",
        "minutes": 30,
        "title": "Reaching hand redraw",
        "bullets": [
-        "Redraw the reaching hand, Sep 2024 WIP",
+        "Redraw the reaching hand, old WIP",
         "Use a photo of your hand, same pose",
         "30 min"
        ]
@@ -6436,11 +6435,11 @@ enum PracticePlanData {
       },
       {
        "kind": "blockA",
-       "text": "Benchmark redraw (25 min) with the same photo as Mar 20, then the Ch. 6 Saturday drill: redraw the \"delusional\" figure with the full process, keeping its gesture. Move-on test: forearm twist · leg alignment · hands in about 2 min · one hand pose from 3 angles · feet as wedges · 50 hands + 15 limbs.",
+       "text": "Benchmark redraw (25 min) with the same photo as Week 20, then the Ch. 6 Saturday drill: redraw the \"delusional\" figure with the full process, keeping its gesture. Move-on test: forearm twist · leg alignment · hands in about 2 min · one hand pose from 3 angles · feet as wedges · 50 hands + 15 limbs.",
        "minutes": 25,
        "title": "Benchmark and figure redraw",
        "bullets": [
-        "Redraw the Mar 20 photo, 25 min",
+        "Redraw the Week 20 photo, 25 min",
         "Redraw the delusional figure",
         "Run the move-on test"
        ]
@@ -6698,11 +6697,11 @@ enum PracticePlanData {
       },
       {
        "kind": "blockB",
-       "text": "30 min · Book 10 S6: benchmark redraw. Repaint the Mar 20 coloured-portrait photo in 25 min inside a 6-8 colour palette. Move-on test: HSB fluency · passes greyscale · deliberate temperature shifts · saturation only at the focal point · keep counting limited-palette pieces toward 5.",
+       "text": "30 min · Book 10 S6: benchmark redraw. Repaint the Week 20 coloured-portrait photo in 25 min inside a 6-8 colour palette. Move-on test: HSB fluency · passes greyscale · deliberate temperature shifts · saturation only at the focal point · keep counting limited-palette pieces toward 5.",
        "minutes": 30,
        "title": "Colour benchmark redraw",
        "bullets": [
-        "Repaint the Mar 20 portrait, 25 min",
+        "Repaint the Week 20 portrait, 25 min",
         "Use a 6-8 colour palette",
         "Run the move-on test"
        ]
@@ -7915,11 +7914,11 @@ enum PracticePlanData {
       },
       {
        "kind": "focus",
-       "text": "The WIP arm. Redraw the reaching arm from your Sep 2024 WIP as overlapping forms, then two more arms from photos.",
+       "text": "The WIP arm. Redraw the reaching arm from an old work in progress as overlapping forms, then two more arms from photos.",
        "minutes": 20,
        "title": "The WIP arm",
        "bullets": [
-        "Redraw the Sep 2024 WIP reaching arm",
+        "Redraw an old WIP's reaching arm",
         "As overlapping forms",
         "Then 2 more arms from photos"
        ]
@@ -7962,11 +7961,11 @@ enum PracticePlanData {
       },
       {
        "kind": "blockB",
-       "text": "30 min · Book 11 S5: benchmark redraw with fewer strokes. The May 1 portrait photo again, 25 min. Compare stroke counts. Move-on test: five passes every time · hard edges only where wanted · a 20-min study in under 60 strokes · materials read · you stop before overworking.",
+       "text": "30 min · Book 11 S5: benchmark redraw with fewer strokes. The Week 26 portrait photo again, 25 min. Compare stroke counts. Move-on test: five passes every time · hard edges only where wanted · a 20-min study in under 60 strokes · materials read · you stop before overworking.",
        "minutes": 30,
        "title": "Fewer-strokes redraw",
        "bullets": [
-        "Redraw the May 1 portrait, 25 min",
+        "Redraw the Week 26 portrait, 25 min",
         "Compare your stroke counts",
         "Run the move-on test"
        ]
@@ -8706,11 +8705,11 @@ enum PracticePlanData {
       },
       {
        "kind": "blockA",
-       "text": "Benchmark redraw (25 min) with the same photo as May 29, then the Ch. 5 Saturday drill: a dynamic pose for one of your characters (three silhouette thumbnails → pick → construct with foreshortening and the horizon). Move-on test: measured lengths · clear overlaps · horizon placed · a jump, a run and a strike that read · black-fill test passed.",
+       "text": "Benchmark redraw (25 min) with the same photo as Week 30, then the Ch. 5 Saturday drill: a dynamic pose for one of your characters (three silhouette thumbnails → pick → construct with foreshortening and the horizon). Move-on test: measured lengths · clear overlaps · horizon placed · a jump, a run and a strike that read · black-fill test passed.",
        "minutes": 25,
        "title": "Benchmark and dynamic pose",
        "bullets": [
-        "Redraw the May 29 photo, 25 min",
+        "Redraw the Week 30 photo, 25 min",
         "Dynamic pose: 3 thumbnails, pick, build",
         "Run the move-on test"
        ]
@@ -10152,7 +10151,7 @@ enum PracticePlanData {
   }
  ],
  "monthlyRitual": "• Redraw a benchmark photo from any finished book and compare.\n• Rerun one structure book's move-on test. Go back to any book that no longer passes (the spiral).\n• Watch one time-lapse. Read the whole error log and cross out rules you no longer need.\n• Redraw the torso from memory (Book 05) · one colour study from a master painting or film still (Book 10).\n• Choose next month's focus.",
- "guideText": "How this plan works\nEach week gets one page. Every day has a fixed shape, so you never decide what to do, you just do the row. Everything here comes from the programme chapters of the books. Where I had to choose (mostly where two books claim the same slot), it's flagged below.\nEvery session, in this order\nBefore\nRead the last three rules in your error log (Book 00).\n5 min\nWarm-up, the exact one written in the row. It changes as you finish books (see the rotation on the next page).\n20 min\nFocus, the drill in the row. Write the date and drill name on the canvas.\n5 min\nCheck: predict where you went wrong BEFORE comparing, compare honestly, write ONE rule.\nAfter\nSave in the book's stack as YYYY-MM-DD · drill. Never delete a drill, especially the bad ones. The rules that keep it working\n• Dates are the earliest you can move on, not deadlines. Each book ends with its move-on test on the last Saturday. Pass most checks and you move on. Fail, and you repeat the book's last 1-2 weeks and shift every later date by that much. The books' typical times are longer than their programmes (Book 03: 4-6 weeks, Books 05-06: 5-8 weeks), so slipping is normal, not failure.\n• Ten minutes counts. On a bad day: five gestures + one quick check. Only zero breaks the streak (Book 00).\n• Sunday is rest. If you feel dread instead of curiosity, take an extra day off or just paint for fun.\n• Every Saturday: watch one time-lapse of the week (Actions → Video → Time-lapse Replay) and look for where you started small or skipped steps.\n• Benchmarks are on each book's first Saturday (Book 04: Day 1 Monday). Redraw the SAME photo on the last Saturday. Save the photos in albums so you can find them.\n• Look after your hand: long lines from the shoulder, a break every 25-30 min on long Saturdays. Pain or tingling that doesn't go away means rest, and see a doctor if it persists.\n• If you're already further along than Book 01, skip to that book's first week and count the dates forward from your Monday.\nTwo choices I made for you\n1. The painting books (09-12) run as a Saturday Block B from February. Book 00 says to do 09, 10 and 11 at weekends alongside the structure books, but every structure book also has its own Saturday exercise. So from Book 05 on, Saturday is Block A (structure) → 10-min break → Block B (30 min of painting). Each painting book is compressed to 3-6 Saturdays. If Saturdays get too long, drop Block B and do Books 09-12 as normal four-week weekday books after Book 08 instead. 2. Book 04 gets a fifth week for its Days 29-30 review and a proper run of its six-check move-on test, since proportion is the skill you named as hardest.\nThe whole road\nEarliest dates. The move-on test is on the last Saturday of each book.\nBook\nWeeks\nDates\nSaturday Block B (painting)\n01 · Procreate for Speed\n2 Nov – 8 Nov 2026\n—\n02 · Gesture\n9 Nov – 6 Dec 2026\n—\n03 · Form and Construction\n7 Dec – 3 Jan 2027\n—\n04 · Proportion & Drawing from Reference\n4 Jan – 7 Feb 2027\n—\n05 · Anatomy I: Head, Neck and Torso\n8 Feb – 14 Mar 2027\nBook 09 Value and Light (5 Sat)\n06 · Anatomy II: Arms, Legs, Hands and Feet\n15 Mar – 18 Apr 2027\nBook 10 Colour (5 Sat)\n07 · Clothing, Folds and Volume\n19 Apr – 23 May 2027\nBook 10 benchmark redraw (1) +\nBook 11 Rendering (4)\n08 · Foreshortening and Dynamic Poses\n24 May – 20 Jun 2027\nBook 11 finish (1) + Book 12\nComposition (3)\n13 · Study Programmes\n21 Jun – 11 Jul 2027\n—\n14 · Characters and Earning a Little\n12 Jul – 25 Jul 2027\n—\nReading that runs alongside: Book 00 in week 1 · Book 13 Ch. 1-2 in Book 02 week 1 (its study formats return as a full block after Book 08). How the warm-up grows\nEach finished book takes over one weekday warm-up slot, so old skills stay alive in 5 minutes. The rows on each week page already include this, so this table is just to show the logic.\nDay\nWarm-up slot\nSwitches on after\nMon\n5-min class-mode mini session\nBook 02\nTue\nFive boxes at new angles · then proportion check (envelope + landmarks)\nBook 03 · Book 04\nWed\nHead studies (eye line halfway) · then five 1-min ball-and-jaw heads\nBook 04 · Book 05\nThu\nFive 1-min hands from your own hand (goal: 200 in the first year)\nBook 06\nFri\nThree 1-min value thumbnails\nBook 09 (Block B)\nSat\n5-min fold sketch: tension points + four folds\nBook 07\nEvery day\nOne gesture is a foreshortened or action pose\nBook 08\nExceptions, because the book itself says so: Book 01 uses no-menu gestures, Book 02 uses long-line warm-ups, Book 04 uses gestures + envelope, and Book 08 uses action photos.",
+ "guideText": "How this plan works\nEach week gets one page. Every day has a fixed shape, so you never decide what to do, you just do the row. Everything here comes from the programme chapters of the books. Where I had to choose (mostly where two books claim the same slot), it's flagged below.\nEvery session, in this order\nBefore\nRead the last three rules in your error log (Book 00).\n5 min\nWarm-up, the exact one written in the row. It changes as you finish books (see the rotation on the next page).\n20 min\nFocus, the drill in the row. Write the date and drill name on the canvas.\n5 min\nCheck: predict where you went wrong BEFORE comparing, compare honestly, write ONE rule.\nAfter\nSave in the book's stack as YYYY-MM-DD · drill. Never delete a drill, especially the bad ones. The rules that keep it working\n• Weeks are the earliest you can move on, not deadlines. Each book ends with its move-on test on the last Saturday. Pass most checks and you move on. Fail, and you repeat the book's last 1-2 weeks and shift every later date by that much. The books' typical times are longer than their programmes (Book 03: 4-6 weeks, Books 05-06: 5-8 weeks), so slipping is normal, not failure.\n• Ten minutes counts. On a bad day: five gestures + one quick check. Only zero breaks the streak (Book 00).\n• Sunday is rest. If you feel dread instead of curiosity, take an extra day off or just paint for fun.\n• Every Saturday: watch one time-lapse of the week (Actions → Video → Time-lapse Replay) and look for where you started small or skipped steps.\n• Benchmarks are on each book's first Saturday (Book 04: Day 1 Monday). Redraw the SAME photo on the last Saturday. Save the photos in albums so you can find them.\n• Look after your hand: long lines from the shoulder, a break every 25-30 min on long Saturdays. Pain or tingling that doesn't go away means rest, and see a doctor if it persists.\n• If you're already further along than Book 01, skip to that book's first week and count the weeks forward from your Monday.\nTwo choices I made for you\n1. The painting books (09-12) run as a Saturday Block B from February. Book 00 says to do 09, 10 and 11 at weekends alongside the structure books, but every structure book also has its own Saturday exercise. So from Book 05 on, Saturday is Block A (structure) → 10-min break → Block B (30 min of painting). Each painting book is compressed to 3-6 Saturdays. If Saturdays get too long, drop Block B and do Books 09-12 as normal four-week weekday books after Book 08 instead. 2. Book 04 gets a fifth week for its Days 29-30 review and a proper run of its six-check move-on test, since proportion is the skill you named as hardest.\nThe whole road\nEarliest weeks. The move-on test is on the last Saturday of each book.\nBook\nWeeks\nPlan weeks\nSaturday Block B (painting)\n01 · Procreate for Speed\nWeek 1\n—\n02 · Gesture\nWeeks 2–5\n—\n03 · Form and Construction\nWeeks 6–9\n—\n04 · Proportion & Drawing from Reference\nWeeks 10–14\n—\n05 · Anatomy I: Head, Neck and Torso\nWeeks 15–19\nBook 09 Value and Light (5 Sat)\n06 · Anatomy II: Arms, Legs, Hands and Feet\nWeeks 20–24\nBook 10 Colour (5 Sat)\n07 · Clothing, Folds and Volume\nWeeks 25–29\nBook 10 benchmark redraw (1) +\nBook 11 Rendering (4)\n08 · Foreshortening and Dynamic Poses\nWeeks 30–33\nBook 11 finish (1) + Book 12\nComposition (3)\n13 · Study Programmes\nWeeks 34–36\n—\n14 · Characters and Earning a Little\nWeeks 37–38\n—\nReading that runs alongside: Book 00 in week 1 · Book 13 Ch. 1-2 in Book 02 week 1 (its study formats return as a full block after Book 08). How the warm-up grows\nEach finished book takes over one weekday warm-up slot, so old skills stay alive in 5 minutes. The rows on each week page already include this, so this table is just to show the logic.\nDay\nWarm-up slot\nSwitches on after\nMon\n5-min class-mode mini session\nBook 02\nTue\nFive boxes at new angles · then proportion check (envelope + landmarks)\nBook 03 · Book 04\nWed\nHead studies (eye line halfway) · then five 1-min ball-and-jaw heads\nBook 04 · Book 05\nThu\nFive 1-min hands from your own hand (goal: 200 in the first year)\nBook 06\nFri\nThree 1-min value thumbnails\nBook 09 (Block B)\nSat\n5-min fold sketch: tension points + four folds\nBook 07\nEvery day\nOne gesture is a foreshortened or action pose\nBook 08\nExceptions, because the book itself says so: Book 01 uses no-menu gestures, Book 02 uses long-line warm-ups, Book 04 uses gestures + envelope, and Book 08 uses action photos.",
  "monthlyRitualBullets": [
   "Redraw a benchmark photo and compare",
   "Rerun a move-on test, redo what fails",

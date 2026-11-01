@@ -53,7 +53,6 @@ public struct PlanWeek: Codable, Hashable, Sendable {
 }
 
 public struct PracticePlan: Codable, Sendable {
-    public let startDate: String
     public let weeks: [PlanWeek]
     /// Monday first.
     public let foreverWeek: [PlanDay]

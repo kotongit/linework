@@ -74,9 +74,11 @@ public static partial class Harness
         Console.Out.WriteLine(requests.Length == 0 ? "check note powercfg was denied, relying on the flag" : $"check note powercfg lists us: {requests.Contains("Linework", StringComparison.OrdinalIgnoreCase)}");
         await Settle(3);
         Check("The pose image renders", player.PoseImage.Source != null);
+        Check("The first-pose note appears", player.ShownNote == "You just began, you can do it.");
         await ShootWindow("player", player);
         Press(player, Key.Space);
         Check("Space pauses", player.Session.Runner.IsPaused);
+        Check("The note hides while paused", player.ShownNote == null);
         Press(player, Key.Space);
         Press(player, Key.G);
         Press(player, Key.Right);

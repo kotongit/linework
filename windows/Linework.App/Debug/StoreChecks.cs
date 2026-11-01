@@ -119,6 +119,26 @@ public static class StoreChecks
         check("A future lesson can be ticked", t.IsTicked(ahead, kind));
         check("It counts on the earlier of its day and today", tick?.CountsOn == PlanTick.CountsOnFor(t.Schedule.DateOf(ahead), host.Today));
         check("It shows on the Path", PlanProgress.Status(ahead, t.TickKeys, t.Schedule) != DayStatus.Empty);
+
+        // Repeats. They need today to be inside the plan.
+        var rp = Path.Combine(bas, $"repeats-{Guid.NewGuid()}");
+        Directory.CreateDirectory(rp);
+        LibraryFolder.Create(rp, LibraryFolder.MondayOf(host.Today), host.Now);
+        var s = new LibraryStore(rp, host);
+        var now = (PlanRef)s.Schedule.TodayRef(host.Today);
+        var later = new PlanRef(now.SequenceIndex + 4, 0);
+        var laterKind = s.Schedule.DayFor(later).Blocks[0].Kind;
+        s.ToggleTick(later, laterKind);
+        check("The streak includes today", PlanProgress.CurrentStreak(s.PracticeDays, host.Today) >= 1);
+        s.AddRepeat(1, host.Today);
+        var shifted = new PlanRef(now.SequenceIndex + 5, 0);
+        check("A repeat before it leaves the tick on its lesson", s.IsTicked(shifted, laterKind));
+        var copy = new PlanRef(now.SequenceIndex + 1, 0);
+        s.ToggleTick(copy, s.Schedule.DayFor(copy).Blocks[0].Kind);
+        var before = s.Ticks.Count;
+        s.UndoLastRepeat();
+        check("Undo removes only that repeat's ticks", s.Ticks.Count == before - 1 && s.IsTicked(later, laterKind));
+        check("The repeat is gone from disk", new LibraryStore(rp, host).Plan.Repeats.Count == 0);
     }
 
     /// <summary>Makes a file unreadable: a lock on Windows, its mode elsewhere.</summary>

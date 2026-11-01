@@ -6,7 +6,7 @@ namespace Linework.App.Theme;
 /// <summary>Linework design tokens. The brushes are shared and change colour in place, so every view follows the theme.</summary>
 public static class Tokens
 {
-    public static readonly SolidColorBrush Ink = new(), Muted = new(), Hairline = new(), Ground = new();
+    public static readonly SolidColorBrush Ink = new(), Muted = new(), Hairline = new(), Ground = new(), Teal = new();
     public static bool IsDark { get; private set; }
     public static event Action? Changed;
 
@@ -24,6 +24,7 @@ public static class Tokens
         Muted.Color = Hex(ink, 0.63);
         Hairline.Color = Hex(ink, 0.18);
         Ground.Color = Hex(dark ? DarkGround : LightGround);
+        Teal.Color = Hex(dark ? 0x40CBE0u : 0x30B0C7u);
         Changed?.Invoke();
     }
 

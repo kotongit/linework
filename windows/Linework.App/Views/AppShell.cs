@@ -232,6 +232,7 @@ public sealed class MainWindow : GlassWindow
             }
         }
         ShowNotice();
+        ShowCelebration();
 
         object key;
         Func<UIElement> make;
@@ -255,6 +256,24 @@ public sealed class MainWindow : GlassWindow
         _page.Content = make();
     }
 
+    /// <summary>Waits for the session window to close, so it's seen rather than played behind it.</summary>
+    void ShowCelebration()
+    {
+        if (Session.PendingCelebration is { } kind && !Session.IsSessionActive)
+        {
+            if (_overlays.Children.Count > 0) return;
+            _overlays.Children.Add(new CelebrationView(kind, Session.PendingCelebrationIsToday, _context.Settings.Current.Sound, () =>
+            {
+                _overlays.Children.Clear();
+                Session.ClearCelebration();
+            }));
+        }
+        else if (Session.PendingCelebration == null)
+        {
+            _overlays.Children.Clear();
+        }
+    }
+
     void OnLibraryChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => Dispatcher.BeginInvoke(ShowNotice);
 
     UIElement Page(LibraryStore library)
@@ -271,10 +290,16 @@ public sealed class MainWindow : GlassWindow
 
     void StartNext(Linework.Core.Plan.PlanDayRef r)
     {
+        if (App.Library is not { } library) return;
+        if (library.Schedule.NextTimedBlock(r, library.TickKeys) is { } block && PlanStarter.Start(block, r, library, _context)) return;
+        Session.SetRoute(new AppRoute(AppSection.Today));
     }
 
     UIElement Section(AppSection section, LibraryStore library) => section switch
     {
+        AppSection.Today => new TodayView(_context, library),
+        AppSection.Path => new PathView(_context, library),
+        AppSection.Calendar => new CalendarHeatmapView(_context, library),
         AppSection.Library => new LibraryView(_context, library),
         _ => new Grid(),
     };

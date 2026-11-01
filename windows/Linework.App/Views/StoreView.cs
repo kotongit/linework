@@ -16,11 +16,13 @@ public abstract class StoreView : UserControl
         _sources = sources.OfType<INotifyPropertyChanged>().ToArray();
         Loaded += (_, _) =>
         {
+            Theme.Tokens.Changed += Invalidate;
             foreach (var source in _sources) source.PropertyChanged += OnChanged;
             Invalidate();
         };
         Unloaded += (_, _) =>
         {
+            Theme.Tokens.Changed -= Invalidate;
             foreach (var source in _sources) source.PropertyChanged -= OnChanged;
         };
     }

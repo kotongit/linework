@@ -28,6 +28,21 @@ public static class Ui
         return t;
     }
 
+    /// <summary>Long text the reader can select and copy.</summary>
+    public static TextBox SelectableText(string text, double size = 14, Brush? color = null) => new()
+    {
+        Style = new Style(typeof(TextBox)),
+        Text = text,
+        IsReadOnly = true,
+        FontFamily = Tokens.Font,
+        FontSize = size,
+        Foreground = color ?? Tokens.Ink,
+        CaretBrush = Brushes.Transparent,
+        Background = Brushes.Transparent,
+        BorderThickness = new Thickness(0),
+        TextWrapping = TextWrapping.Wrap,
+    };
+
     public static readonly FontWeight Medium = FontWeights.Medium, SemiBold = FontWeights.SemiBold;
 
     /// <summary>Only the shape it's given, dimmed when pressed or disabled. Colours stay out of the style, which would freeze them.</summary>
@@ -167,6 +182,9 @@ public static class Ui
         return new Viewbox { Width = size, Height = size, Child = new Canvas { Width = 24, Height = 24, Children = { path } } };
     }
 
+    public const string MoonIcon = "M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z";
+    public const string CheckIcon = "M5 12.5l4.5 4.5L19 7.5";
+    public const string EllipsisIcon = "M5 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3zM12 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3zM19 10.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3z";
     public const string StarIcon = "M12 3l2.7 5.8 6.3.8-4.6 4.3 1.2 6.3L12 17l-5.6 3.2 1.2-6.3L3 9.6l6.3-.8z";
     public const string ChevronLeftIcon = "M15 5L8 12L15 19";
     public const string ChevronRightIcon = "M9 5L16 12L9 19";

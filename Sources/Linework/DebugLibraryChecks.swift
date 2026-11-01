@@ -8,6 +8,36 @@ import SwiftUI
 /// Drives a real `LibraryStore` against real files and prints a line per check.
 @MainActor
 enum DebugLibraryChecks {
+    /// `--perf`: times the slow-looking work on a generated 2,000-photo library.
+    static func performance(source: URL) async {
+        guard let path = ProcessInfo.processInfo.environment["LINEWORK_LIBRARY"] else { exit(2) }
+        let root = URL(fileURLWithPath: path, isDirectory: true)
+        let fm = FileManager.default
+        try? LibraryFolder.create(at: root, weekOneStart: "2026-11-02", now: .now)
+        let hash = (try? FileHash.sha256(of: source)) ?? "x"
+        let records = (0..<2000).map { index -> PhotoRecord in
+            let name = "photo-\(index).\(source.pathExtension)"
+            try? fm.linkItem(at: source, to: root.appending(path: "Photos/\(name)"))
+            return PhotoRecord(id: UUID(), fileName: name, sha256: hash, importedAt: .now, crop: .init(x: 0, y: 0, width: 1, height: 1),
+                               rotation: 0, flipped: false, noFigureFound: false, missing: false)
+        }
+        try? LibraryFiles(root: root).write(records, to: .photos)
+        let clock = ContinuousClock()
+        func timed(_ name: String, _ work: () async -> Void) async {
+            let elapsed = await clock.measure { await work() }
+            print("perf", name, elapsed)
+        }
+        var opened: LibraryStore?
+        await timed("open library") { opened = try? LibraryStore(root: root) }
+        guard let store = opened else { exit(1) }
+        await timed("Finder check, nothing changed") { await PhotoScanner.run(on: store) }
+        await timed("visible photos sorted") { _ = store.visiblePhotos.sorted { $0.importedAt > $1.importedAt } }
+        await timed("save photos.json") { try? store.files.write(store.photos, to: .photos) }
+        await timed("tick summary") { _ = PlanProgress.tickSummary(store.ticks, schedule: store.schedule) }
+        await timed("session queue") { _ = PlanStore.sessionQueue(for: PlanBlock(kind: .warmup, text: "", minutes: 5, timed: [ClassStep(count: 10, seconds: 30)]), photos: store.visiblePhotos) }
+        exit(0)
+    }
+
     static func check(_ name: String, _ ok: Bool) { print("check", ok ? "pass" : "FAIL", name) }
 
     static func run(sources: [URL]) async {

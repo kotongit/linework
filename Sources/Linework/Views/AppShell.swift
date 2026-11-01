@@ -55,6 +55,17 @@ struct AppShell: View {
                     .id(celebration)
             }
         }
+        .overlay(alignment: .bottom) {
+            if let library = app.library, let text = library.saveFailure ?? library.notice ?? damagedText(library) {
+                Text(text)
+                    .font(Theme.font(13, .medium))
+                    .foregroundStyle(Theme.ink)
+                    .padding(.horizontal, 16).padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .overlay(Capsule().strokeBorder(Theme.ink, lineWidth: 1))
+                    .padding(16)
+            }
+        }
         .sheet(isPresented: $showingSetup) {
             if let library = app.library { SessionSetupView().environment(library) }
         }
@@ -67,6 +78,10 @@ struct AppShell: View {
         .onReceive(NotificationCenter.default.publisher(for: .startSessionRequested)) { _ in
             showingSetup = true
         }
+    }
+
+    private func damagedText(_ library: LibraryStore) -> String? {
+        library.damagedFiles.first.map { "“\($0)” couldn't be read, so it was set aside with “damaged” in its name." }
     }
 
     private func scan() {

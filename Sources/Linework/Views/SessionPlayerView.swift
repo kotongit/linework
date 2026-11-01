@@ -34,7 +34,10 @@ struct SessionPlayerView: View {
         }
         .background(WindowAccessor { w in
             window = w
-            if !DebugSnapshots.active, !w.styleMask.contains(.fullScreen) { w.toggleFullScreen(nil) }
+            #if DEBUG
+            if DebugSnapshots.active { return }
+            #endif
+            if !w.styleMask.contains(.fullScreen) { w.toggleFullScreen(nil) }
         })
         .focusable()
         .focusEffectDisabled()

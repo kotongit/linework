@@ -14,24 +14,18 @@ struct MainMenuView: View {
     private var calendar: Calendar { PlanStore.calendar }
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { timeline in
-            content(timeline.date)
+        let schedule = library.schedule
+        VStack(alignment: .leading, spacing: 0) {
+            header(schedule)
+            Spacer(minLength: 24)
+            hero
+            Spacer(minLength: 24)
+            footer(schedule: schedule)
         }
         .padding(.top, 52)
         .padding(.horizontal, 72)
         .padding(.bottom, 56)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private func content(_ now: Date) -> some View {
-        let schedule = library.schedule
-        return VStack(alignment: .leading, spacing: 0) {
-            header(schedule)
-            Spacer(minLength: 24)
-            hero(now)
-            Spacer(minLength: 24)
-            footer(now, schedule: schedule)
-        }
     }
 
     // MARK: Header
@@ -67,17 +61,18 @@ struct MainMenuView: View {
 
     // MARK: Hero
 
-    private func hero(_ now: Date) -> some View {
-        let hour = calendar.component(.hour, from: now)
-        return VStack(alignment: .leading, spacing: 0) {
-            HeroClock(now: now)
-            Text(LineworkCopy.greeting(hour: hour, name: name))
-                .font(Theme.font(26, .medium))
-                .foregroundStyle(Theme.ink)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: 760, alignment: .leading)
-                .padding(.top, 28)
+    private var hero: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            TimelineView(.periodic(from: .now, by: 1)) { HeroClock(now: $0.date) }
+            TimelineView(.everyMinute) { timeline in
+                Text(LineworkCopy.greeting(hour: calendar.component(.hour, from: timeline.date), name: name))
+                    .font(Theme.font(26, .medium))
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: 760, alignment: .leading)
+            }
+            .padding(.top, 28)
             Text(LineworkCopy.underGreeting)
                 .font(Theme.font(15))
                 .foregroundStyle(Theme.muted)
@@ -95,7 +90,7 @@ struct MainMenuView: View {
 
     // MARK: Footer
 
-    private func footer(_ now: Date, schedule: PlanSchedule) -> some View {
+    private func footer(schedule: PlanSchedule) -> some View {
         HStack(alignment: .top, spacing: 48) {
             column("Artist") {
                 if name.isEmpty {
@@ -109,7 +104,9 @@ struct MainMenuView: View {
                 }
             }
             column("Date") {
-                Text(now.formatted(.dateTime.weekday(.wide).month(.wide).day().year().locale(Locale(identifier: "en_US"))))
+                TimelineView(.everyMinute) { timeline in
+                    Text(timeline.date.formatted(.dateTime.weekday(.wide).month(.wide).day().year().locale(Locale(identifier: "en_US"))))
+                }
             }
             column("Local time zone") {
                 Text(calendar.timeZone.identifier.replacingOccurrences(of: "_", with: " "))

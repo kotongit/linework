@@ -8,12 +8,16 @@ struct GlassBackground: View {
 
     var body: some View {
         ZStack {
+            #if DEBUG
             // The blur paints an opaque material offscreen, so snapshots swap in their backdrop.
             if let backdrop = DebugSnapshots.backdrop {
                 backdrop
             } else {
                 VisualEffect()
             }
+            #else
+            VisualEffect()
+            #endif
             Theme.ground.opacity(Glass.tintOpacity(transparency: transparency))
         }
         .ignoresSafeArea()

@@ -66,6 +66,10 @@ private struct AboutMenuButton: View {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if DEBUG
+        if let i = CommandLine.arguments.firstIndex(of: "--perf"), CommandLine.arguments.count > i + 1 {
+            Task { @MainActor in await DebugLibraryChecks.performance(source: URL(fileURLWithPath: CommandLine.arguments[i + 1])) }
+            return
+        }
         if CommandLine.arguments.contains("--library-checks") {
             Task { @MainActor in
                 let i = CommandLine.arguments.firstIndex(of: "--library-checks")!

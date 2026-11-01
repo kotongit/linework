@@ -1,0 +1,13 @@
+{
+  "items" : {
+    "repeats" : [
+      {
+        "afterSequenceIndex" : 1,
+        "number" : 1,
+        "weekCount" : 1
+      }
+    ],
+    "weekOneStart" : "2026-11-02"
+  },
+  "version" : 1
+}

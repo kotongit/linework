@@ -1,0 +1,23 @@
+{
+  "items" : [
+    {
+      "id" : "00000000-AAAA-4BBB-8CCC-000000000050",
+      "name" : "Default class",
+      "steps" : [
+        {
+          "count" : 10,
+          "seconds" : 30
+        },
+        {
+          "count" : 5,
+          "seconds" : 60
+        },
+        {
+          "count" : 2,
+          "seconds" : 300
+        }
+      ]
+    }
+  ],
+  "version" : 1
+}

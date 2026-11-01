@@ -1,12 +1,14 @@
+using System.Text.Json.Serialization;
+
 namespace Linework.Core.Crop;
 
 /// <summary>A crop as stored: normalized, top-left origin, applied after rotation and flip.</summary>
 public readonly record struct NormalizedRect(double X, double Y, double Width, double Height)
 {
-    public double MaxX => X + Width;
-    public double MaxY => Y + Height;
-    public double MidX => X + Width / 2;
-    public double MidY => Y + Height / 2;
+    [JsonIgnore] public double MaxX => X + Width;
+    [JsonIgnore] public double MaxY => Y + Height;
+    [JsonIgnore] public double MidX => X + Width / 2;
+    [JsonIgnore] public double MidY => Y + Height / 2;
 }
 
 public enum CropHandle { TopLeft, Top, TopRight, Right, BottomRight, Bottom, BottomLeft, Left }

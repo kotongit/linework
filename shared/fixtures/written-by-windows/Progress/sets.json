@@ -1,0 +1,22 @@
+{
+  "items" : [
+    {
+      "createdAt" : "2026-11-02T12:00:00Z",
+      "id" : "00000000-AAAA-4BBB-8CCC-000000000040",
+      "name" : "Figures / gesto é",
+      "photoIDs" : [
+        "00000000-AAAA-4BBB-8CCC-000000000010",
+        "00000000-AAAA-4BBB-8CCC-000000000011"
+      ]
+    },
+    {
+      "createdAt" : "2026-11-02T12:00:00Z",
+      "id" : "00000000-AAAA-4BBB-8CCC-000000000041",
+      "name" : "Empty",
+      "photoIDs" : [
+
+      ]
+    }
+  ],
+  "version" : 1
+}

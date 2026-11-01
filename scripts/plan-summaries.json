@@ -1,0 +1,2259 @@
+{
+ "blocks": {
+  "Flip the canvas, toggle the greyscale layer, write one rule.": {
+   "title": "Greyscale check",
+   "bullets": [
+    "Flip the canvas, toggle greyscale",
+    "Write one rule"
+   ]
+  },
+  "Stiffness diagnosis on your worst pose: symmetry? no twist? weight on both feet? Write one rule.": {
+   "title": "Stiffness check",
+   "bullets": [
+    "Check your worst pose",
+    "Symmetry? No twist? Weight on both feet?",
+    "Write one rule"
+   ]
+  },
+  "Cross-contour test on your weakest form: if you can't decide which way the line curves, it's flat. Write one rule.": {
+   "title": "Cross-contour check",
+   "bullets": [
+    "Test your weakest form",
+    "Can't tell the curve? It's flat.",
+    "Write one rule"
+   ]
+  },
+  "Predict your errors in writing, then overlay the photo at 40% (or white silhouette + Difference). Log errors, write one rule.": {
+   "title": "Error prediction check",
+   "bullets": [
+    "Write your predicted errors first",
+    "Overlay the photo at 40%",
+    "Log errors, write one rule"
+   ]
+  },
+  "Draw yesterday's region from memory, then check it against the source. Write one rule.": {
+   "title": "Memory check",
+   "bullets": [
+    "Draw yesterday's region from memory",
+    "Check it, then write one rule"
+   ]
+  },
+  "Draw yesterday's body part from memory, then check. Write one rule.": {
+   "title": "Memory check",
+   "bullets": [
+    "Draw yesterday's body part from memory",
+    "Check it, then write one rule"
+   ]
+  },
+  "Name the fold types in one clothing photo (pipe, zigzag, spiral, half-lock, diaper, drop, inert). Write one rule.": {
+   "title": "Fold name check",
+   "bullets": [
+    "Name the folds in one clothing photo",
+    "Write one rule"
+   ]
+  },
+  "Silhouette check: duplicate, Alpha Lock, fill black, quick-pinch. Does the action read? Write one rule.": {
+   "title": "Silhouette check",
+   "bullets": [
+    "Duplicate, Alpha Lock, fill black",
+    "Quick-pinch: does the action read?",
+    "Write one rule"
+   ]
+  },
+  "Check against the reference (overlay, greyscale or eyedropper), then log the answer to your written question.": {
+   "title": "Reference check",
+   "bullets": [
+    "Check against the reference",
+    "Overlay, greyscale or eyedropper",
+    "Log the answer to your question"
+   ]
+  },
+  "Read it back as a client would: is it clear? Write one rule.": {
+   "title": "Clarity check",
+   "bullets": [
+    "Read it back as a client would",
+    "Is it clear? Write one rule"
+   ]
+  },
+  "Predict, compare, write one rule": {
+   "title": "One rule",
+   "bullets": [
+    "Predict, compare, write one rule"
+   ]
+  },
+  "Ten 30-s gestures with the no-menu rule (gestures + QuickMenu only)": {
+   "title": "No-menu gestures",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Use gestures and QuickMenu only"
+   ]
+  },
+  "Ten 30-s gestures with the no-menu rule (gestures + QuickMenu only).": {
+   "title": "No-menu gestures",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Use gestures and QuickMenu only"
+   ]
+  },
+  "Long lines from the shoulder: C, S, straights, one stroke each, no correcting": {
+   "title": "Long lines",
+   "bullets": [
+    "C, S and straights from the shoulder",
+    "One stroke each, no correcting"
+   ]
+  },
+  "Long lines from the shoulder: C, S, straights, one stroke each, no correcting.": {
+   "title": "Long lines",
+   "bullets": [
+    "C, S and straights from the shoulder",
+    "One stroke each, no correcting"
+   ]
+  },
+  "5-min class-mode mini: 6 × 30 s + 2 × 1 min": {
+   "title": "Class mode mini",
+   "bullets": [
+    "5 min: 6 poses of 30 s, 2 of 1 min"
+   ]
+  },
+  "5-min class-mode mini: 6 × 30 s + 2 × 1 min (one foreshortened/action pose)": {
+   "title": "Class mode mini",
+   "bullets": [
+    "5 min: 6 poses of 30 s, 2 of 1 min",
+    "One pose foreshortened or action"
+   ]
+  },
+  "5-min class mode": {
+   "title": "Class mode mini",
+   "bullets": [
+    "5 min in class mode"
+   ]
+  },
+  "Ten 30-s gestures from photos": {
+   "title": "Gestures",
+   "bullets": [
+    "10 gestures, 30 s each, from photos"
+   ]
+  },
+  "Ten 30-s gestures from photos.": {
+   "title": "Gestures",
+   "bullets": [
+    "10 gestures, 30 s each, from photos"
+   ]
+  },
+  "Ten 30-s gestures from action photos": {
+   "title": "Action gestures",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Use action photos"
+   ]
+  },
+  "Ten 30-s gestures: line of action + envelope only": {
+   "title": "Line and envelope gestures",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Line of action and envelope only"
+   ]
+  },
+  "Ten 30-s gestures: line of action + envelope only.": {
+   "title": "Line and envelope gestures",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Line of action and envelope only"
+   ]
+  },
+  "Ten 30-s gestures: line of action + envelope only · then the 8-head chart from memory (2 min)": {
+   "title": "Gestures and 8-head chart",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Line of action and envelope only",
+    "Then the 8-head chart from memory, 2 min"
+   ]
+  },
+  "Ten 30-s gestures: line of action + envelope only · then the 8-head chart from memory (2 min).": {
+   "title": "Gestures and 8-head chart",
+   "bullets": [
+    "10 gestures, 30 s each",
+    "Line of action and envelope only",
+    "Then the 8-head chart from memory, 2 min"
+   ]
+  },
+  "Proportion check on a photo: envelope + landmarks (3 min) · 5 boxes at new angles (2 min)": {
+   "title": "Proportion check and boxes",
+   "bullets": [
+    "Photo envelope and landmarks, 3 min",
+    "Draw 5 boxes at new angles, 2 min"
+   ]
+  },
+  "Proportion check + 5 boxes": {
+   "title": "Proportion check and boxes",
+   "bullets": [
+    "Proportion check",
+    "Draw 5 boxes"
+   ]
+  },
+  "Head studies from photos: eye line halfway, thirds (5 min)": {
+   "title": "Head studies",
+   "bullets": [
+    "Draw heads from photos, 5 min",
+    "Eye line halfway, then thirds"
+   ]
+  },
+  "Five 1-min ball-and-jaw heads from photos": {
+   "title": "Ball-and-jaw heads",
+   "bullets": [
+    "5 heads, 1 min each, from photos"
+   ]
+  },
+  "Five ball-and-jaw heads": {
+   "title": "Ball-and-jaw heads",
+   "bullets": [
+    "Draw 5 ball-and-jaw heads"
+   ]
+  },
+  "Three 1-min value thumbnails of anything, 3 values": {
+   "title": "Value thumbnails",
+   "bullets": [
+    "3 thumbnails, 1 min each",
+    "3 values, any subject"
+   ]
+  },
+  "Three value thumbnails": {
+   "title": "Value thumbnails",
+   "bullets": [
+    "Draw 3 value thumbnails"
+   ]
+  },
+  "Five 1-min hands from your own hand (add to the hand count)": {
+   "title": "Hand studies",
+   "bullets": [
+    "5 hands, 1 min each",
+    "Draw your own hand",
+    "Add them to the hand count"
+   ]
+  },
+  "Five hands from your own hand": {
+   "title": "Hand studies",
+   "bullets": [
+    "Draw 5 hands from your own hand"
+   ]
+  },
+  "5-min fold sketch: one garment photo → tension points + four folds.": {
+   "title": "Fold sketch",
+   "bullets": [
+    "5 min from one garment photo",
+    "Mark tension points and four folds"
+   ]
+  },
+  "Fold sketch": {
+   "title": "Fold sketch",
+   "bullets": [
+    "Do a fold sketch"
+   ]
+  },
+  "Benchmark, 25 min total: one portrait and one torso from photos. Save the photos.": {
+   "title": "Benchmark",
+   "bullets": [
+    "Draw a portrait and a torso, 25 min",
+    "Use photos and save them"
+   ]
+  },
+  "One 3-value portrait painting, 40 min. Ball and jaw → light direction → flat light/halftone/shadow planes → soften only the round transitions.": {
+   "title": "3-value portrait",
+   "bullets": [
+    "Paint a 3-value portrait, 40 min",
+    "Ball and jaw, light, then planes",
+    "Soften only the round transitions"
+   ]
+  },
+  "Redraw the shoulder area of the Sep 2024 WIP, 30 min: the clavicle lifting toward the raised arm, the deltoid capping the joint, the arm emerging from under it and overlapping the chest.": {
+   "title": "Shoulder redraw",
+   "bullets": [
+    "Redraw the Sep 2024 WIP shoulder, 30 min",
+    "Clavicle, deltoid cap, arm over chest"
+   ]
+  },
+  "A full torso from memory (front and back), then the same from a photo. Compare. What did memory get wrong?": {
+   "title": "Torso from memory",
+   "bullets": [
+    "Torso from memory, front and back",
+    "Same torso from a photo",
+    "Compare: what did memory get wrong?"
+   ]
+  },
+  "Benchmark redraw: the same portrait and torso photos as Feb 13, 25 min total, side by side. Move-on test: ball-and-jaw head in about 2 min · correct 3-value planar head · six torso landmarks found quickly · arms plug in under the deltoid · torso front and back from memory · 20 heads + 10 torsos done.": {
+   "title": "Benchmark redraw",
+   "bullets": [
+    "Redraw the Feb 13 portrait and torso",
+    "25 min total, side by side",
+    "Run the move-on test"
+   ]
+  },
+  "Benchmark, 25 min: one figure with visible hands and legs, from a photo.": {
+   "title": "Benchmark",
+   "bullets": [
+    "Draw a figure, 25 min",
+    "Use a photo, hands and legs visible"
+   ]
+  },
+  "Ten leg studies from dance or sport photos, 30 min.": {
+   "title": "Leg studies",
+   "bullets": [
+    "Draw 10 legs from dance or sport photos",
+    "30 min"
+   ]
+  },
+  "Hands holding five different objects, 40 min. Draw the object first, then wrap the fingers around it with cross-contours.": {
+   "title": "Hands holding objects",
+   "bullets": [
+    "Draw hands holding 5 objects, 40 min",
+    "Object first, then wrap the fingers",
+    "Use cross-contours"
+   ]
+  },
+  "Redraw the reaching hand from your Sep 2024 WIP using a photo of your own hand in the same pose. 30 min.": {
+   "title": "Reaching hand redraw",
+   "bullets": [
+    "Redraw the reaching hand, Sep 2024 WIP",
+    "Use a photo of your hand, same pose",
+    "30 min"
+   ]
+  },
+  "Benchmark redraw (25 min) with the same photo as Mar 20, then the Ch. 6 Saturday drill: redraw the \"delusional\" figure with the full process, keeping its gesture. Move-on test: forearm twist · leg alignment · hands in about 2 min · one hand pose from 3 angles · feet as wedges · 50 hands + 15 limbs.": {
+   "title": "Benchmark and figure redraw",
+   "bullets": [
+    "Redraw the Mar 20 photo, 25 min",
+    "Redraw the delusional figure",
+    "Run the move-on test"
+   ]
+  },
+  "Benchmark, 25 min: one clothed figure from a photo.": {
+   "title": "Benchmark",
+   "bullets": [
+    "Draw a clothed figure, 25 min",
+    "Work from a photo"
+   ]
+  },
+  "Name the fold types in 10 fashion photos (20 min), then sketch the clearest one.": {
+   "title": "Fold types",
+   "bullets": [
+    "Name folds in 10 fashion photos, 20 min",
+    "Then sketch the clearest one"
+   ]
+  },
+  "Finish the striped-shirt figure, 40 min.": {
+   "title": "Striped-shirt figure",
+   "bullets": [
+    "Finish the striped-shirt figure",
+    "40 min"
+   ]
+  },
+  "Design an outfit for one of your characters, on a mannequin, 45 min. Costume logic: where do they live, what do they carry?": {
+   "title": "Outfit design",
+   "bullets": [
+    "Design a character outfit, 45 min",
+    "Draw it on a mannequin",
+    "Ask where they live, what they carry"
+   ]
+  },
+  "Ch. 6 Saturday drill, 45 min: one clothed figure from a photo (mannequin → silhouette → flat → big shadows → five folds → edges), then repaint the \"delusional\" dress the same way. Move-on test: mannequin under every figure · tension points marked first · fold types named · silk/wool/denim recognisable · hems follow the form · 3-value painted folds.": {
+   "title": "Clothed figure drill",
+   "bullets": [
+    "Draw a clothed figure from a photo",
+    "Then repaint the delusional dress",
+    "45 min, then the move-on test"
+   ]
+  },
+  "Benchmark, 25 min: a figure reaching at the camera, from a photo (or your own timer photo).": {
+   "title": "Benchmark",
+   "bullets": [
+    "Figure reaching at the camera, 25 min",
+    "From a photo or your own timer photo"
+   ]
+  },
+  "Seated and lying figures from photos, 40 min.": {
+   "title": "Seated and lying figures",
+   "bullets": [
+    "Draw seated and lying figures",
+    "Work from photos, 40 min"
+   ]
+  },
+  "One figure from three camera heights, 45 min.": {
+   "title": "Three camera heights",
+   "bullets": [
+    "Draw one figure from 3 camera heights",
+    "45 min"
+   ]
+  },
+  "Benchmark redraw (25 min) with the same photo as May 29, then the Ch. 5 Saturday drill: a dynamic pose for one of your characters (three silhouette thumbnails → pick → construct with foreshortening and the horizon). Move-on test: measured lengths · clear overlaps · horizon placed · a jump, a run and a strike that read · black-fill test passed.": {
+   "title": "Benchmark and dynamic pose",
+   "bullets": [
+    "Redraw the May 29 photo, 25 min",
+    "Dynamic pose: 3 thumbnails, pick, build",
+    "Run the move-on test"
+   ]
+  },
+  "30 min · Book 09 S1: value benchmark. A 25-min lit portrait from a photo with strong light. Keep the greyscale layer on top.": {
+   "title": "Value benchmark",
+   "bullets": [
+    "Draw a lit portrait from a photo, 25 min",
+    "Use a photo with strong light",
+    "Keep the greyscale layer on top"
+   ]
+  },
+  "30 min · Book 09 S2: zones and families. 10 min: a 0-10 value scale by eye, checked with the Classic panel. 10 min: three spheres with all seven zones labelled. 10 min: one object in two values first, then the families. Every shadow value darker than every light value.": {
+   "title": "Value zones and families",
+   "bullets": [
+    "0-10 value scale by eye, 10 min",
+    "3 spheres, label all 7 zones, 10 min",
+    "10 min: object in 2 values, families"
+   ]
+  },
+  "30 min · Book 09 S3: light directions. The planar box head four times, 6 min each: front, side, top and rim light. Three values only. Note the mood of each.": {
+   "title": "Light directions",
+   "bullets": [
+    "Planar box head 4 times, 6 min each",
+    "Front, side, top and rim light",
+    "Three values only"
+   ]
+  },
+  "30 min · Book 09 S4: value design. Six stamp-sized thumbnails, 3 values each, for one character idea (vary the light, the background value and the figure value). Scale up the best one and block it in with a hard brush.": {
+   "title": "Value design thumbnails",
+   "bullets": [
+    "6 stamp-sized thumbnails, 3 values each",
+    "Vary light, background and figure values",
+    "Scale up the best, block in hard brush"
+   ]
+  },
+  "30 min · Book 09 S5: benchmark redraw. Repaint the Feb 13 lit-portrait photo in 25 min. Move-on test: 3-5 clear value groups (squint) · families separate · seven zones placeable · one key light · thumbnails before every piece.": {
+   "title": "Value benchmark redraw",
+   "bullets": [
+    "Repaint the Feb 13 lit portrait, 25 min",
+    "Run the move-on test"
+   ]
+  },
+  "30 min · Book 10 S1: colour benchmark. A 25-min coloured portrait from a photo. Greyscale layer on top.": {
+   "title": "Colour benchmark",
+   "bullets": [
+    "Paint a coloured portrait, 25 min",
+    "Use a photo, greyscale layer on top"
+   ]
+  },
+  "30 min · Book 10 S2: HSB + value in colour. 15 min: eyedrop ten colours from a painting you love and write each one's H, S and B. 15 min: a sphere using only saturation under 40% plus one accent.": {
+   "title": "HSB study",
+   "bullets": [
+    "15 min: eyedrop 10 colours, note H, S, B",
+    "15 min: sphere under 40% saturation",
+    "Add one accent"
+   ]
+  },
+  "30 min · Book 10 S3: temperature. The same simple head three times, 8 min each: warm key with cool shadows · cool key with warm shadows · a coloured rim light. Identical values (check in greyscale).": {
+   "title": "Temperature heads",
+   "bullets": [
+    "Same simple head 3 times, 8 min each",
+    "Warm key, cool key, coloured rim light",
+    "Keep values identical"
+   ]
+  },
+  "30 min · Book 10 S4: harmony + palettes. One bust as a greyscale block-in, recoloured 4 ways (monochromatic, analogous, complementary, dominant + accent), 6 min each. Save a palette from one inspiration (Palettes → + → New from Photos) for next time.": {
+   "title": "Harmony palettes",
+   "bullets": [
+    "Greyscale bust, 4 recolours, 6 min each",
+    "Monochromatic, analogous, complementary",
+    "Dominant + accent, then save a palette"
+   ]
+  },
+  "30 min · Book 10 S5: skin and hair. Three 8-min portrait studies, different skin tones and light. Eyedrop the photo afterwards: where did you go too grey, too orange or too saturated?": {
+   "title": "Skin and hair studies",
+   "bullets": [
+    "3 portrait studies, 8 min each",
+    "Different skin tones and light",
+    "Eyedrop the photo: too grey or orange?"
+   ]
+  },
+  "30 min · Book 10 S6: benchmark redraw. Repaint the Mar 20 coloured-portrait photo in 25 min inside a 6-8 colour palette. Move-on test: HSB fluency · passes greyscale · deliberate temperature shifts · saturation only at the focal point · keep counting limited-palette pieces toward 5.": {
+   "title": "Colour benchmark redraw",
+   "bullets": [
+    "Repaint the Mar 20 portrait, 25 min",
+    "Use a 6-8 colour palette",
+    "Run the move-on test"
+   ]
+  },
+  "30 min · Book 11 S1: rendering benchmark. A 25-min portrait study with the five passes on a timer: silhouette 3 · light/shadow 5 · planes 8 · soften 5 · accents 4. Screenshot after each pass. Count and write down your strokes.": {
+   "title": "Rendering benchmark",
+   "bullets": [
+    "25 min portrait study in five passes",
+    "Passes of 3, 5, 8, 5 and 4 min",
+    "Screenshot each pass, count strokes"
+   ]
+  },
+  "30 min · Book 11 S2: edges + economy. 10 min: a simple object in 30 strokes (count them). 20 min: a portrait study in 60 strokes with the no-pressure hard brush and only ONE hard-edge area, at the focal point.": {
+   "title": "Edges and economy",
+   "bullets": [
+    "10 min: simple object in 30 strokes",
+    "20 min: portrait in 60 strokes",
+    "One hard-edge area, at the focal point"
+   ]
+  },
+  "30 min · Book 11 S3: materials. Five spheres, 4 min each: matte, skin, glossy, metal, velvet. Then put one material on a character (a metal bracelet or a glossy boot).": {
+   "title": "Materials",
+   "bullets": [
+    "5 spheres, 4 min each",
+    "Matte, skin, glossy, metal, velvet",
+    "Put one material on a character"
+   ]
+  },
+  "30 min · Book 11 S4: painterly habits. A 25-min bust on ONE layer: eyedrop at least half your colours from the canvas, leave visible strokes in the light family, no smudge tool.": {
+   "title": "Painterly bust",
+   "bullets": [
+    "25 min bust on one layer",
+    "Eyedrop at least half your colours",
+    "Visible strokes in light, no smudge"
+   ]
+  },
+  "30 min · Book 11 S5: benchmark redraw with fewer strokes. The May 1 portrait photo again, 25 min. Compare stroke counts. Move-on test: five passes every time · hard edges only where wanted · a 20-min study in under 60 strokes · materials read · you stop before overworking.": {
+   "title": "Fewer-strokes redraw",
+   "bullets": [
+    "Redraw the May 1 portrait, 25 min",
+    "Compare your stroke counts",
+    "Run the move-on test"
+   ]
+  },
+  "30 min · Book 12 S1: focal point + placement. Six 3-min thumbnails of one character (centred, on a third, close bust, small full body, cropped mid-thigh, extreme close-up). Pick one and write one sentence on why. It becomes your composition benchmark.": {
+   "title": "Focal point thumbnails",
+   "bullets": [
+    "6 character thumbnails, 3 min each",
+    "Pick one, write one sentence on why",
+    "It becomes your composition benchmark"
+   ]
+  },
+  "30 min · Book 12 S2: leading the eye. Two illustrations you love: draw arrows on a layer above for your eye's path. Then sketch your own character composition using the same path.": {
+   "title": "Leading the eye",
+   "bullets": [
+    "Draw eye-path arrows on 2 illustrations",
+    "Sketch your character on the same path"
+   ]
+  },
+  "30 min · Book 12 S3: finishing + presenting. The 10-min finishing pass (greyscale → gentle S-curve in Curves → Color Balance → sharpen the focal point → small Add glow → flip + thumbnail) on your best piece. Export a 4:5 version (1080 × 1350) and a square detail.": {
+   "title": "Finishing and presenting",
+   "bullets": [
+    "10-min finishing pass on your best piece",
+    "Curves, Color Balance, sharpen, glow",
+    "Export 4:5 and a square detail"
+   ]
+  },
+  "Full workflow, 60 min (Ch. 6). Simple bust from a photo: thumbnails 5 · construction sketch 10-20 (lowered to 20-30%) · flats 10 · Multiply value pass 10 · colour of light 5 · merge and render · finish 10. Time each step. Next time cut the slow steps, but never the construction sketch.": {
+   "title": "Full workflow",
+   "bullets": [
+    "Simple bust from a photo, 60 min",
+    "Time each step",
+    "Next time cut slow steps, not the sketch"
+   ]
+  },
+  "Benchmark (30 min). Pick ONE pose set of ten photos and save it in an album named \"Gesture benchmark\". Ten 1-min poses. Save as 2026-11-14 · gesture benchmark. Then run the Book 00 move-on test (two weeks in): streak 12 of 14 days, every session had warm-up/focus/check, a rule after each session, every drill saved, a benchmark exists.": {
+   "title": "Gesture benchmark",
+   "bullets": [
+    "Pick 10 photos, save as an album",
+    "Draw 10 poses, 1 min each, 30 min",
+    "Then run the Book 00 move-on test"
+   ]
+  },
+  "Class-mode session, 30 min: 10 × 30 s · 5 × 1 min · 3 × 2 min · 1 × 5 min, then check. Follow the timing table: 30 s = line + head; 1 min adds tilts and single-line limbs; 2 min adds the bean, mitten hands and wedge feet; 5 min adds simple cylinders and overlaps.": {
+   "title": "Class mode session",
+   "bullets": [
+    "10 poses of 30 s, then 5 of 1 min",
+    "3 of 2 min, then 1 of 5 min"
+   ]
+  },
+  "Shapes-only gestures (RECCU style), 30 min. About twelve 2-min gestures, each built from 3-4 filled shapes (head, bean, limbs) with a hard brush. No lines at all.": {
+   "title": "Shapes-only gestures",
+   "bullets": [
+    "About 12 gestures, 2 min each",
+    "Build each from 3-4 filled shapes",
+    "Hard brush, no lines at all"
+   ]
+  },
+  "Benchmark redraw + rebuild (60 min). 1) Redraw the same ten benchmark photos at 1 min each and put them side by side with Nov 14. 2) Book 02 Ch. 5 Saturday drill: take an old piece with a weak pose, make three new gesture options in 5 min, rebuild the strongest with the gesture layer visible, then compare silhouettes. 3) Move-on test: line of action visible in every 30-s gesture · 10 gestures in 5 min without stopping · one stroke per line · plumb check passes · the 5-min drawings keep the first curve.": {
+   "title": "Benchmark and rebuild",
+   "bullets": [
+    "Redraw 10 benchmark photos, 1 min each",
+    "Compare with Nov 14, side by side",
+    "Rebuild a weak old pose, then test"
+   ]
+  },
+  "Benchmark, 25 min: a mannequin over a photo, then the same pose rotated to a side view. Save the photo with it.": {
+   "title": "Mannequin benchmark",
+   "bullets": [
+    "Mannequin over a photo, 25 min",
+    "Redraw the pose rotated to a side view",
+    "Save the photo with it"
+   ]
+  },
+  "An arm and torso from three angles, 45 min. Ribcage box, sphere joint under a deltoid cap, upper-arm and forearm cylinders. Front, three-quarter and back.": {
+   "title": "Arm and torso angles",
+   "bullets": [
+    "Arm and torso from 3 angles, 45 min",
+    "Front, three-quarter and back",
+    "Ribcage box, deltoid sphere, cylinders"
+   ]
+  },
+  "Redraw an old piece's figure as a mannequin (45 min). Keep its gesture and rebuild the body in forms underneath.": {
+   "title": "Old piece as mannequin",
+   "bullets": [
+    "Old figure as a mannequin, 45 min",
+    "Keep its gesture, rebuild in forms"
+   ]
+  },
+  "Benchmark redraw (25 min) with the same photo as Dec 12, then compare side by side. Move-on test: boxes converge · minor axes line up with cylinders · confident cross-contours · mannequin in about 8 min with correct joins · rotation still reads · overlaps clear. Rotation only needs to be \"readable\".": {
+   "title": "Mannequin benchmark redraw",
+   "bullets": [
+    "Redraw the Dec 12 photo, 25 min",
+    "Compare side by side",
+    "Run the move-on test"
+   ]
+  },
+  "One 25-min figure through all five stages: gesture 1 · envelope 2 · measure 3 · forms 8 · contour 10+. Flip after every stage. Overlay check at the end.": {
+   "title": "Five-stage figure",
+   "bullets": [
+    "25 min: gesture 1, envelope 2, measure 3",
+    "Forms 8 min, contour 10+ min",
+    "Flip each stage, overlay at the end"
+   ]
+  },
+  "Canon practice, 45 min: one figure at realistic proportions, then the same pose at anime proportions (6.5 heads). Write the canon on the measure layer (\"7 heads, shoulders 1.7\").": {
+   "title": "Canon practice",
+   "bullets": [
+    "45 min: realistic proportions",
+    "Same pose, anime proportions (6.5 heads)",
+    "Write the canon on the measure layer"
+   ]
+  },
+  "One dynamic pose (jumping or reaching), 30 min, using every tool in order: envelope → unit + halfway → shoulder/hip angles → plumb line → negative spaces → triangles.": {
+   "title": "Dynamic pose tools",
+   "bullets": [
+    "Draw a jump or a reach, 30 min",
+    "Use every measuring tool, in order"
+   ]
+  },
+  "DAY 27: benchmark redraw. The same photo as Jan 4, 25 min, same rules. Put the two side by side and check both with Difference. That comparison is your score.": {
+   "title": "Benchmark redraw",
+   "bullets": [
+    "Redraw the Jan 4 photo, 25 min",
+    "Same rules, side by side",
+    "Check both with Difference"
+   ]
+  },
+  "Paint something just for fun: no measuring, no overlay, no log (Book 04). Also do the monthly ritual: watch one time-lapse and choose next month's focus. If you scored under 4 of 6, repeat the week 2-3 drills for one week before Book 05.": {
+   "title": "Paint for fun",
+   "bullets": [
+    "No measuring, overlay or log",
+    "Watch a time-lapse, pick next focus",
+    "Under 4 of 6? Repeat weeks 2-3"
+   ]
+  },
+  "Master study, 60 min (Ch. 4): a small area (face or hand) of a piece by one of your inspirations. Question → 3-5 value thumbnail → copy in passes → three things you learned. Label it as a study, credit the artist, never sell it.": {
+   "title": "Master study",
+   "bullets": [
+    "Study a face or hand, 60 min",
+    "Ask a question, then copy in passes",
+    "Label it, credit the artist, never sell"
+   ]
+  },
+  "Master study #2, 60 min: a public-domain painter (Sargent or Zorn for brush economy, Sorolla for light, Rembrandt for edges).": {
+   "title": "Master study",
+   "bullets": [
+    "Study a public-domain painter, 60 min",
+    "Sargent or Zorn: brush economy",
+    "Sorolla: light. Rembrandt: edges"
+   ]
+  },
+  "Master study #3 (60 min), then the move-on test: every study starts with a written question · all six study types done at least twice · three master studies with notes · a lesson logged after every study · the rotation runs without thinking.": {
+   "title": "Master study",
+   "bullets": [
+    "Master study #3, 60 min",
+    "Then run the move-on test"
+   ]
+  },
+  "A complete character sheet, 60-90 min (Ch. 2): a front/side/back turnaround on a 2D grid sized to head height, four expressions, the palette, two details, and notes. Your green-haired avatar is a good candidate.": {
+   "title": "Character sheet",
+   "bullets": [
+    "Draw a character sheet, 60-90 min",
+    "Front, side and back turnaround",
+    "4 expressions, palette, 2 details, notes"
+   ]
+  },
+  "One piece just for you, then post it. That's what all of this is for.": {
+   "title": "Piece just for you",
+   "bullets": [
+    "Make one piece just for you",
+    "Then post it"
+   ]
+  },
+  "Setup day (Book 00 Ch. 4 + Book 01 Ch. 1), about 45 min. Gallery stacks 01 Procreate, 02 Gesture, 03 Form, 04 Proportion. Make the error-log note (date · drill · predicted · actual · rule). Build a drill template and a painting template. Tune the pressure curve in small steps. Eyedropper on touch-and-hold. QuickMenu: Flip Horizontal, New Layer, Clear Layer, Merge Down, Curves, Liquify. End with 15 min of loose sketching to test it all.": {
+   "title": "Set up Procreate",
+   "bullets": [
+    "About 45 min: stacks, log, templates",
+    "Tune pressure, eyedropper, QuickMenu",
+    "End with 15 min of loose sketching"
+   ]
+  },
+  "Brush kit (Ch. 2). Set up five brushes (6B Pencil, Studio Pen/Monoline, Round or Flat, Soft Brush, Gouache) and duplicate before editing. Make a Round Brush copy with pressure→size and pressure→opacity at 0%. Set smudge and eraser to the same brushes. Paint an apple or mug 3 times: normal, no pressure, no pressure + 15-stroke limit.": {
+   "title": "Brush kit",
+   "bullets": [
+    "Set up 5 brushes",
+    "Paint an apple 3 ways"
+   ]
+  },
+  "Flats and layers (Ch. 3). Quick character sketch, closed lines, line layer set to Reference. ColorDrop flats underneath in under 10 min, no leaks. Add one clipped Multiply shadow layer and one clipped Add light layer. Merge, then paint over in Normal mode for 10 min.": {
+   "title": "Flats and layers",
+   "bullets": [
+    "Sketch, ColorDrop flats in under 10 min",
+    "Add a Multiply shadow and an Add light",
+    "Paint over in Normal mode, 10 min"
+   ]
+  },
+  "Fix an old piece (Ch. 4). Duplicate the \"delusional\" piece. 12 min: fix two proportion problems with Freehand selection, Transform (Bicubic) and Liquify. 8 min: black layer set to Color (greyscale check), then Curves to improve the value structure. Keep before and after side by side.": {
+   "title": "Fix an old piece",
+   "bullets": [
+    "Duplicate your delusional piece",
+    "12 min: fix 2 proportion problems",
+    "8 min: greyscale check, then Curves"
+   ]
+  },
+  "No-menu portrait (Ch. 5). A 20-min portrait study from a photo using only gestures, the eyedropper and the QuickMenu. Tally every time you wanted a menu, then assign a gesture or QuickMenu slot to each.": {
+   "title": "No-menu portrait",
+   "bullets": [
+    "20-min portrait study from a photo",
+    "Use only gestures, eyedropper, QuickMenu",
+    "Tally each time you wanted a menu"
+   ]
+  },
+  "One line per pose (Ch. 1). Twenty 1-min poses (Line of Action timer). For each, only ONE line through the body, head to standing foot. Zoomed out, drawing from the shoulder, three-finger scrub to clear between poses.": {
+   "title": "One line per pose",
+   "bullets": [
+    "20 poses, 1 min each",
+    "One line through the body, head to foot",
+    "Zoomed out, draw from the shoulder"
+   ]
+  },
+  "C, S or I (Ch. 2). Fifteen 1-min poses. Say \"C\", \"S\" or \"I\" out loud before each one, then draw the line exaggerated 10-20% plus a head oval. Last 5 min: redraw your 3 favourites with the curve pushed twice as far.": {
+   "title": "C, S or I",
+   "bullets": [
+    "15 poses, 1 min each",
+    "Say C, S or I, then draw it exaggerated",
+    "Last 5 min: redraw 3 favourites bolder"
+   ]
+  },
+  "Straights against curves (Ch. 2). Fifteen 1-min poses from sports and dance photos: the line of action plus one straight on the tension side opposite a curve. Find the head and the weight first.": {
+   "title": "Straights against curves",
+   "bullets": [
+    "15 poses, 1 min each, sport or dance",
+    "Line of action plus an opposing straight",
+    "Find the head and weight first"
+   ]
+  },
+  "Ghosting (Ch. 4 technique). Twenty 1-min lines of action. Before each stroke, hover and rehearse the motion 2-3 times, then commit to one stroke. No erasing.": {
+   "title": "Ghosting",
+   "bullets": [
+    "20 one-minute lines of action",
+    "Rehearse each stroke 2-3 times first",
+    "Commit to one stroke, no erasing"
+   ]
+  },
+  "Mixed timing. Ten 30-s poses (line + head only) and ten 1-min poses (adding limbs as single lines). If a line is wrong, draw the right one beside it and move on.": {
+   "title": "Mixed timing",
+   "bullets": [
+    "10 poses at 30 s: line and head",
+    "10 poses at 1 min: add limb lines",
+    "Wrong line? Draw the right one beside it"
+   ]
+  },
+  "The bean (Ch. 3). 10 min: ten 1-min poses drawn as line of action + bean, with a small ellipse on the ribcage and one on the pelvis showing which way each faces. 10 min: five 2-min standing poses with a plumb line from the pit of the neck.": {
+   "title": "The bean",
+   "bullets": [
+    "10 min: 10 poses, line plus bean",
+    "Ribcage and pelvis ellipses show facing",
+    "10 min: 5 two-min poses, plumb line"
+   ]
+  },
+  "Rhythm in limbs (Ch. 3). Ten 1-min poses where you draw both sides of each limb as offset curves (high point on one side opposite a low point on the other), never parallel lines. Then five 2-min poses.": {
+   "title": "Rhythm in limbs",
+   "bullets": [
+    "10 poses, 1 min each, then 5 at 2 min",
+    "Draw both sides of each limb as curves",
+    "Offset the curves, never parallel"
+   ]
+  },
+  "Bend and twist. Ten 1.5-min poses that bend or twist: mark the squashed side (compressed) against the stretched side (long, smooth), and turn the ribcage and pelvis ellipses in different directions.": {
+   "title": "Bend and twist",
+   "bullets": [
+    "10 poses, 1.5 min each",
+    "Mark the squashed and the stretched side",
+    "Turn ribcage and pelvis ellipses apart"
+   ]
+  },
+  "Opposing tilts. Fifteen 1-min contrapposto poses: line, bean, a tick for the shoulder line and a tick for the hip line, tilting opposite ways.": {
+   "title": "Opposing tilts",
+   "bullets": [
+    "15 contrapposto poses, 1 min each",
+    "Line, bean, shoulder tick, hip tick",
+    "Tilt the two ticks opposite ways"
+   ]
+  },
+  "Weight (Ch. 3). Eight 2-min standing poses. Plumb line from the pit of the neck: does it land on the supporting foot? The weight leg should be straighter and angled under the body.": {
+   "title": "Weight",
+   "bullets": [
+    "8 standing poses, 2 min each",
+    "Plumb line from the pit of the neck",
+    "Does it land on the supporting foot?"
+   ]
+  },
+  "Class mode (10 × 30 s · 5 × 1 min · 3 × 2 min · 1 × 5 min). Today's emphasis: rhythm. Offset contours on every limb in the 2-min and 5-min poses.": {
+   "title": "Class mode: rhythm",
+   "bullets": [
+    "10 poses of 30 s, then 5 of 1 min",
+    "3 of 2 min, then 1 of 5 min",
+    "Offset contours on every limb"
+   ]
+  },
+  "Class mode. Emphasis: weight. A plumb line on every 2-min and 5-min pose. Circle any figure that's \"falling\".": {
+   "title": "Class mode: weight",
+   "bullets": [
+    "Class mode session",
+    "Plumb line on every 2- and 5-min pose",
+    "Circle any figure that's falling"
+   ]
+  },
+  "Class mode. Emphasis: the timing table. Don't draw anything the time slot doesn't allow (no hands in 1 min, no faces in 5 min).": {
+   "title": "Class mode: timing",
+   "bullets": [
+    "Class mode session",
+    "Draw only what the time slot allows",
+    "No hands in 1 min, no faces in 5"
+   ]
+  },
+  "Class mode. Emphasis: line quality. One stroke per line, ghost first, zero erasing. Count the hairy, repeated lines afterwards. Target: zero.": {
+   "title": "Class mode: line quality",
+   "bullets": [
+    "Class mode session",
+    "One stroke per line, ghost, no erasing",
+    "Count hairy repeated lines: aim for zero"
+   ]
+  },
+  "Class mode. Emphasis: new reference. Use only sports, dance or martial-arts photos today. Strong C and S curves.": {
+   "title": "Class mode: new reference",
+   "bullets": [
+    "Class mode session",
+    "Only sport, dance or martial-arts photos",
+    "Go for strong C and S curves"
+   ]
+  },
+  "Short class mode (10 × 30 s · 5 × 1 min), then one 5-min pose built along the curve: gesture layer kept visible at low opacity, cylinders and bean tilted along the line of action, never standing upright.": {
+   "title": "Short class mode",
+   "bullets": [
+    "10 poses of 30 s, then 5 of 1 min",
+    "Build one 5-min pose along the curve",
+    "Keep the gesture layer faint but visible"
+   ]
+  },
+  "Same structure. Emphasis: exaggerate after measuring. On the 5-min pose, check proportions, then push the curve again before you stop.": {
+   "title": "Class mode: exaggerate",
+   "bullets": [
+    "Same short class mode as yesterday",
+    "On the 5-min pose, check proportions",
+    "Then push the curve again"
+   ]
+  },
+  "Same structure. Emphasis: silhouette check. Fill the 5-min figure solid black on a temporary layer. Clear limbs, clear negative spaces, clear direction?": {
+   "title": "Class mode: silhouette",
+   "bullets": [
+    "Same short class mode as yesterday",
+    "Fill the 5-min figure solid black",
+    "Clear limbs, spaces and direction?"
+   ]
+  },
+  "Same structure. Emphasis: gesture is design. On the 5-min pose, add hair, a cape or a ribbon that extends the line of action.": {
+   "title": "Class mode: gesture design",
+   "bullets": [
+    "Same short class mode as yesterday",
+    "On the 5-min pose add hair, cape, ribbon",
+    "It should extend the line of action"
+   ]
+  },
+  "Same structure. Emphasis: does the gesture survive? Toggle the 5-min drawing over its first-minute gesture layer. Did the construction straighten the curve?": {
+   "title": "Class mode: gesture check",
+   "bullets": [
+    "Same short class mode as yesterday",
+    "Toggle 5-min drawing over its gesture",
+    "Did construction straighten the curve?"
+   ]
+  },
+  "Shapes into forms (Ch. 1). 10 min: ten objects from your room as simple forms only (bottle = cylinder, phone = thin box, orange = sphere). 10 min: three cross-contours wrapped around each one.": {
+   "title": "Shapes into forms",
+   "bullets": [
+    "10 min: 10 room objects as simple forms",
+    "Bottle is a cylinder, phone a thin box",
+    "10 min: 3 cross-contours on each"
+   ]
+  },
+  "Harder angles. Ten more objects seen from below, tilted or lying on their side, each with cross-contours. Avoid the comfortable front-on view.": {
+   "title": "Harder angles",
+   "bullets": [
+    "Draw 10 more objects",
+    "From below, tilted or on their side",
+    "Add cross-contours; skip front-on views"
+   ]
+  },
+  "A page of boxes (Ch. 2). 30+ freehand boxes at random angles and sizes, hidden edges drawn lightly. Receding edges must converge, never diverge.": {
+   "title": "A page of boxes",
+   "bullets": [
+    "30+ freehand boxes, any angle or size",
+    "Draw hidden edges lightly",
+    "Receding edges converge, never diverge"
+   ]
+  },
+  "Freehand against the guide (Ch. 2). 10 min: 15 freehand boxes. 10 min: Drawing Guide → Perspective, 2 points, Assisted Drawing on, 5 boxes. Compare: which edges did you get wrong freehand?": {
+   "title": "Freehand against the guide",
+   "bullets": [
+    "10 min: 15 freehand boxes",
+    "10 min: 5 boxes, 2-point Drawing Guide",
+    "Compare: what was wrong freehand?"
+   ]
+  },
+  "Uncomfortable boxes. 25 boxes seen from below, tilted, rotated 45° and nearly edge-on. Then add cross-contours to 5 of them.": {
+   "title": "Uncomfortable boxes",
+   "bullets": [
+    "25 boxes from odd angles",
+    "Below, tilted, 45 degrees, edge-on",
+    "Add cross-contours to 5 of them"
+   ]
+  },
+  "Ellipses (Ch. 3). 8 min: rows of ellipses at different degrees, then at different tilts, going round 2-3 times lightly from the shoulder. 12 min: ten cylinders with three cross-contours each.": {
+   "title": "Ellipses",
+   "bullets": [
+    "8 min: rows of ellipses, varied tilts",
+    "12 min: 10 cylinders",
+    "3 cross-contours on each"
+   ]
+  },
+  "Tapered and bent cylinders. Fifteen cylinders at different angles: some tapered (thigh to knee), some bent at a sphere \"joint\". Three cross-contours on each section.": {
+   "title": "Tapered and bent cylinders",
+   "bullets": [
+    "15 cylinders at different angles",
+    "Some tapered, some bent at a sphere",
+    "3 cross-contours on each section"
+   ]
+  },
+  "Joins (Ch. 4). 15 min: ten combinations (cylinder into box, cylinder into cylinder with a saddle curve, sphere on cylinder), with the join line drawn carefully. 5 min: overlaps and T-junctions.": {
+   "title": "Joins",
+   "bullets": [
+    "15 min: 10 combinations of forms",
+    "Draw each join line carefully",
+    "5 min: overlaps and T-junctions"
+   ]
+  },
+  "Arm into torso (Ch. 4). An arm plugged into the side of a ribcage box (not hanging off the neck) from three angles: front, three-quarter, behind. Do the set twice.": {
+   "title": "Arm into torso",
+   "bullets": [
+    "Plug an arm into a ribcage box side",
+    "Not hanging off the neck",
+    "Front, three-quarter, behind; twice"
+   ]
+  },
+  "Mixed. 5 min ellipse rows, then five limbs as two tapered cylinders meeting at a sphere, with cross-contours showing each section's direction.": {
+   "title": "Mixed forms",
+   "bullets": [
+    "5 min of ellipse rows",
+    "5 limbs: 2 tapered cylinders, a sphere",
+    "Cross-contours on each section"
+   ]
+  },
+  "Overlap and line weight (Ch. 5). 10 min: a stack of overlapping cylinders (logs) showing order with overlap and line weight only. 10 min: start a hand reaching toward the camera as forms.": {
+   "title": "Overlap and line weight",
+   "bullets": [
+    "10 min: stack of overlapping cylinders",
+    "Show order by overlap and line weight",
+    "10 min: start a reaching hand as forms"
+   ]
+  },
+  "Four depth cues (Ch. 5). Redraw the reaching hand from your Sep 2024 WIP (or a photo of a hand reaching at the camera) using overlap, size, ellipse degree and line weight together.": {
+   "title": "Four depth cues",
+   "bullets": [
+    "Redraw the reaching hand, Sep 2024 WIP",
+    "Or use a photo of a hand reaching out",
+    "Overlap, size, ellipse, line weight"
+   ]
+  },
+  "Mannequins (Ch. 6). Two mannequins over photos, 7 min each, with cross-contours on the torso and every limb. 6 min: check each join. Is every limb plugged in, not floating?": {
+   "title": "Mannequins",
+   "bullets": [
+    "2 mannequins over photos, 7 min each",
+    "Cross-contours on torso and every limb",
+    "6 min: is every limb plugged in?"
+   ]
+  },
+  "Three mannequins, 6 min each. Place the ribcage egg and pelvis bowl first (tilt and twist), then limbs joint to joint.": {
+   "title": "Three mannequins",
+   "bullets": [
+    "3 mannequins, 6 min each",
+    "Ribcage egg and pelvis bowl first",
+    "Then limbs, joint to joint"
+   ]
+  },
+  "Timed mannequins. Two mannequins on a timer, aiming for 8 min each (the move-on target). Check that near forms overlap far ones.": {
+   "title": "Timed mannequins",
+   "bullets": [
+    "2 mannequins, aim for 8 min each",
+    "Near forms should overlap far ones"
+   ]
+  },
+  "Rotation (Ch. 6). Two mannequins over photos, 7 min each, then rotate one 90° to a side view (6 min). Use the photo only to check the pose, not the new angle.": {
+   "title": "Rotation",
+   "bullets": [
+    "2 mannequins over photos, 7 min each",
+    "Rotate one 90 degrees to a side view",
+    "Use the photo only to check the pose"
+   ]
+  },
+  "Rotation from behind. One mannequin (8 min), then the same pose seen from behind (12 min). Start with simple standing poses.": {
+   "title": "Rotation from behind",
+   "bullets": [
+    "1 mannequin, 8 min",
+    "Same pose from behind, 12 min",
+    "Start with simple standing poses"
+   ]
+  },
+  "Planes and light (Ch. 7). 10 min: a mannequin from a photo. 10 min: on a layer underneath, paint it in three flat values (light, middle, shadow), light from top left, hard brush, no pressure.": {
+   "title": "Planes and light",
+   "bullets": [
+    "10 min: a mannequin from a photo",
+    "10 min: paint 3 flat values underneath",
+    "Top-left light, hard brush, no pressure"
+   ]
+  },
+  "Planes, new light. Same as yesterday, with the light from the right and above. Every plane facing away goes in shadow.": {
+   "title": "Planes, new light",
+   "bullets": [
+    "Same as yesterday",
+    "Light from the right and above",
+    "Planes facing away go in shadow"
+   ]
+  },
+  "Rotation + planes. Rotate one of this week's mannequins to a view from above, then block its planes in three values.": {
+   "title": "Rotation and planes",
+   "bullets": [
+    "Rotate a mannequin to a view from above",
+    "Block its planes in three values"
+   ]
+  },
+  "DAY 1 BENCHMARK, 25 min. A full-body photo standing with some contrapposto and one bent arm. Your best effort. Save the photo in an album called \"Proportion benchmark\". Do this before reading further.": {
+   "title": "Proportion benchmark",
+   "bullets": [
+    "Draw a standing full-body photo, 25 min",
+    "Some contrapposto, one bent arm",
+    "Save it, do this before reading on"
+   ]
+  },
+  "Accuracy setup (Ch. 6), 10 min: layers photo · measure · drawing · forms · background, the reference window at drawing size, QuickShape for straight lines. Then 10 min: two 5-min figures, stages 1-3 only (gesture 1 min, envelope 2 min, measure 2 min).": {
+   "title": "Accuracy setup",
+   "bullets": [
+    "10 min: set up layers and QuickShape",
+    "10 min: two 5-min figures",
+    "Stages 1-3: gesture, envelope, measure"
+   ]
+  },
+  "Four 5-min figures, stages 1-3. Flip the canvas after each stage. Overlay the best one with the photo at 40%.": {
+   "title": "Stages 1-3 figures",
+   "bullets": [
+    "4 figures, 5 min each, stages 1-3",
+    "Flip the canvas after each stage",
+    "Overlay the best with the photo at 40%"
+   ]
+  },
+  "Four 5-min figures, stages 1-3. Emphasis: the envelope. 6-10 straight lines, then check the height-to-width ratio against the photo before measuring.": {
+   "title": "Envelope figures",
+   "bullets": [
+    "4 figures, 5 min each, stages 1-3",
+    "Envelope: 6-10 straight lines",
+    "Check height to width against the photo"
+   ]
+  },
+  "Four 5-min figures, stages 1-3. Emphasis: landmarks. Top of head, soles, the halfway point, pit of the neck, shoulder and hip lines, plumb line. Check the best one with a white silhouette + Difference.": {
+   "title": "Landmark figures",
+   "bullets": [
+    "4 figures, 5 min each, stages 1-3",
+    "Landmarks: head, soles, halfway, neck",
+    "Check the best with a white silhouette"
+   ]
+  },
+  "Two 10-min standing figures with a head stamp on the measure layer (head-height rectangle, Copy & Paste down the body) and the full checklist: halfway point · elbows at navel · wrists at crotch · fingertips at mid-thigh · shoulders about 2 heads · hand ≈ face · foot ≈ forearm · eye line.": {
+   "title": "Head-stamp figures",
+   "bullets": [
+    "2 standing figures, 10 min each",
+    "Use a head stamp on the measure layer",
+    "Run the full proportion checklist"
+   ]
+  },
+  "Two 10-min standing figures with a head stamp, female references this time (shoulders about 1.5-1.75 heads, hips relatively wider). Circle anything off.": {
+   "title": "Female proportions",
+   "bullets": [
+    "2 head-stamp figures, 10 min each",
+    "Shoulders about 1.5-1.75 heads",
+    "Wider hips; circle anything off"
+   ]
+  },
+  "Five head studies, front and three-quarter: eye line halfway down the head, thirds of the face, five eyes wide, ears between brow and nose base.": {
+   "title": "Head studies",
+   "bullets": [
+    "5 head studies, front and three-quarter",
+    "Eye line halfway, thirds, five eyes wide",
+    "Ears between brow and nose base"
+   ]
+  },
+  "Two 10-min standing figures with a head stamp. Emphasis: arms, which are usually drawn too short. Wrists must reach the crotch line.": {
+   "title": "Arm length",
+   "bullets": [
+    "2 head-stamp figures, 10 min each",
+    "Arms are usually drawn too short",
+    "Wrists must reach the crotch line"
+   ]
+  },
+  "Two 10-min standing figures, then a 2-min test: the 8-head chart from memory. Repeat it until it's perfect.": {
+   "title": "Figures and 8-head test",
+   "bullets": [
+    "2 standing figures, 10 min each",
+    "Then 8-head chart from memory, 2 min",
+    "Repeat until it is perfect"
+   ]
+  },
+  "Contrapposto. Two 10-min figures: shoulder and hip angles first, named like clock hands and checked against the canvas edges (no rotated canvas), then the plumb line from the pit of the neck to the standing ankle.": {
+   "title": "Contrapposto",
+   "bullets": [
+    "2 figures, 10 min each",
+    "Shoulder and hip angles like clock hands",
+    "Plumb line: neck pit to standing ankle"
+   ]
+  },
+  "Contrapposto. Same as Monday with new photos. Add level lines: what sits at the same height?": {
+   "title": "Contrapposto, level lines",
+   "bullets": [
+    "Same as Monday with new photos",
+    "Add level lines",
+    "What sits at the same height?"
+   ]
+  },
+  "Negative space. Two bent-arm or hands-on-hip poses: draw the negative spaces as filled solid shapes FIRST, then the body around them.": {
+   "title": "Negative space",
+   "bullets": [
+    "2 bent-arm or hands-on-hip poses",
+    "Fill negative spaces solid first",
+    "Then draw the body around them"
+   ]
+  },
+  "Negative space + triangles. Two poses as yesterday, then check the big triangles (head-hand-foot, both shoulders + standing foot) against the photo.": {
+   "title": "Negative space and triangles",
+   "bullets": [
+    "Two poses, same as yesterday",
+    "Check big triangles against the photo",
+    "Head-hand-foot, shoulders-standing foot"
+   ]
+  },
+  "Foreshortening (Ch. 5). Three limbs pointing at the camera, drawn as stacked cylinders. Measure the visible length only and watch the ellipses get rounder.": {
+   "title": "Foreshortening",
+   "bullets": [
+    "3 limbs pointing at the camera",
+    "Draw them as stacked cylinders",
+    "Measure the visible length only"
+   ]
+  },
+  "Memory drawing. Look at a pose for 1 min (say what you notice out loud), hide it, draw for 8 min, then check. Do it twice.": {
+   "title": "Memory drawing",
+   "bullets": [
+    "Study a pose for 1 min, out loud",
+    "Hide it, draw for 8 min, then check",
+    "Do it twice"
+   ]
+  },
+  "Memory drawing × 2, new poses. After checking, look again for 30 s and correct from memory.": {
+   "title": "Memory drawing, new poses",
+   "bullets": [
+    "Do it twice with new poses",
+    "After checking, look again for 30 s",
+    "Then correct from memory"
+   ]
+  },
+  "Memory drawing × 2. Use harder poses (a twist or a bent arm).": {
+   "title": "Memory drawing, harder poses",
+   "bullets": [
+    "Do it twice, as before",
+    "Harder poses: a twist or a bent arm"
+   ]
+  },
+  "Clothed figure: hoodie. Mannequin on a 30% layer first, anchor points (shoulders, waist, bent elbows), then the clothes, with folds radiating from tension points.": {
+   "title": "Clothed figure: hoodie",
+   "bullets": [
+    "Mannequin first, on a 30% layer",
+    "Anchors: shoulders, waist, bent elbows",
+    "Add clothes; folds radiate from tension"
+   ]
+  },
+  "Clothed figure: long skirt or dress. Same process. Where does the skirt flare relative to the hips? Can you see the knees underneath?": {
+   "title": "Clothed figure: long skirt",
+   "bullets": [
+    "Same process as the hoodie",
+    "Where does the skirt flare from hips?",
+    "Can you see the knees underneath?"
+   ]
+  },
+  "Day 29: review. Read the whole error log, cross out rules you no longer need, and write your top 3 recurring errors. Put both benchmarks side by side with Difference.": {
+   "title": "Review the error log",
+   "bullets": [
+    "Read the error log, cross out old rules",
+    "Write your top 3 recurring errors",
+    "Compare both benchmarks with Difference"
+   ]
+  },
+  "Day 30: test part 1. Speed: stages 1-3 on a standing pose with a timer, three tries, target under 4 min. Memory: the 8-head chart in 2 min with no mistakes.": {
+   "title": "Speed and memory test",
+   "bullets": [
+    "Stages 1-3 on a standing pose, timed",
+    "3 tries, target under 4 min",
+    "8-head chart in 2 min, no mistakes"
+   ]
+  },
+  "Test part 2: hard poses. One seated figure (thighs foreshorten, about 5.5-6 heads tall), 15 min, then overlay.": {
+   "title": "Seated figure test",
+   "bullets": [
+    "Draw a seated figure, 15 min",
+    "Thighs foreshorten, about 5.5-6 heads",
+    "Then overlay"
+   ]
+  },
+  "Test part 3: hard poses. One foreshortened figure, 15 min, then overlay.": {
+   "title": "Foreshortened figure test",
+   "bullets": [
+    "Draw a foreshortened figure, 15 min",
+    "Then overlay"
+   ]
+  },
+  "Test part 4: consistency. One standing figure + overlay. Count your last 5 overlays: do 3 show no part off by more than about 10%? Score the test. You need 4 of 6.": {
+   "title": "Consistency test",
+   "bullets": [
+    "Draw a standing figure, then overlay",
+    "3 of last 5 overlays off by under 10%?",
+    "Score the test: you need 4 of 6"
+   ]
+  },
+  "Landmarks (Ch. 1). Five photos of people in tank tops or swimwear. Mark ONLY the pit of the neck, clavicles, bottom of the ribcage, hip points and navel.": {
+   "title": "Landmarks",
+   "bullets": [
+    "5 photos in tank tops or swimwear",
+    "Mark only 5 landmarks, nothing else",
+    "Neck pit, clavicles, ribs, hips, navel"
+   ]
+  },
+  "Landmarks, side and back views. Five more photos. Which landmark was hardest to find? That's this book's first focus. Write it down.": {
+   "title": "Landmarks, side and back",
+   "bullets": [
+    "5 more photos, side and back views",
+    "Which landmark was hardest to find?",
+    "Write it down: it's your first focus"
+   ]
+  },
+  "Ball and jaw (Ch. 2). Twenty heads from photos, 45 s each: ball, side plane, centre line, brow line, jaw. No features. 5 min left: tilts.": {
+   "title": "Ball and jaw heads",
+   "bullets": [
+    "20 heads from photos, 45 s each",
+    "Ball, side plane, centre, brow, jaw",
+    "No features; last 5 min: tilts"
+   ]
+  },
+  "Ball and jaw. 15 min: twenty more heads. 5 min: five heads from imagination at your hardest angles (from below, from above, nearly profile), then check against photos.": {
+   "title": "Ball and jaw practice",
+   "bullets": [
+    "15 min: 20 more heads",
+    "5 min: 5 heads from imagination",
+    "Hard angles, then check with photos"
+   ]
+  },
+  "Turning heads. Ten heads emphasising the turn (the side plane widens, the far eye narrows toward the nose), plus five tilting up and down.": {
+   "title": "Turning heads",
+   "bullets": [
+    "10 heads that emphasise the turn",
+    "Side plane widens, far eye narrows",
+    "Plus 5 heads tilting up and down"
+   ]
+  },
+  "Planar heads (Ch. 3). Four 5-min heads from photos with strong light: three flat values only, hard brush, no pressure. Then check in greyscale: did your shadow planes match?": {
+   "title": "Planar heads",
+   "bullets": [
+    "4 heads from photos, 5 min each",
+    "Strong light, 3 flat values, hard brush",
+    "Check in greyscale: planes match?"
+   ]
+  },
+  "Feature: EYES (Ch. 4). Ten eyes from photos at different angles: first a ball in a socket with the lids wrapping it, then detail. The upper lid casts a shadow.": {
+   "title": "Eyes",
+   "bullets": [
+    "10 eyes from photos, different angles",
+    "Ball in a socket, lids wrap it",
+    "Then detail; upper lid casts a shadow"
+   ]
+  },
+  "Feature: NOSE. Ten noses as wedges: lit top plane, two side planes, the base plane in shadow, and the cast shadow underneath.": {
+   "title": "Noses",
+   "bullets": [
+    "10 noses as wedges",
+    "Lit top plane, two side planes",
+    "Base plane in shadow, cast shadow below"
+   ]
+  },
+  "Feature: MOUTH. Ten mouths wrapped around the muzzle barrel. The upper lip faces down (darker), the lower lip faces up (lighter, with a shadow below).": {
+   "title": "Mouths",
+   "bullets": [
+    "10 mouths wrapped around the muzzle",
+    "Upper lip faces down: darker",
+    "Lower lip faces up: lighter"
+   ]
+  },
+  "Feature: EARS + assembly. Ten ears on the side plane (a C with a Y inside), then two planar heads with every feature placed.": {
+   "title": "Ears and assembly",
+   "bullets": [
+    "10 ears: a C with a Y inside",
+    "2 planar heads with every feature placed"
+   ]
+  },
+  "Necks (Ch. 5). Ten head-and-neck studies, 2 min each, head turned or tilted: ball and jaw, a neck cylinder leaning forward, the SCM \"V\", the trapezius slope.": {
+   "title": "Necks",
+   "bullets": [
+    "10 head-and-neck studies, 2 min each",
+    "Head turned or tilted",
+    "Add the SCM V and trapezius slope"
+   ]
+  },
+  "Necks, side views. Ten studies: the jaw's back edge overlaps the front of the neck, and the neck is wider than you think.": {
+   "title": "Necks, side views",
+   "bullets": [
+    "10 side-view studies",
+    "Jaw's back edge overlaps the neck front",
+    "The neck is wider than you think"
+   ]
+  },
+  "Your light study. 10 min: redraw the neck and jaw of the Aug 2024 light study with these shapes (the jaw underside in shadow). 10 min: five more neck studies.": {
+   "title": "Neck and jaw light study",
+   "bullets": [
+    "10 min: redraw Aug 2024 neck and jaw",
+    "Put the jaw underside in shadow",
+    "10 min: 5 more neck studies"
+   ]
+  },
+  "Shoulders (Ch. 7). Eight studies: arm down, forward, raised, behind. Ribcage → clavicle → ball joint on the SIDE of the ribcage → deltoid cap → arm cylinder.": {
+   "title": "Shoulders",
+   "bullets": [
+    "8 studies: down, forward, raised, behind",
+    "Ribcage, clavicle, ball joint on side",
+    "Then deltoid cap and arm cylinder"
+   ]
+  },
+  "Shoulders. Eight more studies, focusing on raised arms (the clavicle lifts and the shoulder blade rotates).": {
+   "title": "Raised-arm shoulders",
+   "bullets": [
+    "8 more studies, mostly raised arms",
+    "The clavicle lifts",
+    "The shoulder blade rotates"
+   ]
+  },
+  "Torsos (Ch. 6). Five studies, 4 min each: ribcage and pelvis tilts first, then the six landmarks, then the masses as simple shapes.": {
+   "title": "Torsos",
+   "bullets": [
+    "5 studies, 4 min each",
+    "Ribcage and pelvis tilts first",
+    "Then six landmarks, then simple masses"
+   ]
+  },
+  "Back views. Five studies: shoulder blades sliding on the ribcage, the spine groove, lats fanning from the armpit.": {
+   "title": "Back views",
+   "bullets": [
+    "5 back-view studies",
+    "Shoulder blades slide on the ribcage",
+    "Spine groove; lats fan from the armpit"
+   ]
+  },
+  "Bending. Five studies of side bends: the obliques squash on one side and stretch on the other.": {
+   "title": "Bending",
+   "bullets": [
+    "5 studies of side bends",
+    "Obliques: squash one side, stretch other"
+   ]
+  },
+  "Twisting. Five studies: the centre line spirals, and the ribcage and pelvis face different ways.": {
+   "title": "Twisting",
+   "bullets": [
+    "5 twisting studies",
+    "Centre line spirals",
+    "Ribcage and pelvis face different ways"
+   ]
+  },
+  "Mixed bodies. Five torso studies across different body types, including women (the breasts sit on the pectorals and follow the ribcage).": {
+   "title": "Mixed bodies",
+   "bullets": [
+    "5 torsos across different body types",
+    "Include women",
+    "Breasts sit on pectorals, follow ribs"
+   ]
+  },
+  "Mixed. Two figures from photos (10 min each): ball-and-jaw head, neck, shoulder girdle, torso masses.": {
+   "title": "Mixed figures",
+   "bullets": [
+    "2 figures from photos, 10 min each",
+    "Head, neck, shoulders, torso masses"
+   ]
+  },
+  "Mixed. One figure from a photo (10 min), then the same figure from memory (10 min).": {
+   "title": "Figure and memory redraw",
+   "bullets": [
+    "1 figure from a photo, 10 min",
+    "Same figure from memory, 10 min"
+   ]
+  },
+  "Head mileage. Ten 2-min ball-and-jaw heads at any turn or tilt (move-on target: about 2 min each). Update your count: you need 20+ head studies.": {
+   "title": "Head mileage",
+   "bullets": [
+    "10 ball-and-jaw heads, 2 min each",
+    "Any turn or tilt",
+    "Update your count: need 20+ heads"
+   ]
+  },
+  "Torso mileage. Four torso studies (5 min each). Update your count: you need 10+ torso studies.": {
+   "title": "Torso mileage",
+   "bullets": [
+    "4 torso studies, 5 min each",
+    "Update your count: need 10+ torsos"
+   ]
+  },
+  "Planes for a given light. Two three-value planar heads with the light chosen BEFORE you start.": {
+   "title": "Planes for a given light",
+   "bullets": [
+    "2 three-value planar heads",
+    "Choose the light before you start"
+   ]
+  },
+  "Your own arm (Ch. 1). Photograph your arm in five positions: palm up, palm down, bent, raised, reaching toward the camera. Draw each as cylinders first, then add the masses.": {
+   "title": "Your own arm",
+   "bullets": [
+    "Photograph your arm in 5 positions",
+    "Palm up, down, bent, raised, reaching",
+    "Draw each as cylinders, then add masses"
+   ]
+  },
+  "Forearm twist. Palm-up and palm-down forearms, 5 of each: the radius crosses the ulna. Round and wide near the elbow, flat and boxy at the wrist.": {
+   "title": "Forearm twist",
+   "bullets": [
+    "10 forearms: 5 palm up, 5 palm down",
+    "Radius crosses the ulna",
+    "Round at elbow, flat and boxy at wrist"
+   ]
+  },
+  "Arm masses. Eight arms from photos, 2.5 min each: deltoid, biceps oval, triceps horseshoe, extensor and flexor wedges. Use offset contours, never parallel lines.": {
+   "title": "Arm masses",
+   "bullets": [
+    "8 arms from photos, 2.5 min each",
+    "Deltoid, biceps, triceps, forearm wedges",
+    "Offset contours, never parallel lines"
+   ]
+  },
+  "Bent arms. Eight studies: the elbow point at the corner, the biceps bulging.": {
+   "title": "Bent arms",
+   "bullets": [
+    "8 studies of bent arms",
+    "Elbow at the corner, biceps bulging"
+   ]
+  },
+  "Raised and reaching arms. Six studies connected to the shoulder girdle (clavicle lift, deltoid cap).": {
+   "title": "Raised and reaching arms",
+   "bullets": [
+    "6 studies tied to the shoulder girdle",
+    "Clavicle lift and deltoid cap"
+   ]
+  },
+  "Legs (Ch. 2). Ten leg studies, 2 min each: front, side, back, bent, crossed. The bone axis first, then masses with alternating contours.": {
+   "title": "Legs",
+   "bullets": [
+    "10 leg studies, 2 min each",
+    "Front, side, back, bent, crossed",
+    "Bone axis first, then masses"
+   ]
+  },
+  "Front alignment. Ten front views: thighs angle inward to the knees, shins drop roughly vertical, and the inner ankle sits higher than the outer.": {
+   "title": "Front leg alignment",
+   "bullets": [
+    "10 front views",
+    "Thighs angle inward to the knees",
+    "Shins about vertical; inner ankle higher"
+   ]
+  },
+  "Side rhythm. Ten side views: the thigh bows forward, the calf bows back, the shinbone stays almost straight. An S-rhythm.": {
+   "title": "Side leg rhythm",
+   "bullets": [
+    "10 side views",
+    "Thigh bows forward, calf bows back",
+    "Shinbone stays almost straight"
+   ]
+  },
+  "High-low. Ten back and three-quarter views: the outer calf high and inner low, the inner ankle high and outer low.": {
+   "title": "Leg high and low",
+   "bullets": [
+    "10 back and three-quarter views",
+    "Outer calf high, inner low",
+    "Inner ankle high, outer low"
+   ]
+  },
+  "Standing leg vs free leg (Ch. 6 preview). Eight figures' lower halves: the standing leg is straighter with its hip higher, and the free leg is bent with its hip lower.": {
+   "title": "Standing and free leg",
+   "bullets": [
+    "8 lower halves of figures",
+    "Standing leg: straighter, hip higher",
+    "Free leg: bent, hip lower"
+   ]
+  },
+  "Ten hands from your own hand, 2 min each, stages: mitten → palm box → knuckle arc + finger lines → segments. Today: the back of the hand, flat.": {
+   "title": "Hands: back of hand",
+   "bullets": [
+    "10 hands from your own, 2 min each",
+    "Mitten, palm box, knuckle arc, segments",
+    "Today: back of the hand, flat"
+   ]
+  },
+  "Ten hands, 2 min each. Today: the palm side. The thumb starts low from the thenar mass near the wrist.": {
+   "title": "Hands: palm side",
+   "bullets": [
+    "10 hands, 2 min each",
+    "Today: the palm side",
+    "Thumb starts low, near the wrist"
+   ]
+  },
+  "Ten hands, 2 min each. Today: side views. The thumb sits on its own plane, facing the fingers.": {
+   "title": "Hands: side views",
+   "bullets": [
+    "10 hands, 2 min each",
+    "Today: side views",
+    "Thumb sits on its own plane"
+   ]
+  },
+  "Ten hands, 2 min each. Today: the relaxed curl cascade (index least curled, pinky most).": {
+   "title": "Hands: relaxed curl",
+   "bullets": [
+    "10 hands, 2 min each",
+    "Today: the relaxed curl",
+    "Index least curled, pinky most"
+   ]
+  },
+  "Ten hands, 2 min each, mixed. Check size against your face in a mirror (hand ≈ face). Running count: 50 hands.": {
+   "title": "Hands: mixed",
+   "bullets": [
+    "10 mixed hands, 2 min each",
+    "Check hand size against your face",
+    "Running count: 50 hands"
+   ]
+  },
+  "The five poses (Ch. 4), 4 min each, from your own hand: relaxed hanging · fist · open reaching · holding an object · pointing.": {
+   "title": "Five hand poses",
+   "bullets": [
+    "5 poses, 4 min each, your own hand",
+    "Hanging, fist, open reaching",
+    "Holding an object, pointing"
+   ]
+  },
+  "Fists × 5: a box, the knuckle ridge, the thumb wrapping over the middle segments. Three different angles.": {
+   "title": "Fists",
+   "bullets": [
+    "5 fists at 3 different angles",
+    "A box and the knuckle ridge",
+    "Thumb wraps over the middle segments"
+   ]
+  },
+  "Holding × 5: a cup, a pen, a phone, a ball, a strap. Object first.": {
+   "title": "Hands holding",
+   "bullets": [
+    "Draw 5 hands holding objects",
+    "Cup, pen, phone, ball, strap",
+    "Draw the object first"
+   ]
+  },
+  "Foreshortened hands × 5 reaching toward the camera: a narrow palm box, fingers as stacked circles, the fingertips biggest, the heaviest lines at the front.": {
+   "title": "Foreshortened hands",
+   "bullets": [
+    "5 hands reaching toward the camera",
+    "Narrow palm box, stacked-circle fingers",
+    "Biggest fingertips, heaviest front lines"
+   ]
+  },
+  "One pose, three angles. Take two hand poses and draw each from three angles (a move-on check). Photograph your own hand for each.": {
+   "title": "One pose, three angles",
+   "bullets": [
+    "2 hand poses, each from 3 angles",
+    "Photograph your own hand for each"
+   ]
+  },
+  "Feet (Ch. 5). Ten feet from photos, 90 s each: side, front, three-quarter, behind, tiptoe. A wedge with an arch; length ≈ forearm.": {
+   "title": "Feet",
+   "bullets": [
+    "10 feet from photos, 90 s each",
+    "Side, front, 3/4, behind, tiptoe",
+    "Wedge with an arch, length of forearm"
+   ]
+  },
+  "Shoes. Three pairs of shoes on feet: the wedge first, then the sole under it, then the opening as an ellipse around the ankle cylinder.": {
+   "title": "Shoes",
+   "bullets": [
+    "3 pairs of shoes on feet",
+    "Wedge first, then the sole under it",
+    "Opening: an ellipse around the ankle"
+   ]
+  },
+  "Hip connection (Ch. 6). Four figures' lower halves: the thigh plugs into the SIDE of the pelvis, the greater trochanter a little below the hip points, the inguinal line.": {
+   "title": "Hip connection",
+   "bullets": [
+    "4 lower halves of figures",
+    "Thigh plugs into the side of the pelvis",
+    "Mark trochanter and the inguinal line"
+   ]
+  },
+  "Full figure, 20 min: gesture → envelope → mannequin → landmarks → limb masses → hands and feet constructed.": {
+   "title": "Full figure",
+   "bullets": [
+    "Draw a full figure, 20 min",
+    "Gesture, envelope, mannequin, landmarks",
+    "Limb masses, then hands and feet"
+   ]
+  },
+  "Full figure #2, 20 min. Then check your counts: 50+ hands and 15+ limb studies?": {
+   "title": "Full figure and counts",
+   "bullets": [
+    "Draw a second full figure, 20 min",
+    "Check counts: 50+ hands, 15+ limbs?"
+   ]
+  },
+  "Body first (Ch. 1). Four photos of people in loose clothes. For each: mannequin, anchor points marked (shoulders, chest, waist/hips, bent knees and elbows), then ONLY the garment silhouette. No folds.": {
+   "title": "Body first",
+   "bullets": [
+    "4 photos of people in loose clothes",
+    "Mannequin with anchor points marked",
+    "Garment silhouette only, no folds"
+   ]
+  },
+  "Same drill, four new photos. Measure how far the garment stands off the body at each point.": {
+   "title": "Body first, again",
+   "bullets": [
+    "Same drill, 4 new photos",
+    "Measure the garment's gap from the body"
+   ]
+  },
+  "Thickness. Six garment edges with a visible inner edge (hem, collar, cuff, hood opening, skirt bottom), then two silhouettes.": {
+   "title": "Thickness",
+   "bullets": [
+    "6 edges showing an inner edge",
+    "Hem, collar, cuff, hood, skirt bottom",
+    "Then 2 silhouettes"
+   ]
+  },
+  "The \"delusional\" dress. 10 min: redo the body under it. 10 min: two more silhouettes from photos.": {
+   "title": "The delusional dress",
+   "bullets": [
+    "10 min: redo the body under it",
+    "10 min: 2 more silhouettes from photos"
+   ]
+  },
+  "Tight vs loose. Four figures: two in fitted clothes and two in baggy ones. Same mannequin process.": {
+   "title": "Tight and loose",
+   "bullets": [
+    "4 figures: 2 fitted, 2 baggy",
+    "Same mannequin process"
+   ]
+  },
+  "Forces (Ch. 2). 10 min: three clothing photos with only tension dots and arrows for pull, compression and gravity. 10 min: draw two of them with four folds max, each labelled with its type.": {
+   "title": "Fold forces",
+   "bullets": [
+    "10 min: 3 photos, tension dots, arrows",
+    "Pull, compression and gravity",
+    "10 min: draw 2, four folds max, labelled"
+   ]
+  },
+  "Pipe + drop folds. Four studies: skirts, curtains, capes, the edge of a cape over a shoulder.": {
+   "title": "Pipe and drop folds",
+   "bullets": [
+    "4 studies: skirts, curtains, capes",
+    "Include a cape edge over a shoulder"
+   ]
+  },
+  "Zigzag + half-lock. Four studies: inside bent elbows and knees, the back of a bent knee in loose trousers.": {
+   "title": "Zigzag and half-lock folds",
+   "bullets": [
+    "4 studies inside bent elbows and knees",
+    "Back of a bent knee in loose trousers"
+   ]
+  },
+  "Spiral + diaper. Four studies: a tight sleeve on a raised arm, a scarf, the front of a hood.": {
+   "title": "Spiral and diaper folds",
+   "bullets": [
+    "4 studies: sleeve on a raised arm",
+    "Also a scarf and the front of a hood"
+   ]
+  },
+  "Inert + mixed. Three photos: name all the forces, then draw with four folds each. Include one fabric pooled on a surface.": {
+   "title": "Inert and mixed folds",
+   "bullets": [
+    "3 photos: name all the forces",
+    "Draw each with four folds",
+    "Include one fabric pooled on a surface"
+   ]
+  },
+  "Fabric (Ch. 3). The same standing pose with one arm raised, three times: silk shirt (many small soft folds), wool sweater (medium, rounded), denim jacket (few, wide, sharp).": {
+   "title": "Fabric types",
+   "bullets": [
+    "Same standing pose, one arm up, 3 times",
+    "Silk: many small, soft folds",
+    "Wool medium; denim few, wide, sharp"
+   ]
+  },
+  "Heavy fabric. A cloaked or coated figure with very few big folds. Describe the weight through the silhouette.": {
+   "title": "Heavy fabric",
+   "bullets": [
+    "A cloaked or coated figure",
+    "Very few big folds",
+    "Show weight through the silhouette"
+   ]
+  },
+  "Wrapping (Ch. 4). Six cylinders and cones at different angles, each with a hem, a seam and two stripes.": {
+   "title": "Wrapping",
+   "bullets": [
+    "6 cylinders and cones, different angles",
+    "Each with a hem, a seam, two stripes"
+   ]
+  },
+  "Eye level on hems. Four skirts and sleeves above and below eye level: hems curve down at the front below eye level and up above it. Seams on a shirt.": {
+   "title": "Eye level on hems",
+   "bullets": [
+    "4 skirts and sleeves around eye level",
+    "Below eye level: hems curve down",
+    "Above it: hems curve up; add seams"
+   ]
+  },
+  "Stripes over folds. Start the striped-shirt figure: every stripe follows the form and breaks and shifts where it crosses a fold.": {
+   "title": "Stripes over folds",
+   "bullets": [
+    "Start the striped-shirt figure",
+    "Stripes follow the form",
+    "They break and shift at each fold"
+   ]
+  },
+  "T-shirt / shirt. On a mannequin in 3 poses from photos (standing, sitting, arms raised): pull from the armpit to the waist, zigzags at the elbow. Check: draw it from memory in a 4th pose.": {
+   "title": "T-shirt folds",
+   "bullets": [
+    "Mannequin in 3 poses from photos",
+    "Pull armpit to waist, zigzag at elbow",
+    "Check: draw a 4th pose from memory"
+   ]
+  },
+  "Hoodie. 3 poses: diaper folds in the hood front, bunching at the waistband and cuffs. Check: memory, 4th pose.": {
+   "title": "Hoodie folds",
+   "bullets": [
+    "3 poses: diaper folds in the hood front",
+    "Bunching at waistband and cuffs",
+    "Check: draw a 4th pose from memory"
+   ]
+  },
+  "Trousers. 3 poses: pull from the crotch to the bent knee, zigzags behind the knee, stacking at the ankle. Check: memory, 4th pose.": {
+   "title": "Trousers folds",
+   "bullets": [
+    "3 poses: pull from crotch to bent knee",
+    "Zigzags behind knee, stacking at ankle",
+    "Check: draw a 4th pose from memory"
+   ]
+  },
+  "Skirt / dress. 3 poses: pipe folds from the hips, a cone with an elliptical hem, pleats fanning around it. Check: memory, 4th pose.": {
+   "title": "Skirt and dress folds",
+   "bullets": [
+    "3 poses: pipe folds from the hips",
+    "Cone with elliptical hem, fanned pleats",
+    "Check: draw a 4th pose from memory"
+   ]
+  },
+  "Coat, cape or frills. 3 poses: few heavy folds and thick lapels, or frills as many small pipe folds radiating from a seam. Check: memory, 4th pose.": {
+   "title": "Coat, cape and frills",
+   "bullets": [
+    "3 poses: few heavy folds, thick lapels",
+    "Or frills: small pipe folds from a seam",
+    "Check: draw a 4th pose from memory"
+   ]
+  },
+  "A fold is a form (Ch. 6). Paint one rounded fold as a half-cylinder (lit top, halftone, core shadow, valley) and one crease as two planes with a hard edge. Then a sleeve: flat → big shadow → 3 folds.": {
+   "title": "A fold is a form",
+   "bullets": [
+    "Paint a rounded fold as a half-cylinder",
+    "Paint a crease as two planes, hard edge",
+    "Then a sleeve: flat, big shadow, 3 folds"
+   ]
+  },
+  "Shirt from a photo: flat → big shadow shapes (ignore the folds) → the 5 main folds → edges.": {
+   "title": "Shirt painting steps",
+   "bullets": [
+    "Shirt from a photo, five steps",
+    "Flat, big shadows (ignore folds)",
+    "Then the 5 main folds, then edges"
+   ]
+  },
+  "Trousers or a skirt from a photo, same five steps. The valleys are the darkest parts.": {
+   "title": "Trousers or skirt",
+   "bullets": [
+    "Trousers or skirt from a photo",
+    "Same five steps as yesterday",
+    "Valleys are the darkest parts"
+   ]
+  },
+  "Fabric through edges. The same small pose painted twice: silk (soft edges, sharp bright highlights) vs denim (crisp angular creases).": {
+   "title": "Fabric through edges",
+   "bullets": [
+    "Paint the same small pose twice",
+    "Silk: soft edges, sharp highlights",
+    "Denim: crisp, angular creases"
+   ]
+  },
+  "Accents and noise control. Paint a garment, then squint. Does the cloth collapse into 3-4 values? Remove any wrinkle that competes.": {
+   "title": "Accents and noise",
+   "bullets": [
+    "Paint a garment, then squint",
+    "Does it collapse into 3-4 values?",
+    "Remove any wrinkle that competes"
+   ]
+  },
+  "Measured length (Ch. 1). A pen or bottle from your desk at five angles, from side-on to pointing straight at you. Measure each drawn length against its width. Then one foreshortened arm.": {
+   "title": "Measured length",
+   "bullets": [
+    "Draw a pen or bottle at 5 angles",
+    "Side-on to pointing at you",
+    "Measure length against width, then 1 arm"
+   ]
+  },
+  "Five tools. Three foreshortened arms from photos as stacks of cylinders, using measured length, overlap, size change, round ellipses, and line weight/value.": {
+   "title": "Five foreshortening tools",
+   "bullets": [
+    "3 foreshortened arms from photos",
+    "Draw as stacks of cylinders",
+    "Use all five tools together"
+   ]
+  },
+  "Your own arm (Ch. 2). Phone on a timer: photograph your arm reaching at the camera from three angles. Draw the joints as circles (shoulder small, elbow medium, wrist big), then overlapping cylinders, then the hand as the biggest form.": {
+   "title": "Your own arm, foreshortened",
+   "bullets": [
+    "Photograph your arm reaching, 3 angles",
+    "Joints as circles: small, medium, big",
+    "Then cylinders; hand is the biggest form"
+   ]
+  },
+  "Arms going away. Three studies with the rules reversed: the far end smaller, overlapped by the near end, thinner lines.": {
+   "title": "Arms going away",
+   "bullets": [
+    "3 studies with the rules reversed",
+    "Far end smaller, overlapped, thin lines"
+   ]
+  },
+  "The WIP arm. Redraw the reaching arm from your Sep 2024 WIP as overlapping forms, then two more arms from photos.": {
+   "title": "The WIP arm",
+   "bullets": [
+    "Redraw the Sep 2024 WIP reaching arm",
+    "As overlapping forms",
+    "Then 2 more arms from photos"
+   ]
+  },
+  "Your own leg toward the camera from three angles: the knee a big round form, the thigh a short cylinder behind it.": {
+   "title": "Leg toward the camera",
+   "bullets": [
+    "Your own leg, from 3 angles",
+    "Knee is a big round form",
+    "Thigh is a short cylinder behind it"
+   ]
+  },
+  "Seated figures from the front. Two figures: measure the thigh's visible length against the shin (it's often much shorter).": {
+   "title": "Seated figures",
+   "bullets": [
+    "2 seated figures from the front",
+    "Measure thigh length against the shin",
+    "The thigh is often much shorter"
+   ]
+  },
+  "Foreshortened hands × 5 toward the camera: stacked circles and short cylinders, the fingertips biggest.": {
+   "title": "Hands toward the camera",
+   "bullets": [
+    "5 hands toward the camera",
+    "Stacked circles and short cylinders",
+    "Fingertips biggest"
+   ]
+  },
+  "Feet × 5: soles toward you, and a leg kicking away (small sole, big thigh).": {
+   "title": "Feet toward you",
+   "bullets": [
+    "5 feet with soles toward you",
+    "A leg kicking away: small sole, big leg"
+   ]
+  },
+  "Lying figures × 2 from photos. Measure every limb's visible length.": {
+   "title": "Lying figures",
+   "bullets": [
+    "2 lying figures from photos",
+    "Measure every limb's visible length"
+   ]
+  },
+  "Three camera heights (Ch. 3). The same standing mannequin three times: worm's-eye, eye level, bird's-eye. Horizon first, then curve every cross-contour to match.": {
+   "title": "Three camera heights",
+   "bullets": [
+    "Same standing mannequin 3 times",
+    "Worm's-eye, eye level, bird's-eye",
+    "Horizon first; curve every cross-contour"
+   ]
+  },
+  "Find the horizon. 5 min: mark the horizon on four extreme-angle photos. 15 min: two worm's-eye figures (verticals narrow toward the top, the chin overlaps the neck).": {
+   "title": "Find the horizon",
+   "bullets": [
+    "5 min: mark the horizon on 4 photos",
+    "15 min: 2 worm's-eye figures",
+    "Verticals narrow up; chin overlaps neck"
+   ]
+  },
+  "Bird's-eye. Two figures from above: Drawing Guide → Perspective with a vanishing point below the canvas for the box the figure fits in. The head overlaps the shoulders.": {
+   "title": "Bird's-eye figures",
+   "bullets": [
+    "2 figures from above",
+    "Perspective guide, vanishing point below",
+    "Head overlaps the shoulders"
+   ]
+  },
+  "Horizon at the waist. Two figures: the belt is a straight line, everything above curves up and everything below curves down.": {
+   "title": "Horizon at the waist",
+   "bullets": [
+    "2 figures with the horizon at the waist",
+    "Belt is a straight line",
+    "Above it curves up, below curves down"
+   ]
+  },
+  "Mixed. Two figures from photos with unusual camera heights. Mark the horizon before construction.": {
+   "title": "Mixed camera heights",
+   "bullets": [
+    "2 figures from photos",
+    "Unusual camera heights",
+    "Mark the horizon before construction"
+   ]
+  },
+  "Action (Ch. 4). Four 5-min action poses: a pushed line of action, mannequin, twist (ribcage vs pelvis), opposition (arm forward = opposite leg forward). Redraw one with the line pushed 30% further.": {
+   "title": "Action poses",
+   "bullets": [
+    "4 action poses, 5 min each",
+    "Push the line, twist, arm-leg opposition",
+    "Redraw one pushed 30% further"
+   ]
+  },
+  "Jumps × 4. Off balance on purpose: the centre of gravity outside the feet.": {
+   "title": "Jumps",
+   "bullets": [
+    "4 jumps",
+    "Off balance on purpose",
+    "Centre of gravity outside the feet"
+   ]
+  },
+  "Runs × 4. Opposition and squash/stretch in the bean.": {
+   "title": "Runs",
+   "bullets": [
+    "4 runs",
+    "Opposition, squash, stretch in the bean"
+   ]
+  },
+  "Strikes × 4. Draw the anticipation or the extreme of the action, not the moment of contact.": {
+   "title": "Strikes",
+   "bullets": [
+    "4 strikes",
+    "Draw the anticipation or the extreme",
+    "Not the moment of contact"
+   ]
+  },
+  "Readability (Ch. 5). One action as three black-fill silhouettes. Pick the clearest (limbs breaking out of the body, clear negative spaces) and construct it.": {
+   "title": "Readability",
+   "bullets": [
+    "One action as 3 black silhouettes",
+    "Pick the clearest, then construct it"
+   ]
+  },
+  "Photo study (Ch. 3). Make the side-by-side template (canvas twice as wide as tall, photo locked on the left). One 20-min photo study on your current weakest skill. Write the question first.": {
+   "title": "Photo study",
+   "bullets": [
+    "Make a side-by-side template",
+    "Canvas twice as wide, photo locked left",
+    "20 min, weakest skill, question first"
+   ]
+  },
+  "Value study. Three 6-min value studies (3-5 values) of film stills or photos.": {
+   "title": "Value study",
+   "bullets": [
+    "3 studies, 6 min each, 3-5 values",
+    "Use film stills or photos"
+   ]
+  },
+  "Colour study. Two 10-min colour studies: what colour is the shadow? What colour is the light?": {
+   "title": "Colour study",
+   "bullets": [
+    "2 colour studies, 10 min each",
+    "What colour is the shadow?",
+    "What colour is the light?"
+   ]
+  },
+  "Constraint study (Ch. 5). A 60-stroke face. Put the constraint in the file name (e.g. 60 strokes · round · no pressure).": {
+   "title": "Constraint study",
+   "bullets": [
+    "Paint a face in 60 strokes",
+    "Put the constraint in the file name"
+   ]
+  },
+  "Memory study. One full figure: 1 min looking (say out loud what you notice) → hide → 8 min drawing → compare → 30 s look → correct. Do it twice.": {
+   "title": "Memory study",
+   "bullets": [
+    "Look at a full figure for 1 min",
+    "Hide it, draw 8 min, compare",
+    "Look 30 s, correct; do it twice"
+   ]
+  },
+  "Three questions (Ch. 1). The same photo three times, 6 min each: one proportion question, one value question, one colour question. Answer after each.": {
+   "title": "Three questions",
+   "bullets": [
+    "Same photo 3 times, 6 min each",
+    "1 proportion, 1 value, 1 colour question",
+    "Answer after each"
+   ]
+  },
+  "Photo study: a fashion or editorial photo. Question: \"which 4 folds explain this garment?\"": {
+   "title": "Fold study",
+   "bullets": [
+    "Study a fashion or editorial photo",
+    "Which 4 folds explain this garment?"
+   ]
+  },
+  "Value + colour. Two value studies (5 min each), then one colour study (10 min).": {
+   "title": "Value and colour",
+   "bullets": [
+    "2 value studies, 5 min each",
+    "1 colour study, 10 min"
+   ]
+  },
+  "Constraint: 20 min, 1 layer, round brush with no pressure, no undo for the first 10 min.": {
+   "title": "Constraint study",
+   "bullets": [
+    "20 min, 1 layer",
+    "Round brush, no pressure",
+    "No undo for the first 10 min"
+   ]
+  },
+  "Memory day: two memory figures (1 min look, 8 min draw, check).": {
+   "title": "Memory day",
+   "bullets": [
+    "2 memory figures",
+    "1 min look, 8 min draw, then check"
+   ]
+  },
+  "Write next month's rotation (Ch. 6): four study days, one memory day, one piece day, one rest day. Set up the study log (date · type · question · answer · constraint). Do today's study from it.": {
+   "title": "Next month's rotation",
+   "bullets": [
+    "Write next month's rotation",
+    "4 study, 1 memory, 1 piece, 1 rest day",
+    "Set up study log; do today's study"
+   ]
+  },
+  "Follow your rotation: a photo study on your weakest skill.": {
+   "title": "Rotation: photo study",
+   "bullets": [
+    "Follow your rotation",
+    "Photo study on your weakest skill"
+   ]
+  },
+  "Follow your rotation: a value or colour study.": {
+   "title": "Rotation: value or colour",
+   "bullets": [
+    "Follow your rotation",
+    "A value or colour study"
+   ]
+  },
+  "Follow your rotation: a constraint study.": {
+   "title": "Rotation: constraint study",
+   "bullets": [
+    "Follow your rotation",
+    "A constraint study"
+   ]
+  },
+  "Memory day.": {
+   "title": "Memory day",
+   "bullets": [
+    "Memory day"
+   ]
+  },
+  "Shape language (Ch. 1). Ten 2-min black silhouettes of one character idea using different shapes (triangle, inverted triangle, circle, square, spikes).": {
+   "title": "Shape language",
+   "bullets": [
+    "10 black silhouettes, 2 min each",
+    "One character idea, different shapes",
+    "Triangle, circle, square, spikes"
+   ]
+  },
+  "Develop. Pick the strongest three silhouettes and give one a value pass (light, middle, dark areas in the costume).": {
+   "title": "Develop silhouettes",
+   "bullets": [
+    "Pick your 3 strongest silhouettes",
+    "Give one a 3-value pass on the costume"
+   ]
+  },
+  "Costume logic on a mannequin. Where do they live, what do they do, what do they carry? Detail goes near the face.": {
+   "title": "Costume logic",
+   "bullets": [
+    "Costume on a mannequin",
+    "Where they live, what they do, carry",
+    "Put detail near the face"
+   ]
+  },
+  "Expressions. Four to six expression heads (ball and jaw first).": {
+   "title": "Expressions",
+   "bullets": [
+    "4-6 expression heads",
+    "Ball and jaw first"
+   ]
+  },
+  "Palette + details. A 6-8 colour palette with one signature accent colour, plus two close-up details (accessories, hair from behind).": {
+   "title": "Palette and details",
+   "bullets": [
+    "6-8 colour palette, 1 signature accent",
+    "2 close-up details",
+    "Accessories, hair from behind"
+   ]
+  },
+  "Portfolio (Ch. 3). Gather your 20 best pieces, cut to 12, and order them strongest first. Ask one honest friend which two to remove.": {
+   "title": "Portfolio",
+   "bullets": [
+    "Gather your 20 best, cut to 12",
+    "Order them strongest first",
+    "Ask one honest friend which 2 to cut"
+   ]
+  },
+  "Commission sheet (Ch. 4). Three tiers (bust, half body, full body), each with a real example, add-ons, and terms in five short lines. Don't open commissions yet.": {
+   "title": "Commission sheet",
+   "bullets": [
+    "3 tiers: bust, half body, full body",
+    "Each with an example and add-ons",
+    "Terms in 5 short lines; don't open yet"
+   ]
+  },
+  "Posting plan (Ch. 5). One month of posts (four pieces or studies, four process posts, a pinned portfolio) and a bio line about what you draw plus your terms.": {
+   "title": "Posting plan",
+   "bullets": [
+    "One month of posts",
+    "4 pieces or studies, 4 process posts",
+    "Pinned portfolio; bio with your terms"
+   ]
+  },
+  "Presentation (Book 12 Ch. 5). Export your best piece at three sizes and crops, and make a process carousel: final, detail, WIP, thumbnail.": {
+   "title": "Presentation",
+   "bullets": [
+    "Export your best piece at 3 sizes",
+    "Make a process carousel",
+    "Final, detail, WIP, thumbnail"
+   ]
+  },
+  "Loop the spiral. Rerun the move-on tests of Books 03, 04 and 06. The one that fails is your next focus.": {
+   "title": "Loop the spiral",
+   "bullets": [
+    "Rerun the Book 03, 04 and 06 tests",
+    "The one that fails is your next focus"
+   ]
+  },
+  "Photo study on your weakest skill (question written first)": {
+   "title": "Photo study",
+   "bullets": [
+    "Study your weakest skill",
+    "Write the question first"
+   ]
+  },
+  "Photo or constraint study": {
+   "title": "Photo or constraint study",
+   "bullets": [
+    "Photo study or constraint study"
+   ]
+  },
+  "Value or colour study": {
+   "title": "Value or colour study",
+   "bullets": [
+    "Do a value or colour study"
+   ]
+  },
+  "Photo study": {
+   "title": "Photo study",
+   "bullets": [
+    "Do a photo study"
+   ]
+  },
+  "Memory study (1 min look · 8 min draw · check · correct)": {
+   "title": "Memory study",
+   "bullets": [
+    "Look 1 min, draw 8 min",
+    "Check, then correct"
+   ]
+  },
+  "Alternate: a finished piece for fun / a constraint study (stroke limit, one layer, no pressure)": {
+   "title": "Piece or constraint study",
+   "bullets": [
+    "Alternate: a piece for fun",
+    "or a constraint study",
+    "Stroke limit, 1 layer, no pressure"
+   ]
+  }
+ },
+ "reading": {
+  "Book 00 (all, once) · Book 01: one chapter per day, Ch. 1 on Mon through Ch. 7 on Sat": "Book 00, then Book 01 Ch. 1-7, one a day",
+  "Book 02 Ch. 1-2 · Book 13 Ch. 1-2 (the study formats you'll use for the rest of the course)": "Book 02, Ch. 1-2 + Book 13, Ch. 1-2",
+  "Book 02 Ch. 3-4": "Book 02, Ch. 3-4",
+  "Book 02 Ch. 5": "Book 02, Ch. 5",
+  "Book 02 Ch. 6 (programme and move-on test)": "Book 02, Ch. 6",
+  "Book 03 Ch. 1-2": "Book 03, Ch. 1-2",
+  "Book 03 Ch. 3-4": "Book 03, Ch. 3-4",
+  "Book 03 Ch. 5-6": "Book 03, Ch. 5-6",
+  "Book 03 Ch. 7-8": "Book 03, Ch. 7-8",
+  "Book 04 Ch. 1-2 and Ch. 7": "Book 04, Ch. 1-2 and Ch. 7",
+  "Book 04 Ch. 3-4": "Book 04, Ch. 3-4",
+  "Book 04 Ch. 5-6": "Book 04, Ch. 5-6",
+  "Book 04 Ch. 8-9": "Book 04, Ch. 8-9",
+  "Book 04 Ch. 9 again (plateaus, signs you moved on too early)": "Book 04, Ch. 9 again",
+  "Book 05 Ch. 1-2 · Book 09 Ch. 1 (for the weekend painting block)": "Book 05, Ch. 1-2 + Book 09, Ch. 1",
+  "Book 05 Ch. 3-4 · Book 09 Ch. 2-3": "Book 05, Ch. 3-4 + Book 09, Ch. 2-3",
+  "Book 05 Ch. 5 and 7 · Book 09 Ch. 4": "Book 05, Ch. 5 and 7 + Book 09, Ch. 4",
+  "Book 05 Ch. 6 · Book 09 Ch. 5-6": "Book 05, Ch. 6 + Book 09, Ch. 5-6",
+  "Book 05 Ch. 8 · Book 09 Ch. 7": "Book 05, Ch. 8 + Book 09, Ch. 7",
+  "Book 06 Ch. 1 (reread Book 05 Ch. 7 first) · Book 10 Ch. 1": "Book 05, Ch. 7 again, Book 06 Ch. 1, Book 10 Ch. 1",
+  "Book 06 Ch. 2 · Book 10 Ch. 2-3": "Book 06, Ch. 2 + Book 10, Ch. 2-3",
+  "Book 06 Ch. 3 · Book 10 Ch. 4": "Book 06, Ch. 3 + Book 10, Ch. 4",
+  "Book 06 Ch. 4 · Book 10 Ch. 5": "Book 06, Ch. 4 + Book 10, Ch. 5",
+  "Book 06 Ch. 5-7 · Book 10 Ch. 6": "Book 06, Ch. 5-7 + Book 10, Ch. 6",
+  "Book 07 Ch. 1": "Book 07, Ch. 1",
+  "Book 07 Ch. 2 · Book 11 Ch. 1": "Book 07, Ch. 2 + Book 11, Ch. 1",
+  "Book 07 Ch. 3-4 · Book 11 Ch. 2-3": "Book 07, Ch. 3-4 + Book 11, Ch. 2-3",
+  "Book 07 Ch. 5 · Book 11 Ch. 4": "Book 07, Ch. 5 + Book 11, Ch. 4",
+  "Book 07 Ch. 6-7 · Book 11 Ch. 5-6": "Book 07, Ch. 6-7 + Book 11, Ch. 5-6",
+  "Book 08 Ch. 1-2 · Book 11 Ch. 7": "Book 08, Ch. 1-2 + Book 11, Ch. 7",
+  "Book 08 Ch. 2 · Book 12 Ch. 1-2": "Book 08, Ch. 2 + Book 12, Ch. 1-2",
+  "Book 08 Ch. 3 · Book 12 Ch. 3": "Book 08, Ch. 3 + Book 12, Ch. 3",
+  "Book 08 Ch. 4-6 · Book 12 Ch. 4-5": "Book 08, Ch. 4-6 + Book 12, Ch. 4-5",
+  "Book 13 Ch. 2-5": "Book 13, Ch. 2-5",
+  "Book 13 Ch. 1 and Ch. 6": "Book 13, Ch. 1 and Ch. 6",
+  "Book 13 Ch. 7": "Book 13, Ch. 7",
+  "Book 14 Ch. 1-2": "Book 14, Ch. 1-2",
+  "Book 14 Ch. 3-6": "Book 14, Ch. 3-6"
+ },
+ "ritual": [
+  "Redraw a benchmark photo and compare",
+  "Rerun a move-on test, redo what fails",
+  "Watch a time-lapse; prune the error log",
+  "Torso from memory; one colour study",
+  "Choose next month's focus"
+ ]
+}

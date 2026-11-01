@@ -51,6 +51,7 @@ public static partial class Harness
             Directory.CreateDirectory(path);
             Check("Inter Tight loads", Tokens.Font.GetTypefaces().Count() >= 3);
             StoreChecks.Run(Path.Combine(path, "checks", "library"), new WpfHost(), Check);
+            SessionChecks.Run(Path.Combine(path, "session-checks", "library"), new WpfHost(), Check);
             await Stages(path);
         }
         catch (Exception e)
@@ -109,6 +110,26 @@ public static partial class Harness
         return new LineworkContext(new AppModel(host, settings), new SessionStore(host));
     }
 
+    /// <summary>The real main window, opened and routed, so nothing in it can fail only when it's seen.</summary>
+    static async Task ShellStage(LineworkContext context)
+    {
+        var window = new MainWindow(context) { Left = 40, Top = 40, WindowStartupLocation = WindowStartupLocation.Manual };
+        window.Show();
+        await Settle(1);
+        await ShootWindow("shell-menu", window);
+        foreach (var section in AppSections.Visible)
+        {
+            context.Session.SetRoute(new AppRoute(section));
+            await Settle(1);
+            await ShootWindow($"shell-{section}", window);
+        }
+        context.Session.SetRoute(AppRoute.Menu);
+        await Settle(0.2);
+        Check("The main window routes", window.IsVisible);
+        window.Close();
+        Check("The main window closes", !window.IsVisible);
+    }
+
     static async Task Stages(string path)
     {
         var context = Context();
@@ -125,6 +146,8 @@ public static partial class Harness
         await Shoot("about", AboutWindow.Body(), 420, 240);
         await Shoot("topbar", new TopBar(context, library, () => { }), 1280, 52);
         await PhotoStages(path, context, library);
+        await SessionStages(context, library);
+        await ShellStage(context);
         Check("Screenshots were written", Directory.GetFiles(_shots, "*.png").Length >= 12);
     }
 }

@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -19,6 +19,7 @@ jobs:
         run: dotnet test windows/Linework.Core.Tests --logger "console;verbosity=minimal"
       - name: Harness
         shell: pwsh
+        timeout-minutes: 8
         run: |
           dotnet build windows/Linework.App -c Debug -v quiet
           $env:LINEWORK_LIBRARY = Join-Path $env:RUNNER_TEMP "harness-library"
@@ -34,13 +35,33 @@ jobs:
           path: ${{ runner.temp }}/shots
           if-no-files-found: warn
       - name: Publish
-        run: dotnet publish windows/Linework.App -c Release -r win-x64 --self-contained true -o windows/publish -v quiet
+        shell: pwsh
+        run: |
+          dotnet publish windows/Linework.App -c Release -r win-x64 --self-contained true -o windows/publish -v quiet
+          # ONNX Runtime needs the Visual C++ runtime, which a fresh Windows may not have. Microsoft allows deploying it beside the app.
+          foreach ($dll in "vcruntime140.dll", "vcruntime140_1.dll", "msvcp140.dll") { Copy-Item "$env:WINDIR\System32\$dll" windows/publish/ }
       - name: Installer
         shell: pwsh
         run: |
           choco install innosetup --no-progress -y | Out-Null
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Qp windows/installer/Linework.iss
+          [xml]$props = Get-Content windows/Directory.Build.props
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Qp "/DAppVersion=$($props.Project.PropertyGroup.Version)" windows/installer/Linework.iss
           if ($LASTEXITCODE -ne 0) { throw "Installer failed" }
+      - name: Install, run and uninstall
+        shell: pwsh
+        timeout-minutes: 3
+        run: |
+          Start-Process windows/installer/Output/Linework-Setup.exe -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES","/NORESTART" -Wait
+          $exe = "$env:LOCALAPPDATA\Programs\Linework\Linework.exe"
+          if (!(Test-Path $exe)) { throw "Not installed" }
+          if (!(Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Linework.lnk")) { throw "No Start menu entry" }
+          $p = Start-Process $exe -PassThru
+          Start-Sleep -Seconds 6
+          if ($p.HasExited) { throw "The installed app quit with $($p.ExitCode)" }
+          Stop-Process $p
+          Start-Process "$env:LOCALAPPDATA\Programs\Linework\unins000.exe" -ArgumentList "/VERYSILENT","/SUPPRESSMSGBOXES" -Wait
+          Start-Sleep -Seconds 2
+          if (Test-Path $exe) { throw "Not uninstalled" }
       - uses: actions/upload-artifact@v4
         with:
           name: installer

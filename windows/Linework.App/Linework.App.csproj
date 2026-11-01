@@ -7,6 +7,8 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <AssemblyName>Linework</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Resources/AppIcon.ico</ApplicationIcon>
     <RootNamespace>Linework.App</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
@@ -14,7 +16,7 @@
     <None Include="Resources/Fonts/OFL.txt" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Resources/Models/yolox_nano.onnx" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../LICENSES/**" Link="Licenses/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
-    <Resource Include="Resources/Sounds/*.wav" />
+    <None Include="Resources/Sounds/*.wav" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />

@@ -166,6 +166,7 @@ public sealed class MainWindow : GlassWindow
 
     public void StartSession()
     {
+        if (App.Library is { } library) new SessionSetupWindow(_context, library) { Owner = this }.ShowDialog();
     }
 
     void Scan()
@@ -259,13 +260,17 @@ public sealed class MainWindow : GlassWindow
     UIElement Page(LibraryStore library)
     {
         if (Session.Route.Section is not { } section)
-            return new MainMenuView(_context, library, OpenSettings, _ => { });
+            return new MainMenuView(_context, library, OpenSettings, StartNext);
         var panel = new DockPanel();
         var bar = new TopBar(_context, library, StartSession);
         DockPanel.SetDock(bar, Dock.Top);
         panel.Children.Add(bar);
         panel.Children.Add(Section(section, library));
         return panel;
+    }
+
+    void StartNext(Linework.Core.Plan.PlanDayRef r)
+    {
     }
 
     UIElement Section(AppSection section, LibraryStore library) => section switch

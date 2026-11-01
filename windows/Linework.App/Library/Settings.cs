@@ -18,7 +18,12 @@ public sealed class Settings : ObservableObject
         public string? Library { get; init; }
         public bool Sound { get; init; } = true;
         public bool SetupGrayscale { get; init; }
-        public string SetupJson { get; init; } = "";
+        public bool SetupClassMode { get; init; }
+        public int SetupSeconds { get; init; } = 60;
+        public int SetupMaxPoses { get; init; }
+        public bool SetupShuffle { get; init; } = true;
+        public bool SetupToday { get; init; }
+        public int SetupTargetMinutes { get; init; } = Linework.Core.Session.SessionLength.DefaultTargetSeconds / 60;
     }
 
     static readonly JsonSerializerOptions Options = new() { WriteIndented = true };

@@ -9,3 +9,5 @@
 **ONNX Runtime** runs it. MIT license, Copyright Microsoft Corporation, from NuGet package `Microsoft.ML.OnnxRuntime`.
 
 **Test image** `shared/fixtures/sample-person.jpg`: NASA portrait of astronaut Eileen Collins, public domain as a work of NASA, taken from scikit-image's `astronaut.png`. Used only by tests.
+
+**Visual C++ runtime** (`vcruntime140.dll`, `vcruntime140_1.dll`, `msvcp140.dll`), copied beside the app by the Windows build because ONNX Runtime needs it. Microsoft's Visual Studio redistributable terms allow this.

@@ -20,6 +20,17 @@ public static class PlanBlockKinds
         _ => "ritual",
     };
 
+    public static string Label(this PlanBlockKind kind) => kind switch
+    {
+        PlanBlockKind.Warmup => "Warm-up",
+        PlanBlockKind.Focus => "Focus",
+        PlanBlockKind.Check => "Check",
+        PlanBlockKind.Exercise => "Exercise",
+        PlanBlockKind.BlockA => "Block A",
+        PlanBlockKind.BlockB => "Block B",
+        _ => "Monthly ritual",
+    };
+
     public static PlanBlockKind Parse(string raw) =>
         Enum.GetValues<PlanBlockKind>().First(k => k.Raw() == raw);
 }

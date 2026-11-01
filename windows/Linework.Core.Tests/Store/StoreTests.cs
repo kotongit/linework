@@ -59,6 +59,14 @@ public class StoreTests
     }
 
     [Fact]
+    public void SessionChecksPass()
+    {
+        var failures = new List<string>();
+        SessionChecks.Run(Path.Combine(Lib.Temp(), "library"), new FakeHost(), (name, ok) => { if (!ok) failures.Add(name); });
+        Assert.Empty(failures);
+    }
+
+    [Fact]
     public void ChangesSaveAfterADelayAndAtFlush()
     {
         var host = new FakeHost();

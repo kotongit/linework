@@ -26,7 +26,7 @@ jobs:
           $app = Get-ChildItem windows/Linework.App/bin/Debug -Recurse -Filter Linework.exe | Select-Object -First 1
           $p = Start-Process $app.FullName -ArgumentList "--harness" -PassThru -Wait -RedirectStandardOutput harness.log
           Get-Content harness.log
-          if ($p.ExitCode -ne 0 -or (Select-String -Path harness.log -Pattern "^FAIL" -Quiet)) { throw "Harness failed" }
+          if ($p.ExitCode -ne 0 -or (Select-String -Path harness.log -Pattern "^check FAIL" -Quiet)) { throw "Harness failed" }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -10,6 +10,15 @@
     <RootNamespace>Linework.App</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Resource Include="Resources/Fonts/*.ttf" />
+    <None Include="Resources/Fonts/OFL.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Resources/Models/yolox_nano.onnx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../LICENSES/**" Link="Licenses/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Resource Include="Resources/Sounds/*.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+    <Using Include="System.IO" />
     <ProjectReference Include="../Linework.Core/Linework.Core.csproj" />
   </ItemGroup>
 </Project>

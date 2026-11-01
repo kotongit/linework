@@ -668,3 +668,42 @@ public class CanvasDirectoryTests
         Assert.False(Directory.Exists(root));
     }
 }
+
+public class RealLibraryTests
+{
+    /// <summary>Set LINEWORK_REAL_LIBRARY to a scratch copy of a real library's text files, and LINEWORK_REAL_COUNTS to the Swift app's --print-counts line. Does nothing otherwise.</summary>
+    [Fact]
+    public void ARealLibraryHasTheSameCountsAndRewritesUnchanged()
+    {
+        if (Environment.GetEnvironmentVariable("LINEWORK_REAL_LIBRARY") is not { } root) return;
+        var f = new LibraryFiles(root);
+        static int Count<T>(LoadResult<IReadOnlyList<T>> r) => r is Loaded<IReadOnlyList<T>> l ? l.Value.Count : 0;
+        var b = f.Read(LibraryFile.Benchmarks) is Loaded<BenchmarksFile> lb ? lb.Value : BenchmarksFile.Empty;
+        var plan = Lib.Loaded(f.Read(LibraryFile.Plan));
+        var counts = $"photos {Count(f.Read(LibraryFile.Photos))} sets {Count(f.Read(LibraryFile.Sets))} presets {Count(f.Read(LibraryFile.Presets))} sessions {Count(f.Read(LibraryFile.Sessions))} benchmarks {b.Benchmarks.Count} attempts {b.Attempts.Count} ticks {Count(f.Read(LibraryFile.Checks))} repeats {plan.Repeats.Count}";
+        Assert.Equal(Environment.GetEnvironmentVariable("LINEWORK_REAL_COUNTS"), counts);
+
+        var scratch = Lib.Temp(true);
+        var to = new LibraryFiles(scratch);
+        void Same<T>(LibraryFile<T> file)
+        {
+            if (f.Read(file) is not Loaded<T> loaded) return;
+            to.Write(file, loaded.Value);
+            // By value: the Python importer spaces its JSON a little differently from Swift's encoder.
+            Assert.True(System.Text.Json.Nodes.JsonNode.DeepEquals(System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(f.PathOf(file))), System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(to.PathOf(file)))), file.Name);
+        }
+        Same(LibraryFile.Photos);
+        Same(LibraryFile.Benchmarks);
+        Same(LibraryFile.Sets);
+        Same(LibraryFile.Presets);
+        Same(LibraryFile.Checks);
+        Same(LibraryFile.Plan);
+        Same(LibraryFile.Sessions);
+
+        foreach (var canvas in Directory.GetFiles(Path.Combine(root, "Canvases"), "canvas.json", SearchOption.AllDirectories))
+        {
+            var doc = FreehandFiles.Decode(File.ReadAllBytes(canvas));
+            Assert.Equal(doc.Items, FreehandFiles.Decode(FreehandFiles.Encode(doc)).Items);
+        }
+    }
+}

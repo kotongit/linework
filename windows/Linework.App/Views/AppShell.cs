@@ -86,14 +86,19 @@ public sealed class MainWindow : GlassWindow
         if (e.Category == UserPreferenceCategory.General) Dispatcher.BeginInvoke(() => Tokens.Apply(Tokens.SystemIsDark()));
     }
 
+    /// <summary>For the harness: the File and Go menus, as drawn.</summary>
+    public Menu? MenuBar { get; private set; }
+
     FrameworkElement TitleRow()
     {
         var dock = new DockPanel();
         var caption = CaptionButtons();
         DockPanel.SetDock(caption, Dock.Right);
         dock.Children.Add(caption);
-        var menu = new Menu { Background = Brushes.Transparent, Foreground = Tokens.Ink, FontFamily = Tokens.Font, FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0), HorizontalAlignment = HorizontalAlignment.Left };
+        // Empty styles keep the classic look: the system theme's menu doesn't draw in this slim row.
+        var menu = new Menu { Style = new Style(typeof(Menu)), Background = Brushes.Transparent, Foreground = Tokens.Ink, FontFamily = Tokens.Font, FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0), HorizontalAlignment = HorizontalAlignment.Left };
         WindowChrome.SetIsHitTestVisibleInChrome(menu, true);
+        MenuBar = menu;
         menu.Items.Add(FileMenu());
         menu.Items.Add(GoMenu());
         dock.Children.Add(menu);
@@ -104,7 +109,7 @@ public sealed class MainWindow : GlassWindow
 
     static MenuItem Item(string title, Action click, string? gesture = null, Func<bool>? enabled = null)
     {
-        var item = new MenuItem { Header = title, InputGestureText = gesture ?? "" };
+        var item = new MenuItem { Style = new Style(typeof(MenuItem)), Header = title, InputGestureText = gesture ?? "", Foreground = Brushes.Black };
         item.Click += (_, _) => click();
         if (enabled != null) item.Loaded += (_, _) => item.IsEnabled = enabled();
         return item;
@@ -112,26 +117,26 @@ public sealed class MainWindow : GlassWindow
 
     MenuItem FileMenu()
     {
-        var file = new MenuItem { Header = "_File", Foreground = Tokens.Ink };
+        var file = new MenuItem { Style = new Style(typeof(MenuItem)), Header = "_File", Foreground = Tokens.Ink };
         file.Items.Add(Item("Open Library…", App.CloseForSwitch, enabled: () => !Session.IsSessionActive));
         file.Items.Add(Item("Reveal Library in File Explorer", Reveal, enabled: () => App.Library != null));
-        file.Items.Add(new Separator());
+        file.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
         file.Items.Add(Item("Import Photos…", ImportPhotos, "Ctrl+I", () => App.Library != null && !Session.IsSessionActive));
-        file.Items.Add(new Separator());
+        file.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
         file.Items.Add(Item("Settings…", OpenSettings, "Ctrl+,"));
         file.Items.Add(Item("About Linework", () => new AboutWindow(_context.Settings) { Owner = this }.Show()));
-        file.Items.Add(new Separator());
+        file.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
         file.Items.Add(Item("Exit", Close, "Alt+F4"));
         return file;
     }
 
     MenuItem GoMenu()
     {
-        var go = new MenuItem { Header = "_Go", Foreground = Tokens.Ink };
+        var go = new MenuItem { Style = new Style(typeof(MenuItem)), Header = "_Go", Foreground = Tokens.Ink };
         go.Items.Add(Item("Main Menu", () => Session.SetRoute(AppRoute.Menu), "Ctrl+0", () => !Welcoming));
         foreach (var section in AppSections.Visible)
             go.Items.Add(Item(section.Title(), () => Session.SetRoute(new AppRoute(section)), $"Ctrl+{(int)section + 1}", () => !Welcoming));
-        go.Items.Add(new Separator());
+        go.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
         go.Items.Add(Item("Start Session", StartSession, "Ctrl+R", () => !Welcoming && !Session.IsSessionActive));
         return go;
     }

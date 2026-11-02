@@ -120,6 +120,13 @@ public static partial class Harness
         window.Show();
         await Settle(1);
         await ShootWindow("shell-menu", window);
+        var titles = window.MenuBar!.Items.OfType<MenuItem>().ToList();
+        Check("The File and Go menus are drawn", titles.Count == 2 && titles.All(t => t.ActualWidth > 10 && t.ActualHeight > 10 && t.IsVisible));
+        Check("The menu row fits its 30 points", titles.All(t => t.ActualHeight <= 30));
+        titles[0].IsSubmenuOpen = true;
+        await Settle(0.3);
+        Check("The File menu opens with its items", titles[0].Items.OfType<MenuItem>().Count(i => i.IsVisible && i.ActualHeight > 10) >= 6);
+        titles[0].IsSubmenuOpen = false;
         foreach (var section in AppSections.Visible)
         {
             context.Session.SetRoute(new AppRoute(section));

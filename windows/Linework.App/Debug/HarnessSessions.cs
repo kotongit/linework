@@ -101,12 +101,9 @@ public static partial class Harness
         var content = (FrameworkElement)window.Content;
         var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(Math.Max((int)content.ActualWidth, 1), Math.Max((int)content.ActualHeight, 1), 96, 96, PixelFormats.Pbgra32);
         var layer = new DrawingVisual();
-        using (var dc = layer.RenderOpen())
-        {
-            dc.DrawRectangle(Brushes.Black, null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
-            dc.DrawRectangle(new VisualBrush(content) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top }, null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
-        }
+        using (var dc = layer.RenderOpen()) dc.DrawRectangle(Brushes.Black, null, new Rect(0, 0, content.ActualWidth, content.ActualHeight));
         bitmap.Render(layer);
+        bitmap.Render(content);
         var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
         encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
         await using var file = File.Create(Path.Combine(_shots, name + ".png"));

@@ -55,7 +55,7 @@ public struct FreehandFiles: Sendable {
         let images = imagesDir
         doc.items = doc.items.filter { fm.fileExists(atPath: images.appendingPathComponent($0.fileName).path) }
         if !hasDamagedFile {
-            removeOrphans(keeping: Set(doc.items.map(\.fileName)))
+            removeOrphans(keeping: Set(doc.items.map { PhotoScan.comparable($0.fileName) }))
         }
         return doc
     }
@@ -86,7 +86,7 @@ public struct FreehandFiles: Sendable {
     private func removeOrphans(keeping used: Set<String>) {
         let fm = FileManager.default
         let names = (try? fm.contentsOfDirectory(atPath: imagesDir.path)) ?? []
-        for name in names where !used.contains(name) {
+        for name in names where !used.contains(PhotoScan.comparable(name)) {
             try? fm.removeItem(at: imagesDir.appendingPathComponent(name))
         }
     }

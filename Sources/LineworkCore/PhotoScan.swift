@@ -31,7 +31,7 @@ public enum PhotoScan {
         imageExtensions.contains((name as NSString).pathExtension.lowercased())
     }
 
-    private static func comparable(_ name: String) -> String {
+    static func comparable(_ name: String) -> String {
         name.precomposedStringWithCanonicalMapping.lowercased()
     }
 

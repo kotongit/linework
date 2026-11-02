@@ -21,6 +21,17 @@ private func makeItem(_ files: FreehandFiles, name: String = "\(UUID().uuidStrin
 
 private func exists(_ url: URL) -> Bool { FileManager.default.fileExists(atPath: url.path) }
 
+/// Creates a file with exactly these scalars; going through a URL would decompose the name.
+private func writeExactName(_ name: String, in files: FreehandFiles) throws {
+    let fd = open(files.imagesDir.path + "/" + name, O_CREAT | O_WRONLY, 0o644)
+    guard fd >= 0 else { throw CocoaError(.fileWriteUnknown) }
+    close(fd)
+}
+
+private func scalarsOnDisk(_ files: FreehandFiles) throws -> [[Unicode.Scalar]] {
+    try FileManager.default.contentsOfDirectory(atPath: files.imagesDir.path).map { Array($0.unicodeScalars) }
+}
+
 @Suite struct FreehandFilesTests {
     @Test func loadMissingIsEmpty() throws {
         try withTempRoot { _, files in
@@ -94,6 +105,30 @@ private func exists(_ url: URL) -> Bool { FileManager.default.fileExists(atPath:
             #expect(files.load().items == [kept])
             #expect(exists(files.imageURL(kept.fileName)))
             #expect(!exists(files.imageURL(orphan.fileName)))
+        }
+    }
+
+    @Test(arguments: [("caf\u{E9}.png", "cafe\u{301}.png"), ("cafe\u{301}.png", "caf\u{E9}.png")])
+    func imageNamedInTheOtherUnicodeFormIsKept(jsonName: String, diskName: String) throws {
+        try withTempRoot { _, files in
+            try writeExactName(diskName, in: files)
+            #expect(try scalarsOnDisk(files) == [Array(diskName.unicodeScalars)])
+            let item = FreehandItem(fileName: jsonName, center: .zero, fullSize: CGSize(width: 100, height: 50))
+            try files.save(FreehandDocument(items: [item]))
+            #expect(files.load().items == [item])
+            #expect(try scalarsOnDisk(files) == [Array(diskName.unicodeScalars)])
+        }
+    }
+
+    @Test func imageNamedInADifferentCaseIsKept() throws {
+        try withTempRoot { _, files in
+            try writeExactName("photo.png", in: files)
+            // A case-sensitive volume holds no such match, so the item is rightly dropped.
+            guard exists(files.imageURL("Photo.PNG")) else { return }
+            let item = FreehandItem(fileName: "Photo.PNG", center: .zero, fullSize: CGSize(width: 100, height: 50))
+            try files.save(FreehandDocument(items: [item]))
+            #expect(files.load().items == [item])
+            #expect(try FileManager.default.contentsOfDirectory(atPath: files.imagesDir.path) == ["photo.png"])
         }
     }
 

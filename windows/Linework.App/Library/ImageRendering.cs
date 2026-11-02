@@ -43,7 +43,7 @@ public static class ImageRendering
     }
 
     public static bool IsDecodeFailure(Exception e) =>
-        e is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException or COMException or InvalidOperationException or FileFormatException;
+        e is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException or COMException or InvalidOperationException or FormatException or OverflowException;
 
     static int OrientationOf(BitmapFrame frame)
     {

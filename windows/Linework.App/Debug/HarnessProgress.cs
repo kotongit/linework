@@ -20,7 +20,11 @@ public static partial class Harness
         await Shoot("progress", new BenchmarkProgressView(context, library), 1280, 718);
         var attempt = library.Attempts(photo.Id).Last();
         await Shoot("comparison", ComparisonWindow.Body(library, attempt, () => { }), 1000, 680);
-        await Shoot("attempt", new AttemptSheet(context, library, photo, 3, Guid.NewGuid()).Body(), 520, 460);
+        var sheet = new AttemptSheet(context, library, photo, 3, Guid.NewGuid());
+        var sheetBody = (FrameworkElement)sheet.Content!;
+        sheet.Content = null;
+        await Shoot("attempt", sheetBody, 520, 460);
+        sheet.Close();
 
         var store = context.App.Freehand!;
         store.LoadIfNeeded();

@@ -92,14 +92,22 @@ public sealed class FreehandFiles(string root)
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            // Could not keep the bad file: leave it where it is rather than lose it.
+            // Could not keep the bad file: it stays, and nothing may be saved over it.
+            throw new UnreadableException("canvas.json", e);
         }
     }
 
     void RemoveOrphans(IReadOnlySet<string> used)
     {
         if (!Directory.Exists(ImagesDir)) return;
-        foreach (var path in Directory.EnumerateFileSystemEntries(ImagesDir))
-            if (!used.Contains(PhotoScan.Comparable(Path.GetFileName(path)))) RemoveImage(Path.GetFileName(path));
+        try
+        {
+            foreach (var path in Directory.EnumerateFileSystemEntries(ImagesDir))
+                if (!used.Contains(PhotoScan.Comparable(Path.GetFileName(path)))) RemoveImage(Path.GetFileName(path));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // Cleaning up can wait for another load.
+        }
     }
 }

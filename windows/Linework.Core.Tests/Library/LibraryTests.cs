@@ -389,6 +389,40 @@ public class LibraryFolderTests
     }
 
     [Fact]
+    public void CreateNeverReplacesAGoodManifest()
+    {
+        var url = Lib.Temp();
+        LibraryFolder.Create(url, "2026-11-02", Now);
+        var path = Path.Combine(url, "library.json");
+        var before = File.ReadAllBytes(path);
+        LibraryFolder.Create(url, "2026-11-02", Now);
+        Assert.Equal(before, File.ReadAllBytes(path));
+    }
+
+    [Fact]
+    public void CreateSetsADamagedManifestAside()
+    {
+        var url = Lib.Temp();
+        File.WriteAllText(Path.Combine(url, "library.json"), "junk");
+        Assert.Equal(FolderKind.OtherContents, LibraryFolder.Classify(url));
+        LibraryFolder.Create(url, "2026-11-02", Now);
+        Assert.Equal("junk", File.ReadAllText(Path.Combine(url, "library.damaged.json")));
+        Assert.Equal(FolderKind.Library, LibraryFolder.Classify(url));
+    }
+
+    [Fact]
+    public void AnUnreadableManifestIsNotOtherContents()
+    {
+        if (OperatingSystem.IsWindows()) return; // No POSIX modes there.
+        var url = Lib.Temp();
+        LibraryFolder.Create(url, "2026-11-02", Now);
+        var path = Path.Combine(url, "library.json");
+        File.SetUnixFileMode(path, UnixFileMode.None);
+        try { Assert.Equal(FolderKind.Unreadable, LibraryFolder.Classify(url)); }
+        finally { File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite); }
+    }
+
+    [Fact]
     public void CreateKeepsAnExistingPlan()
     {
         var url = Lib.Temp(true);
@@ -511,6 +545,16 @@ public class PhotoScanTests
     }
 
     [Fact]
+    public void PathOnDiskSurvivesAFolderItCannotList()
+    {
+        if (OperatingSystem.IsWindows()) return; // No POSIX modes there.
+        var folder = Lib.Temp();
+        File.SetUnixFileMode(folder, UnixFileMode.None);
+        try { Assert.Equal(Path.Combine(folder, "a.jpg"), PhotoScan.PathOnDisk(folder, "a.jpg")); }
+        finally { File.SetUnixFileMode(folder, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute); }
+    }
+
+    [Fact]
     public void RecordsLookIncompleteWhenSomethingPointsPastThem()
     {
         var r = Rec("a.jpg");
@@ -580,6 +624,32 @@ public class CanvasDirectoryTests
      InlineData("a\"b"), InlineData("a\\b"), InlineData("a|b"), InlineData("a*b")]
     public void WindowsReservedCanvasNamesRejected(string bad) =>
         Assert.Equal(CanvasNameError.Invalid, Assert.Throws<CanvasNameException>(() => Dir().Create(bad)).Error);
+
+    [Fact]
+    public void AFailedCaseOnlyRenamePutsTheFolderBack()
+    {
+        var d = Dir();
+        d.Create("hands");
+        d.MoveFolder = (from, to) =>
+        {
+            if (Path.GetFileName(to) == "Hands") throw new IOException("Locked");
+            Directory.Move(from, to);
+        };
+        Assert.Throws<IOException>(() => d.Rename("hands", "Hands"));
+        d.MoveFolder = Directory.Move;
+        Assert.Equal(["hands"], d.List());
+        Assert.Empty(Directory.GetDirectories(d.CanvasesRoot, ".renaming-*"));
+    }
+
+    [Fact]
+    public void RenameSaysWhichNameItChose() => Assert.Equal("caf\u00E9", RenameTo("cafe\u0301 "));
+
+    static string RenameTo(string name)
+    {
+        var d = Dir();
+        d.Create("old");
+        return d.Rename("old", name);
+    }
 
     [Fact]
     public void ATrailingSpaceNeverReachesTheDisk() => Assert.Equal("a", Dir().Create("a "));

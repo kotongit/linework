@@ -53,7 +53,7 @@ public sealed class WpfHost : ILibraryHost
             using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             return BitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None).Frames.Count > 0;
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException or COMException or InvalidOperationException)
+        catch (Exception e) when (ImageRendering.IsDecodeFailure(e))
         {
             return false;
         }

@@ -39,6 +39,18 @@ public static class AutoCropper
     public static (NormalizedRect Rect, bool Found) Crop(BitmapSource image)
     {
         if (Session.Value is not { } session) return (CropMath.Unit, false);
+        try
+        {
+            return Detect(image, session);
+        }
+        catch (Exception e) when (e is OnnxRuntimeException || ImageRendering.IsDecodeFailure(e))
+        {
+            return (CropMath.Unit, false);
+        }
+    }
+
+    static (NormalizedRect Rect, bool Found) Detect(BitmapSource image, InferenceSession session)
+    {
         int w = image.PixelWidth, h = image.PixelHeight;
         var scale = Linework.Core.Crop.PersonDetection.Scale(w, h, InputSize);
         var scaled = new TransformedBitmap(image, new ScaleTransform(scale, scale));
@@ -53,15 +65,8 @@ public static class AutoCropper
             for (var y = 0; y < InputSize; y++)
                 for (var x = 0; x < InputSize; x++)
                     input[0, c, y, x] = y < sh && x < sw ? pixels[y * stride + x * 3 + c] : 114f;
-        try
-        {
-            using var results = session.Run([NamedOnnxValue.CreateFromTensor(session.InputMetadata.Keys.First(), input)]);
-            var output = results[0].AsTensor<float>().ToArray();
-            return Linework.Core.Crop.PersonDetection.AutoCrop(Linework.Core.Crop.PersonDetection.Boxes(output, InputSize, w, h));
-        }
-        catch (OnnxRuntimeException)
-        {
-            return (CropMath.Unit, false);
-        }
+        using var results = session.Run([NamedOnnxValue.CreateFromTensor(session.InputMetadata.Keys.First(), input)]);
+        var output = results[0].AsTensor<float>().ToArray();
+        return Linework.Core.Crop.PersonDetection.AutoCrop(Linework.Core.Crop.PersonDetection.Boxes(output, InputSize, w, h));
     }
 }

@@ -15,14 +15,26 @@ public sealed class CanvasNameException(CanvasNameError error) : Exception(error
 public sealed class CanvasDirectory(string canvasesRoot)
 {
     public string CanvasesRoot { get; } = canvasesRoot;
+    internal Action<string, string> MoveFolder { get; set; } = Directory.Move;
 
     static readonly char[] Forbidden = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
 
     public string PathOf(string name) => Path.Combine(CanvasesRoot, name);
 
-    IEnumerable<string> Folders() => Directory.Exists(CanvasesRoot)
-        ? Directory.EnumerateDirectories(CanvasesRoot).Select(p => Path.GetFileName(p)!).Where(n => !n.StartsWith('.'))
-        : [];
+    /// <summary>Empty if the folder is out of reach, which a later save or switch will report.</summary>
+    List<string> Folders()
+    {
+        try
+        {
+            return Directory.Exists(CanvasesRoot)
+                ? Directory.EnumerateDirectories(CanvasesRoot).Select(p => Path.GetFileName(p)!).Where(n => !n.StartsWith('.')).ToList()
+                : [];
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return [];
+        }
+    }
 
     public IReadOnlyList<string> List() => Folders().Where(IsUsableName).Order(Comparer<string>.Create(NaturalCompare)).ToList();
 
@@ -96,22 +108,32 @@ public sealed class CanvasDirectory(string canvasesRoot)
         return chosen;
     }
 
-    public void Rename(string old, string name)
+    public string Rename(string old, string name)
     {
         var chosen = Clean(name);
-        if (chosen == old) return;
+        if (chosen == old) return chosen;
         if (Folders().Any(n => Same(n, chosen) && !Same(n, old))) throw new CanvasNameException(CanvasNameError.Duplicate);
         if (Same(old, chosen))
         {
             // The disk sees these as one name, so it takes two steps.
             var step = PathOf($".renaming-{Guid.NewGuid()}");
-            Directory.Move(PathOf(old), step);
-            Directory.Move(step, PathOf(chosen));
+            FileRetry.Run(() => MoveFolder(PathOf(old), step));
+            try
+            {
+                FileRetry.Run(() => MoveFolder(step, PathOf(chosen)));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // Put it back under its old name, or it would look lost.
+                MoveFolder(step, PathOf(old));
+                throw;
+            }
         }
         else
         {
-            Directory.Move(PathOf(old), PathOf(chosen));
+            FileRetry.Run(() => MoveFolder(PathOf(old), PathOf(chosen)));
         }
+        return chosen;
     }
 
     public string Duplicate(string name)

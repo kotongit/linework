@@ -187,6 +187,22 @@ public class FreehandFilesTests
     }
 
     [Fact]
+    public void ABadCanvasThatCannotBeSetAsideIsReportedNotEmptied()
+    {
+        if (OperatingSystem.IsWindows()) return; // No POSIX modes there.
+        var (root, files) = Temp();
+        var item = Item(files);
+        File.WriteAllText(Path.Combine(root, "canvas.json"), "garbage");
+        File.SetUnixFileMode(root, UnixFileMode.UserRead | UnixFileMode.UserExecute);
+        try
+        {
+            Assert.Throws<Library.UnreadableException>(() => files.Load());
+            Assert.True(File.Exists(files.ImagePath(item.FileName)));
+        }
+        finally { File.SetUnixFileMode(root, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute); }
+    }
+
+    [Fact]
     public void AskingForTheImagesPathCreatesNothing()
     {
         var root = Path.Combine(Path.GetTempPath(), "gone-" + Guid.NewGuid());

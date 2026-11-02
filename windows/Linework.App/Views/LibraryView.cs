@@ -330,8 +330,15 @@ public sealed class LibraryView : UserControl
         _importing = true;
         _status_ = null;
         Draw();
-        var (imported, skipped) = await ImportService.ImportAsync(paths, _library, _context.App.Host, CurrentSet?.Id);
-        _importing = false;
+        int imported = 0, skipped = paths.Count;
+        try
+        {
+            (imported, skipped) = await ImportService.ImportAsync(paths, _library, _context.App.Host, CurrentSet?.Id);
+        }
+        finally
+        {
+            _importing = false;
+        }
         var text = "Imported " + imported.ToString(CultureInfo.InvariantCulture);
         if (skipped > 0) text += $" · {skipped.ToString(CultureInfo.InvariantCulture)} skipped (not images)";
         _status_ = text;

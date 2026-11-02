@@ -76,7 +76,7 @@ public sealed class FreehandStore(CanvasDirectory canvases, Guid libraryId, ILib
             _readFailed = false;
             _isDirty = false;
         }
-        catch (UnreadableException)
+        catch (Exception e) when (e is UnreadableException or IOException or UnauthorizedAccessException)
         {
             // Locked or offline. Empty for now, and saves wait, so the file on disk can't be replaced by nothing.
             Document = FreehandDocument.Empty;
@@ -105,11 +105,10 @@ public sealed class FreehandStore(CanvasDirectory canvases, Guid libraryId, ILib
     public void RenameCurrent(string name)
     {
         if (!Flush()) throw new LibraryUnavailableException();
-        canvases.Rename(CurrentName, name);
-        var trimmed = name.Trim();
-        CurrentName = trimmed;
-        _files = new FreehandFiles(canvases.PathOf(trimmed));
-        Remember(trimmed);
+        var chosen = canvases.Rename(CurrentName, name);
+        CurrentName = chosen;
+        _files = new FreehandFiles(canvases.PathOf(chosen));
+        Remember(chosen);
         RefreshList();
     }
 
@@ -481,16 +480,17 @@ public sealed class FreehandStore(CanvasDirectory canvases, Guid libraryId, ILib
     /// <summary>Reads only the file's header for its size, so a very large image isn't decoded here.</summary>
     static Copied? CopyIn(string path, string fileName, FreehandFiles files, ILibraryHost host)
     {
-        if (!host.IsReadableImage(path) || host.OrientedPixelSize(path) is not { } size) return null;
         try
         {
+            if (!host.IsReadableImage(path) || host.OrientedPixelSize(path) is not { } size) return null;
             File.Copy(path, Path.Combine(files.ImagesDir, fileName));
+            return new Copied(fileName, size.Width, size.Height);
         }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        catch (Exception)
         {
+            // One bad file, whatever way the imaging system failed on it, never costs the others.
             return null;
         }
-        return new Copied(fileName, size.Width, size.Height);
     }
 }
 

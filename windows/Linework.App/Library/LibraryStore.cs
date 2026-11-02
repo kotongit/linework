@@ -11,11 +11,14 @@ public sealed class LibraryStore : ObservableObject
 
     static readonly Part[] AllParts = Enum.GetValues<Part>();
     public static readonly TimeSpan NoticeTime = TimeSpan.FromSeconds(8);
-    static readonly TimeSpan SaveDelay = TimeSpan.FromMilliseconds(500);
+    static readonly TimeSpan SaveDelay = TimeSpan.FromMilliseconds(500), RetryDelay = TimeSpan.FromSeconds(30);
     const string DefaultPreset = "Default class";
 
     readonly ILibraryHost _host;
     readonly HashSet<Part> _dirty = [];
+    /// <summary>On disk from a newer app. Memory carries on, and these aren't saved over.</summary>
+    readonly HashSet<Part> _newer = [];
+    readonly HashSet<Part> _failed = [];
     readonly Dictionary<Part, DateTime?> _loadedDates = [];
     IDisposable? _saveTimer, _noticeTimer;
     bool _isReloading;
@@ -155,10 +158,15 @@ public sealed class LibraryStore : ObservableObject
                 MarkDirty(part);
                 changed = true;
             }
-            catch (Exception e) when (e is UnreadableException or NewerFormatException or IOException or UnauthorizedAccessException)
+            catch (NewerFormatException)
             {
-                // Out of reach or from a newer app: leave the file and memory alone.
+                // From a newer app: leave the file and memory alone, and don't save over it.
+                _newer.Add(part);
                 _loadedDates[part] = onDisk;
+            }
+            catch (Exception e) when (e is UnreadableException or IOException or UnauthorizedAccessException)
+            {
+                // Out of reach just now: leave both alone. The date stays old, so the next look tries again.
             }
             finally
             {
@@ -184,6 +192,8 @@ public sealed class LibraryStore : ObservableObject
         _saveTimer?.Dispose();
         _saveTimer = null;
         foreach (var part in _dirty.ToList()) Save(part);
+        // What couldn't be saved tries again by itself, so it isn't left to a next edit that may not come.
+        if (_dirty.Count > 0) _saveTimer = _host.After(RetryDelay, () => Flush());
         NotifyChanged();
         return _dirty.Count == 0;
     }
@@ -197,6 +207,11 @@ public sealed class LibraryStore : ObservableObject
 
     void Save(Part part)
     {
+        if (_newer.Contains(part))
+        {
+            SaveFailure = "Part of your library was saved by a newer version of Linework, so changes to it aren't being saved here.";
+            return;
+        }
         try
         {
             switch (part)
@@ -211,11 +226,13 @@ public sealed class LibraryStore : ObservableObject
             }
             _dirty.Remove(part);
             _loadedDates[part] = DiskDate(part);
-            SaveFailure = null;
+            if (_dirty.Count == 0 || !_failed.Overlaps(_dirty)) SaveFailure = null;
+            _failed.Remove(part);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or LibraryUnavailableException)
         {
             // Stays dirty and in memory, so the next save tries again.
+            _failed.Add(part);
             SaveFailure = Directory.Exists(Root) ? "Couldn't save your library." : "Your library's folder can't be found, so changes aren't being saved.";
         }
     }
@@ -464,7 +481,24 @@ public sealed class LibraryStore : ObservableObject
         get
         {
             var referenced = Sets.SelectMany(s => s.PhotoIDs).Concat(BenchmarkData.Benchmarks.Select(b => b.PhotoID)).Concat(BenchmarkData.Attempts.Select(a => a.PhotoID)).ToHashSet();
-            return !DamagedFiles.Contains(LibraryFile.Photos.Name) && PhotoScan.RecordsLookComplete(Photos, referenced);
+            return !DamagedFiles.Contains(LibraryFile.Photos.Name) && !PhotoRecordsWereSetAside && PhotoScan.RecordsLookComplete(Photos, referenced);
+        }
+    }
+
+    /// <summary>A set-aside photos file from an earlier run still means the records were lost. Adding files now would give them new
+    /// identities and lose their crops, so the check waits until the user has dealt with it.</summary>
+    bool PhotoRecordsWereSetAside
+    {
+        get
+        {
+            try
+            {
+                return Directory.EnumerateFiles(Path.Combine(Root, "Progress"), "photos.damaged*.json").Any();
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                return false;
+            }
         }
     }
 

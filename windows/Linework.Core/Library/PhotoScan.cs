@@ -110,8 +110,15 @@ public static class PhotoScan
         var plain = Path.Combine(folder, name);
         if (File.Exists(plain) || !Directory.Exists(folder)) return plain;
         var wanted = Comparable(name);
-        foreach (var path in Directory.EnumerateFiles(folder))
-            if (Comparable(Path.GetFileName(path)) == wanted) return path;
+        try
+        {
+            foreach (var path in Directory.EnumerateFiles(folder))
+                if (Comparable(Path.GetFileName(path)) == wanted) return path;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            // Out of reach: whatever opens the path will say so.
+        }
         return plain;
     }
 }

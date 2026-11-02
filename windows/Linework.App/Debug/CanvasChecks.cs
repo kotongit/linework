@@ -44,6 +44,16 @@ public static class CanvasChecks
         foreach (var _ in dir.List()) canvas.DeleteCurrent();
         check("Deleting them all leaves one canvas", dir.List().Count == 1);
 
+        // A name pasted in decomposed Unicode is stored composed, and the store must follow it.
+        var (n, ndir, _) = Fresh("nfd-rename");
+        n.LoadIfNeeded();
+        n.SetGreyscale(true);
+        n.RenameCurrent("cafe\u0301");
+        check("A rename follows the name the folder got", n.CurrentName == "caf\u00E9" && ndir.List().Count == 1);
+        n.SetGreyscale(false);
+        n.Flush();
+        check("Saving after it doesn't split the canvas", Directory.GetDirectories(ndir.CanvasesRoot).Length == 1);
+
         // The library goes away with a canvas open.
         var (g, _, groot) = Fresh("gone");
         g.LoadIfNeeded();

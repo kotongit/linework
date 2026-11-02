@@ -8,6 +8,8 @@ public sealed class FakeHost : ILibraryHost
 {
     public List<(TimeSpan Delay, Action Action)> Pending { get; } = [];
     public bool AllowLosing { get; set; }
+    /// <summary>A file the imaging system fails on in a way nobody listed.</summary>
+    public string? Poison { get; set; }
 
     public IDisposable After(TimeSpan delay, Action action)
     {
@@ -31,7 +33,7 @@ public sealed class FakeHost : ILibraryHost
     }
 
     public bool ConfirmLosingChanges() => AllowLosing;
-    public bool IsReadableImage(string path) => PhotoScan.IsImageName(path) && File.Exists(path) && new FileInfo(path).Length > 0;
+    public bool IsReadableImage(string path) => path == Poison ? throw new FormatException("Bad header") : PhotoScan.IsImageName(path) && File.Exists(path) && new FileInfo(path).Length > 0;
     public (double Width, double Height)? OrientedPixelSize(string path) => IsReadableImage(path) ? (640, 480) : null;
     public (Linework.Core.Crop.NormalizedRect Rect, bool Found) AutoCrop(string path) => (Linework.Core.Crop.CropMath.Unit, false);
     public DateTimeOffset Now => new(2026, 11, 4, 12, 0, 0, TimeSpan.Zero);
@@ -77,6 +79,105 @@ public class StoreTests
         var failures = new List<string>();
         await CanvasChecks.RunAsync(Lib.Temp(), new FakeHost(), Repo.Fixture("sample-person.jpg"), (name, ok) => { if (!ok) failures.Add(name); });
         Assert.Empty(failures);
+    }
+
+    static (string Root, FakeHost Host, LibraryStore Store) Fresh()
+    {
+        var host = new FakeHost();
+        var root = Lib.Temp();
+        LibraryFolder.Create(root, "2026-11-02", host.Now);
+        var store = new LibraryStore(root, host);
+        store.Flush();
+        return (root, host, store);
+    }
+
+    [Fact]
+    public async Task AFileThatFailsOddlyIsSkippedNotFatal()
+    {
+        var (_, host, store) = Fresh();
+        var good = Repo.Fixture("sample-person.jpg");
+        var bad = Path.Combine(Lib.Temp(), "bad.jpg");
+        File.WriteAllBytes(bad, [0xFF, 0xD8, 0xFF]);
+        host.Poison = bad;
+        var (imported, skipped) = await ImportService.ImportAsync([good, bad], store, host, null);
+        Assert.Equal((1, 1), (imported, skipped));
+        Assert.Equal(0, store.ImportsRunning);
+    }
+
+    [Fact]
+    public async Task AFileThatFailsOddlyDoesNotStopTheScan()
+    {
+        var (_, host, store) = Fresh();
+        var bad = Path.Combine(store.PhotosDir, "bad.jpg");
+        File.WriteAllBytes(bad, [0xFF, 0xD8, 0xFF]);
+        File.Copy(Repo.Fixture("sample-person.jpg"), Path.Combine(store.PhotosDir, "good.jpg"));
+        host.Poison = bad;
+        await PhotoScanner.RunAsync(store, host);
+        Assert.Equal("good.jpg", Assert.Single(store.Photos).FileName);
+    }
+
+    [Fact]
+    public void AFileFromANewerAppIsNotSavedOver()
+    {
+        var (_, _, store) = Fresh();
+        var path = store.Files.PathOf(LibraryFile.Sets);
+        store.CreateSet("Mine");
+        store.Flush();
+        const string newer = """{"version":99,"items":[]}""";
+        File.WriteAllText(path, newer);
+        File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddSeconds(5));
+        store.ReloadIfChanged();
+        store.CreateSet("Another");
+        Assert.False(store.Flush());
+        Assert.Equal(newer, File.ReadAllText(path));
+        Assert.NotNull(store.SaveFailure);
+    }
+
+    [Fact]
+    public void AReloadThatFailsIsTriedAgain()
+    {
+        if (OperatingSystem.IsWindows()) return; // No POSIX modes there.
+        var (_, _, store) = Fresh();
+        store.CreateSet("Old");
+        store.Flush();
+        var path = store.Files.PathOf(LibraryFile.Sets);
+        var text = File.ReadAllText(path).Replace("Old", "From the Mac");
+        File.WriteAllText(path, text);
+        File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddSeconds(5));
+        File.SetUnixFileMode(path, UnixFileMode.None);
+        store.ReloadIfChanged();
+        Assert.Equal("Old", store.Sets[0].Name);
+        File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+        store.ReloadIfChanged();
+        Assert.Equal("From the Mac", store.Sets[0].Name);
+    }
+
+    [Fact]
+    public void ASaveThatWorksDoesNotHideOneThatFailed()
+    {
+        var (_, host, store) = Fresh();
+        // A folder where the file goes makes that one save fail, and only that one.
+        Directory.CreateDirectory(store.Files.PathOf(LibraryFile.Photos));
+        store.AddPhotos([Lib.Photo()], null);
+        store.CreateSet("Saves fine");
+        Assert.False(store.Flush());
+        Assert.NotNull(store.SaveFailure);
+        Assert.Single(Lib.Loaded(store.Files.Read(LibraryFile.Sets)));
+        Assert.NotEmpty(host.Pending); // It tries again by itself.
+    }
+
+    [Fact]
+    public async Task RecordsSetAsideEarlierStillPauseTheScan()
+    {
+        var (root, host, store) = Fresh();
+        await ImportService.ImportAsync([Repo.Fixture("sample-person.jpg")], store, host, null);
+        store.Flush();
+        File.WriteAllText(store.Files.PathOf(LibraryFile.Photos), "junk");
+        _ = new LibraryStore(root, host); // Sets the file aside.
+        var relaunched = new LibraryStore(root, host);
+        await PhotoScanner.RunAsync(relaunched, host);
+        Assert.Empty(relaunched.Photos);
+        Assert.NotNull(relaunched.Notice);
     }
 
     [Fact]

@@ -21,6 +21,8 @@ public sealed class AppModel(ILibraryHost host, Settings settings) : ObservableO
     /// <summary>A folder with other things in it, waiting for the user to agree before Linework adds to it.</summary>
     public string? PendingAdoption { get; set; }
 
+    const string UnreadableText = "Some of that library's files can't be read right now, so it wasn't opened. If it's in a synced folder, check that it has finished downloading.";
+
     public void OpenRemembered()
     {
         if (Location.Remembered is not { } path) return;
@@ -42,6 +44,7 @@ public sealed class AppModel(ILibraryHost host, Settings settings) : ObservableO
             case FolderKind.OtherContents: PendingAdoption = path; break;
             case FolderKind.Unavailable: Message = new ChooserMissing(path); break;
             case FolderKind.NewerFormat: Message = new ChooserNewerFormat(); break;
+            case FolderKind.Unreadable: Message = new ChooserFailed(UnreadableText); break;
         }
         NotifyChanged();
     }
@@ -101,7 +104,7 @@ public sealed class AppModel(ILibraryHost host, Settings settings) : ObservableO
         }
         catch (UnreadableException)
         {
-            Message = new ChooserFailed("Some of that library's files can't be read right now, so it wasn't opened. If it's in a synced folder, check that it has finished downloading.");
+            Message = new ChooserFailed(UnreadableText);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
         {

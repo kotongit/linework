@@ -2,7 +2,7 @@ using Linework.Core.Plan;
 
 namespace Linework.Core.Library;
 
-public enum FolderKind { Library, Empty, OtherContents, Unavailable, NewerFormat }
+public enum FolderKind { Library, Empty, OtherContents, Unavailable, NewerFormat, Unreadable }
 
 /// <summary>What a chosen folder is, and how to make it a library.</summary>
 public static class LibraryFolder
@@ -22,14 +22,19 @@ public static class LibraryFolder
         {
             return FolderKind.Unavailable;
         }
-        byte[]? data = null;
-        try
+        var manifest = Path.Combine(path, ManifestName);
+        if (File.Exists(manifest))
         {
-            data = File.ReadAllBytes(Path.Combine(path, ManifestName));
-        }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-        if (data != null)
-        {
+            byte[] data;
+            try
+            {
+                data = FileRetry.Run(() => File.ReadAllBytes(manifest));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // Locked or still in the cloud. It's a library until it says otherwise.
+                return FolderKind.Unreadable;
+            }
             try
             {
                 return LibraryJson.Decode<LibraryManifest>(data).Format > LibraryManifest.CurrentFormat ? FolderKind.NewerFormat : FolderKind.Library;
@@ -63,14 +68,34 @@ public static class LibraryFolder
             var files = new LibraryFiles(path);
             if (!File.Exists(files.PathOf(LibraryFile.Plan)))
                 files.Write(LibraryFile.Plan, new PlanRecord(weekOneStart, []));
-            var manifest = new LibraryManifest(LibraryManifest.CurrentFormat, Guid.NewGuid(), now);
-            AtomicFile.Write(Path.Combine(path, ManifestName), LibraryJson.Encode(manifest));
+            var manifestPath = Path.Combine(path, ManifestName);
+            if (!HasGoodManifest(manifestPath))
+            {
+                // A damaged one is set aside, never overwritten.
+                if (File.Exists(manifestPath)) FileRetry.Run(() => File.Move(manifestPath, LibraryFiles.FreeAsideName(manifestPath)));
+                var manifest = new LibraryManifest(LibraryManifest.CurrentFormat, Guid.NewGuid(), now);
+                AtomicFile.Write(manifestPath, LibraryJson.Encode(manifest));
+            }
         }
         catch
         {
             foreach (var folder in made)
                 try { Directory.Delete(folder, true); } catch (IOException) { } catch (UnauthorizedAccessException) { }
             throw;
+        }
+    }
+
+    static bool HasGoodManifest(string path)
+    {
+        if (!File.Exists(path)) return false;
+        try
+        {
+            LibraryJson.Decode<LibraryManifest>(FileRetry.Run(() => File.ReadAllBytes(path)));
+            return true;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return false;
         }
     }
 

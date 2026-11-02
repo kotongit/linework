@@ -49,8 +49,9 @@ public static class ImportService
             {
                 return work(job);
             }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException)
+            catch (Exception)
             {
+                // One bad file, whatever way the imaging system failed on it, never costs the others.
                 return null;
             }
             finally

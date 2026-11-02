@@ -27,6 +27,19 @@ public static partial class Harness
         var (rect, found) = AutoCropper.Crop(sample);
         Check("ModelFindsAPersonInTheSample", found && rect.Width < 1 && rect.Width > 0.5 && rect.Height > 0.8);
 
+        // A recognised signature over a bad header fails in its own way.
+        foreach (var (name, bytes) in new (string, byte[])[]
+        {
+            ("damaged.jpg", [0xFF, 0xD8, 0xFF, 0xE0, 0, 16, 0x4A, 0x46]),
+            ("damaged.png", [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13]),
+            ("damaged.gif", [0x47, 0x49, 0x46, 0x38, 0x39, 0x61]),
+        })
+        {
+            var bad = Path.Combine(path, name);
+            File.WriteAllBytes(bad, bytes);
+            Check($"{name} is unreadable, not a crash", !host.IsReadableImage(bad) && ImageRendering.Load(bad) == null && host.AutoCrop(bad).Found == false);
+        }
+
         await PhotoChecks.RunAsync(Path.Combine(path, "photo-checks"), host, sample, Fixture("library/Photos/pose one.png"), Check);
 
         // EXIF: a sideways file shows upright.

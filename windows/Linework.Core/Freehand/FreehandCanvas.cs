@@ -124,6 +124,25 @@ public sealed record FreehandDocument(int Version = FreehandDocument.CurrentVers
     public IReadOnlyList<FreehandItem> Items { get; init; } = Items ?? [];
 }
 
+/// <summary>Turns wheel messages into a pan. A mouse sends whole notches of 120; a precision touchpad sends small steps, which pass straight through.</summary>
+public static class CanvasWheel
+{
+    public static Size2 Vertical(int delta) => new(0, Distance(delta));
+    /// <summary>Positive means scrolling right, which moves the canvas left.</summary>
+    public static Size2 Horizontal(int delta) => new(-Distance(delta), 0);
+    public static Size2 ShiftVertical(int delta) => new(Distance(delta), 0);
+
+    /// <summary>The signed high word of a WM_MOUSEHWHEEL wParam.</summary>
+    public static int DeltaFrom(long wParam) => (short)((wParam >> 16) & 0xFFFF);
+
+    /// <summary>The signed screen point in a mouse message's lParam.</summary>
+    public static (int X, int Y) PointFrom(long lParam) => ((short)(lParam & 0xFFFF), (short)((lParam >> 16) & 0xFFFF));
+
+    static double Distance(int delta) => delta * (delta % 120 == 0 ? NotchPoints / 120.0 : FinePointsPerUnit);
+
+    const double NotchPoints = 30, FinePointsPerUnit = 0.8;
+}
+
 public enum Corner { TopLeft, TopRight, BottomRight, BottomLeft }
 
 public static class FreehandGeometry

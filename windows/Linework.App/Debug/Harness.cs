@@ -1,5 +1,5 @@
 #if DEBUG
-using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -120,6 +120,7 @@ public static partial class Harness
         window.Show();
         await Settle(1);
         await ShootWindow("shell-menu", window);
+        await CaptionStage(window);
         Check("The File and Go titles have pixels", HasInk(window.MenuRow!));
         var fileMenu = window.OpenFileMenuForCheck();
         await Settle(0.3);
@@ -132,11 +133,77 @@ public static partial class Harness
             await Settle(1);
             await ShootWindow($"shell-{section}", window);
         }
+        await WheelStage(window, context);
         context.Session.SetRoute(AppRoute.Menu);
         await Settle(0.2);
         Check("The main window routes", window.IsVisible);
         window.Close();
         Check("The main window closes", !window.IsVisible);
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>The real screen, where Windows' own caption buttons would show. Offscreen renders can't see them.</summary>
+    static async Task CaptionStage(MainWindow window)
+    {
+        Check("Windows draws no second set of caption buttons", !window.HasSystemButtons);
+        window.WindowState = WindowState.Maximized;
+        await Settle(0.5);
+        Check("Still none when maximized", !window.HasSystemButtons);
+        window.WindowState = WindowState.Normal;
+        await Settle(0.5);
+        Check("Still none when restored", !window.HasSystemButtons);
+        Console.Out.WriteLine($"check note Mica available: {GlassWindow.MicaAvailable}, build {Environment.OSVersion.Version.Build}");
+        window.Topmost = true;
+        await Settle(0.5);
+        CaptureScreen("caption-after", window);
+        window.ShowSystemButtonsForCheck(true);
+        await Settle(0.5);
+        CaptureScreen("caption-before", window);
+        window.ShowSystemButtonsForCheck(false);
+        window.Topmost = false;
+        await Settle(0.2);
+        Check("The check left it off", !window.HasSystemButtons);
+    }
+
+    static void CaptureScreen(string name, Window window)
+    {
+        try
+        {
+            var dpi = VisualTreeHelper.GetDpi(window);
+            var at = window.PointToScreen(new Point(0, 0));
+            int w = (int)(window.ActualWidth * dpi.DpiScaleX), h = (int)(70 * dpi.DpiScaleY);
+            using var bitmap = new System.Drawing.Bitmap(w, h);
+            using (var g = System.Drawing.Graphics.FromImage(bitmap)) g.CopyFromScreen((int)at.X, (int)at.Y, 0, 0, new System.Drawing.Size(w, h));
+            bitmap.Save(Path.Combine(_shots, name + ".png"), System.Drawing.Imaging.ImageFormat.Png);
+        }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or ExternalException or ArgumentException)
+        {
+            Console.Out.WriteLine($"check note no screen to capture: {e.Message}");
+        }
+    }
+
+    /// <summary>The real message, sent to the real window on the Freehand page.</summary>
+    static async Task WheelStage(MainWindow window, LineworkContext context)
+    {
+        context.Session.SetRoute(new AppRoute(AppSection.Freehand));
+        await Settle(1);
+        var store = context.App.Freehand!;
+        var hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+        var center = window.PointToScreen(new Point(window.ActualWidth / 2, window.ActualHeight / 2));
+        var lParam = new IntPtr(((int)center.Y << 16) | ((int)center.X & 0xFFFF));
+        const int HWheel = 0x020E;
+        var before = store.Document.Camera.Offset;
+        SendMessage(hwnd, HWheel, new IntPtr(7 << 16), lParam);
+        var moved = store.Document.Camera.Offset;
+        Check("A sideways touchpad step pans the canvas", Math.Abs(moved.X - (before.X - 7 * 0.8)) < 1e-9 && moved.Y == before.Y);
+        SendMessage(hwnd, HWheel, new IntPtr(unchecked((short)-120) << 16), lParam);
+        Check("Scrolling left pans the other way", store.Document.Camera.Offset.X > moved.X);
+        var unmoved = store.Document.Camera.Offset.X;
+        var corner = window.PointToScreen(new Point(2, 2));
+        SendMessage(hwnd, HWheel, new IntPtr(120 << 16), new IntPtr(((int)corner.Y << 16) | ((int)corner.X & 0xFFFF)));
+        Check("Over the title row nothing pans", store.Document.Camera.Offset.X == unmoved);
+        store.Flush();
     }
 
     /// <summary>True if the element really draws something: a size alone doesn't prove it.</summary>

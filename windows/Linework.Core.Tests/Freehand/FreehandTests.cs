@@ -233,6 +233,38 @@ public class FreehandFilesTests
     }
 }
 
+public class CanvasWheelTests
+{
+    [Fact]
+    public void AMouseNotchMovesThirtyPoints()
+    {
+        Assert.Equal(new Size2(0, 30), CanvasWheel.Vertical(120));
+        Assert.Equal(new Size2(0, -60), CanvasWheel.Vertical(-240));
+    }
+
+    [Fact]
+    public void ATouchpadsFineStepsStayFine()
+    {
+        Assert.Equal(new Size2(0, 3 * 0.8), CanvasWheel.Vertical(3));
+        Assert.Equal(new Size2(-7 * 0.8, 0), CanvasWheel.Horizontal(7));
+    }
+
+    [Fact]
+    public void ScrollingRightMovesTheCanvasLeft()
+    {
+        Assert.True(CanvasWheel.Horizontal(120).Width < 0);
+        Assert.Equal(new Size2(30, 0), CanvasWheel.ShiftVertical(120));
+    }
+
+    [Theory]
+    [InlineData(0x00780000L, 120), InlineData(0xFF880000L, -120), InlineData(0x00030008L, 3), InlineData(unchecked((long)0xFFFFFFFFFFF90000UL), -7)]
+    public void TheDeltaIsTheMessagesHighWord(long wParam, int delta) => Assert.Equal(delta, CanvasWheel.DeltaFrom(wParam));
+
+    [Theory]
+    [InlineData(0x01F40320L, 800, 500), InlineData(0xFFF6FFFEL, -2, -10)]
+    public void ThePointIsSigned(long lParam, int x, int y) => Assert.Equal((x, y), CanvasWheel.PointFrom(lParam));
+}
+
 public class FreehandCanvasTests
 {
     internal static void Near(Point2 a, Point2 b, double tol = 1e-6) => Assert.True(Math.Abs(a.X - b.X) < tol && Math.Abs(a.Y - b.Y) < tol, $"{a} vs {b}");

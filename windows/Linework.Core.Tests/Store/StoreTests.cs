@@ -180,6 +180,21 @@ public class StoreTests
         Assert.NotNull(relaunched.Notice);
     }
 
+    /// <summary>The bar reads Status every frame while panning, so it can't go to the disk.</summary>
+    [Fact]
+    public void StatusReadsNoFolderUntilTheListRefreshes()
+    {
+        if (OperatingSystem.IsWindows()) return; // Windows can't make such a name.
+        var root = Lib.Temp();
+        var directory = new Linework.Core.Freehand.CanvasDirectory(root);
+        var store = new FreehandStore(directory, Guid.NewGuid(), new FakeHost(), new Settings(null));
+        store.LoadIfNeeded();
+        Directory.CreateDirectory(Path.Combine(root, "a?b"));
+        Assert.Null(store.Status);
+        store.RefreshList();
+        Assert.Contains("a?b", store.Status);
+    }
+
     [Fact]
     public void ChangesSaveAfterADelayAndAtFlush()
     {

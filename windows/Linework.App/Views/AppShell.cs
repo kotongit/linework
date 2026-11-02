@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -34,6 +36,7 @@ public sealed class MainWindow : GlassWindow
         MinWidth = 1100;
         MinHeight = 700;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        SourceInitialized += (_, _) => KeepOneSetOfCaptionButtons();
 
         var layout = new Grid();
         layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
@@ -77,6 +80,51 @@ public sealed class MainWindow : GlassWindow
             _dayTimer.Stop();
         };
         Route();
+    }
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] static extern IntPtr GetWindowLongPtr(IntPtr hwnd, int index);
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] static extern IntPtr SetWindowLongPtr(IntPtr hwnd, int index, IntPtr value);
+    [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int w, int h, uint flags);
+
+    const int GwlStyle = -16, WmStyleChanging = 0x007C;
+    const long WsSysMenu = 0x00080000;
+    const uint SwpFrameFlags = 0x0001 | 0x0002 | 0x0004 | 0x0010 | 0x0020; // no size, move, z-order or activation; frame changed
+
+    bool _allowSystemButtonsForCheck;
+
+    /// <summary>With the frame extended for Mica, Windows draws its own caption buttons under ours. Without the system menu style it draws none.
+    /// The style is held off, as WPF can write it back.</summary>
+    void KeepOneSetOfCaptionButtons()
+    {
+        var hwnd = new WindowInteropHelper(this).Handle;
+        HwndSource.FromHwnd(hwnd)?.AddHook((IntPtr _, int message, IntPtr wParam, IntPtr lParam, ref bool _) =>
+        {
+            if (message == WmStyleChanging && wParam.ToInt64() == GwlStyle && !_allowSystemButtonsForCheck)
+            {
+                // STYLESTRUCT: the old style, then the new one.
+                var wanted = Marshal.ReadInt32(lParam, 4);
+                Marshal.WriteInt32(lParam, 4, (int)(wanted & ~WsSysMenu));
+            }
+            return IntPtr.Zero;
+        });
+        SetSystemButtons(hwnd, false);
+    }
+
+    static void SetSystemButtons(IntPtr hwnd, bool on)
+    {
+        var style = GetWindowLongPtr(hwnd, GwlStyle).ToInt64();
+        SetWindowLongPtr(hwnd, GwlStyle, new IntPtr(on ? style | WsSysMenu : style & ~WsSysMenu));
+        SetWindowPos(hwnd, IntPtr.Zero, 0, 0, 0, 0, SwpFrameFlags);
+    }
+
+    /// <summary>For the harness.</summary>
+    public bool HasSystemButtons => (GetWindowLongPtr(new WindowInteropHelper(this).Handle, GwlStyle).ToInt64() & WsSysMenu) != 0;
+
+    /// <summary>For the harness: puts the old state back, to show that a screen capture can see the difference.</summary>
+    public void ShowSystemButtonsForCheck(bool on)
+    {
+        _allowSystemButtonsForCheck = on;
+        SetSystemButtons(new WindowInteropHelper(this).Handle, on);
     }
 
     void OnTimeChanged(object? sender, EventArgs e) => Dispatcher.BeginInvoke(() => Session.RefreshToday());
@@ -175,6 +223,13 @@ public sealed class MainWindow : GlassWindow
 
     void OnKey(object sender, System.Windows.Input.KeyEventArgs e)
     {
+        // Without the system menu, Alt+F4 is ours to answer.
+        if (System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Alt && e.Key == System.Windows.Input.Key.System && e.SystemKey == System.Windows.Input.Key.F4)
+        {
+            Close();
+            e.Handled = true;
+            return;
+        }
         if (System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Alt && e.Key == System.Windows.Input.Key.System
             && e.SystemKey is System.Windows.Input.Key.F or System.Windows.Input.Key.G)
         {

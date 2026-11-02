@@ -28,7 +28,7 @@ public sealed class FreehandStore(CanvasDirectory canvases, Guid libraryId, ILib
     Drag? _drag;
     Point2 _dragLast, _dragStart;
     bool _dragMoved, _isLoaded, _isDirty, _saveFailed, _readFailed;
-    string? _skipNote;
+    string? _skipNote, _unusable;
     IDisposable? _saveTimer, _skipTimer;
     FreehandFiles _files = new(canvases.CanvasesRoot);
 
@@ -51,13 +51,15 @@ public sealed class FreehandStore(CanvasDirectory canvases, Guid libraryId, ILib
     /// <summary>What the floating bar should say. A skip note shows over a save failure, which returns after it.</summary>
     public string? Status => _skipNote
         ?? (_readFailed ? "Couldn't read this canvas" : _saveFailed ? "Couldn't save your canvas" : null)
-        ?? (canvases.UnusableNames() is { Count: > 0 } unusable ? $"“{unusable[0]}” has a name Windows can't use, so it was left alone" : null);
+        ?? (_unusable is { } unusable ? $"“{unusable}” has a name Windows can't use, so it was left alone" : null);
 
     // Canvases
 
     public void RefreshList()
     {
         Names = canvases.List();
+        // Kept, because the bar reads Status every frame while panning.
+        _unusable = canvases.UnusableNames().FirstOrDefault();
         if (_readFailed && CurrentName.Length > 0) LoadCurrent();
         NotifyChanged();
     }

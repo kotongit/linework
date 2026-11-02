@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -22,7 +23,8 @@ namespace Linework.App.Views;
 /// The images ignore clicks, so everything reaches this view, and the store does the hit-testing.</summary>
 public sealed class FreehandView : UserControl
 {
-    const double WheelLine = 10, WheelNotch = 120, MarkSize = 10;
+    const double WheelNotch = 120, MarkSize = 10;
+    const int WmMouseHWheel = 0x020E;
 
     readonly LineworkContext _context;
     readonly LibraryStore _library;
@@ -94,11 +96,10 @@ public sealed class FreehandView : UserControl
         _root.LostMouseCapture += (_, _) => store.CancelDrag();
         _root.MouseWheel += (_, e) =>
         {
-            var notches = e.Delta / WheelNotch;
             // Ctrl with the wheel is also how a touchpad's pinch arrives.
-            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) store.Magnify(Math.Pow(1.1, notches), At(e));
-            else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) store.Scroll(new Size2(notches * 3 * WheelLine, 0));
-            else store.Scroll(new Size2(0, notches * 3 * WheelLine));
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) store.Magnify(Math.Pow(1.1, e.Delta / WheelNotch), At(e));
+            else if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) store.Scroll(CanvasWheel.ShiftVertical(e.Delta));
+            else store.Scroll(CanvasWheel.Vertical(e.Delta));
             e.Handled = true;
         };
         _root.KeyDown += OnKey;
@@ -111,8 +112,12 @@ public sealed class FreehandView : UserControl
         {
             if (e.Mode == PowerModes.Suspend) Dispatcher.BeginInvoke(() => _notes.Sleep());
         }
+        HwndSource? source = null;
         Loaded += (_, _) =>
         {
+            // WPF has no event for sideways scrolling, so the message is read directly.
+            source = PresentationSource.FromVisual(this) as HwndSource;
+            source?.AddHook(OnWindowMessage);
             store.LoadIfNeeded();
             store.PropertyChanged += OnChanged;
             SystemEvents.PowerModeChanged += OnPower;
@@ -123,6 +128,8 @@ public sealed class FreehandView : UserControl
         };
         Unloaded += (_, _) =>
         {
+            source?.RemoveHook(OnWindowMessage);
+            source = null;
             store.PropertyChanged -= OnChanged;
             SystemEvents.PowerModeChanged -= OnPower;
             _noteTimer.Stop();
@@ -131,6 +138,17 @@ public sealed class FreehandView : UserControl
         _noteTimer.Tick += (_, _) => TickNotes();
         store.LoadIfNeeded();
         Sync();
+    }
+
+    IntPtr OnWindowMessage(IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (message != WmMouseHWheel) return IntPtr.Zero;
+        var (x, y) = CanvasWheel.PointFrom(lParam.ToInt64());
+        var at = _root.PointFromScreen(new Point(x, y));
+        if (at.X < 0 || at.Y < 0 || at.X > _root.ActualWidth || at.Y > _root.ActualHeight) return IntPtr.Zero;
+        _store.Scroll(CanvasWheel.Horizontal(CanvasWheel.DeltaFrom(wParam.ToInt64())));
+        handled = true;
+        return IntPtr.Zero;
     }
 
     static Point2 At(Point p) => new(p.X, p.Y);
@@ -207,7 +225,7 @@ public sealed class FreehandView : UserControl
                 _images.Children.Add(visual.Element);
             }
             Panel.SetZIndex(visual.Element, z);
-            visual.Show(item, _store.Files.ImagePath(item.FileName), doc.Camera, _store.Viewport, doc.Greyscale);
+            visual.Show(item, _store.Files, doc.Camera, _store.Viewport, doc.Greyscale);
         }
     }
 
@@ -332,6 +350,11 @@ public sealed class FreehandView : UserControl
     {
         readonly Image _image = new() { Stretch = Stretch.Fill };
         readonly Border _frame = new() { BorderBrush = Tokens.Hairline };
+        readonly ScaleTransform _flip = new();
+        readonly RotateTransform _turn = new();
+        readonly TranslateTransform _move = new();
+        (FreehandFiles?, string?) _pathFor;
+        string? _path;
         RenderRequest? _request;
         NormalizedRect? _decodedCrop;
         BitmapSource? _decoded;
@@ -343,18 +366,27 @@ public sealed class FreehandView : UserControl
         {
             _frame.Child = _image;
             _frame.RenderTransformOrigin = new Point(0.5, 0.5);
+            _frame.RenderTransform = new TransformGroup { Children = { _flip, _turn, _move } };
             RenderOptions.SetBitmapScalingMode(_image, BitmapScalingMode.HighQuality);
         }
 
-        public void Show(FreehandItem item, string path, FreehandCamera camera, Size2 viewport, bool greyscale)
+        /// <summary>Runs every frame of a pan: no disk here, and it moves by transform so nothing is laid out again.</summary>
+        public void Show(FreehandItem item, FreehandFiles files, FreehandCamera camera, Size2 viewport, bool greyscale)
         {
             double w = item.VisibleSize.Width * camera.Zoom, h = item.VisibleSize.Height * camera.Zoom;
             var center = camera.ToScreen(item.Center);
-            _frame.Width = Math.Max(w, 0);
-            _frame.Height = Math.Max(h, 0);
-            Canvas.SetLeft(_frame, center.X - w / 2);
-            Canvas.SetTop(_frame, center.Y - h / 2);
-            _frame.RenderTransform = new TransformGroup { Children = { new ScaleTransform(item.Flipped ? -1 : 1, 1), new RotateTransform(item.Rotation) } };
+            if (_frame.Width != w) _frame.Width = Math.Max(w, 0);
+            if (_frame.Height != h) _frame.Height = Math.Max(h, 0);
+            _flip.ScaleX = item.Flipped ? -1 : 1;
+            _turn.Angle = item.Rotation;
+            _move.X = center.X - w / 2;
+            _move.Y = center.Y - h / 2;
+            if (_pathFor != (files, item.FileName))
+            {
+                _pathFor = (files, item.FileName);
+                _path = files.ImagePath(item.FileName);
+            }
+            var path = _path!;
             var request = new RenderRequest(path, 0, false, item.Crop, FreehandGeometry.DecodePixels(item, camera, viewport));
             _grey = greyscale;
             if (request != _request)

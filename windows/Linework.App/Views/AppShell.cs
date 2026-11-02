@@ -86,8 +86,8 @@ public sealed class MainWindow : GlassWindow
         if (e.Category == UserPreferenceCategory.General) Dispatcher.BeginInvoke(() => Tokens.Apply(Tokens.SystemIsDark()));
     }
 
-    /// <summary>For the harness: the File and Go menus, as drawn.</summary>
-    public Menu? MenuBar { get; private set; }
+    /// <summary>For the harness: the row holding File and Go, as drawn.</summary>
+    public FrameworkElement? MenuRow { get; private set; }
 
     FrameworkElement TitleRow()
     {
@@ -95,54 +95,94 @@ public sealed class MainWindow : GlassWindow
         var caption = CaptionButtons();
         DockPanel.SetDock(caption, Dock.Right);
         dock.Children.Add(caption);
-        // Empty styles keep the classic look: the system theme's menu doesn't draw in this slim row.
-        var menu = new Menu { Style = new Style(typeof(Menu)), Background = Brushes.Transparent, Foreground = Tokens.Ink, FontFamily = Tokens.Font, FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0), HorizontalAlignment = HorizontalAlignment.Left };
-        WindowChrome.SetIsHitTestVisibleInChrome(menu, true);
-        MenuBar = menu;
-        menu.Items.Add(FileMenu());
-        menu.Items.Add(GoMenu());
-        dock.Children.Add(menu);
+        // Plain text buttons, each opening a menu: WPF's Menu control draws nothing in this row under the system theme.
+        Button? file = null, go = null;
+        file = MenuTitle("File", () => OpenMenu(FileMenu(), file!));
+        go = MenuTitle("Go", () => OpenMenu(GoMenu(), go!));
+        _fileTitle = file;
+        _goTitle = go;
+        var row = Ui.Row(0, file, go).Margin(8);
+        row.HorizontalAlignment = HorizontalAlignment.Left;
+        MenuRow = row;
+        dock.Children.Add(row);
         return dock;
+    }
+
+    Button? _fileTitle, _goTitle;
+
+    static Button MenuTitle(string title, Action open)
+    {
+        var body = new Border { Height = 30, Padding = new Thickness(10, 0, 10, 0), Background = Brushes.Transparent, Child = Ui.Text(title, 12).Align(HorizontalAlignment.Center, VerticalAlignment.Center) };
+        body.MouseEnter += (_, _) => body.Background = Tokens.Hairline;
+        body.MouseLeave += (_, _) => body.Background = Brushes.Transparent;
+        var button = Ui.Plain(body, open);
+        button.Cursor = System.Windows.Input.Cursors.Arrow;
+        System.Windows.Automation.AutomationProperties.SetName(button, title);
+        WindowChrome.SetIsHitTestVisibleInChrome(button, true);
+        return button;
+    }
+
+    static void OpenMenu(ContextMenu menu, FrameworkElement title)
+    {
+        menu.PlacementTarget = title;
+        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+        menu.IsOpen = true;
+    }
+
+    /// <summary>For the harness.</summary>
+    public ContextMenu OpenFileMenuForCheck()
+    {
+        var menu = FileMenu();
+        OpenMenu(menu, _fileTitle!);
+        return menu;
     }
 
     bool Welcoming => App.Library == null || LineworkCopy.ShouldShowWelcome(_context.Settings.Current.Name, _context.Settings.Current.Welcomed);
 
-    static MenuItem Item(string title, Action click, string? gesture = null, Func<bool>? enabled = null)
+    static MenuItem Item(string title, Action click, string? gesture = null, bool enabled = true)
     {
-        var item = new MenuItem { Style = new Style(typeof(MenuItem)), Header = title, InputGestureText = gesture ?? "", Foreground = Brushes.Black };
+        var item = new MenuItem { Header = title, InputGestureText = gesture ?? "", IsEnabled = enabled };
         item.Click += (_, _) => click();
-        if (enabled != null) item.Loaded += (_, _) => item.IsEnabled = enabled();
         return item;
     }
 
-    MenuItem FileMenu()
+    /// <summary>Built as it opens, so what's enabled is current.</summary>
+    ContextMenu FileMenu()
     {
-        var file = new MenuItem { Style = new Style(typeof(MenuItem)), Header = "_File", Foreground = Tokens.Ink };
-        file.Items.Add(Item("Open Library…", App.CloseForSwitch, enabled: () => !Session.IsSessionActive));
-        file.Items.Add(Item("Reveal Library in File Explorer", Reveal, enabled: () => App.Library != null));
-        file.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
-        file.Items.Add(Item("Import Photos…", ImportPhotos, "Ctrl+I", () => App.Library != null && !Session.IsSessionActive));
-        file.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
+        var file = new ContextMenu();
+        file.Items.Add(Item("Open Library…", App.CloseForSwitch, enabled: !Session.IsSessionActive));
+        file.Items.Add(Item("Reveal Library in File Explorer", Reveal, enabled: App.Library != null));
+        file.Items.Add(new Separator());
+        file.Items.Add(Item("Import Photos…", ImportPhotos, "Ctrl+I", App.Library != null && !Session.IsSessionActive));
+        file.Items.Add(new Separator());
         file.Items.Add(Item("Settings…", OpenSettings, "Ctrl+,"));
         file.Items.Add(Item("About Linework", () => new AboutWindow(_context.Settings) { Owner = this }.Show()));
-        file.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
+        file.Items.Add(new Separator());
         file.Items.Add(Item("Exit", Close, "Alt+F4"));
         return file;
     }
 
-    MenuItem GoMenu()
+    ContextMenu GoMenu()
     {
-        var go = new MenuItem { Style = new Style(typeof(MenuItem)), Header = "_Go", Foreground = Tokens.Ink };
-        go.Items.Add(Item("Main Menu", () => Session.SetRoute(AppRoute.Menu), "Ctrl+0", () => !Welcoming));
+        var go = new ContextMenu();
+        go.Items.Add(Item("Main Menu", () => Session.SetRoute(AppRoute.Menu), "Ctrl+0", !Welcoming));
         foreach (var section in AppSections.Visible)
-            go.Items.Add(Item(section.Title(), () => Session.SetRoute(new AppRoute(section)), $"Ctrl+{(int)section + 1}", () => !Welcoming));
-        go.Items.Add(new Separator { Style = new Style(typeof(Separator)) });
-        go.Items.Add(Item("Start Session", StartSession, "Ctrl+R", () => !Welcoming && !Session.IsSessionActive));
+            go.Items.Add(Item(section.Title(), () => Session.SetRoute(new AppRoute(section)), $"Ctrl+{(int)section + 1}", !Welcoming));
+        go.Items.Add(new Separator());
+        go.Items.Add(Item("Start Session", StartSession, "Ctrl+R", !Welcoming && !Session.IsSessionActive));
         return go;
     }
 
     void OnKey(object sender, System.Windows.Input.KeyEventArgs e)
     {
+        if (System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Alt && e.Key == System.Windows.Input.Key.System
+            && e.SystemKey is System.Windows.Input.Key.F or System.Windows.Input.Key.G)
+        {
+            if (e.SystemKey == System.Windows.Input.Key.F) OpenMenu(FileMenu(), _fileTitle!);
+            else OpenMenu(GoMenu(), _goTitle!);
+            e.Handled = true;
+            return;
+        }
         if (System.Windows.Input.Keyboard.Modifiers != System.Windows.Input.ModifierKeys.Control) return;
         var key = e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key;
         switch (key)

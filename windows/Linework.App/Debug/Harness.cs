@@ -120,13 +120,12 @@ public static partial class Harness
         window.Show();
         await Settle(1);
         await ShootWindow("shell-menu", window);
-        var titles = window.MenuBar!.Items.OfType<MenuItem>().ToList();
-        Check("The File and Go menus are drawn", titles.Count == 2 && titles.All(t => t.ActualWidth > 10 && t.ActualHeight > 10 && t.IsVisible));
-        Check("The menu row fits its 30 points", titles.All(t => t.ActualHeight <= 30));
-        titles[0].IsSubmenuOpen = true;
+        Check("The File and Go titles have pixels", HasInk(window.MenuRow!));
+        var fileMenu = window.OpenFileMenuForCheck();
         await Settle(0.3);
-        Check("The File menu opens with its items", titles[0].Items.OfType<MenuItem>().Count(i => i.IsVisible && i.ActualHeight > 10) >= 6);
-        titles[0].IsSubmenuOpen = false;
+        Check("The File menu opens with its items", fileMenu.IsOpen && fileMenu.Items.OfType<MenuItem>().Count(i => i.IsVisible && i.ActualHeight > 10) >= 6);
+        Check("The open menu has pixels", HasInk(fileMenu));
+        fileMenu.IsOpen = false;
         foreach (var section in AppSections.Visible)
         {
             context.Session.SetRoute(new AppRoute(section));
@@ -138,6 +137,18 @@ public static partial class Harness
         Check("The main window routes", window.IsVisible);
         window.Close();
         Check("The main window closes", !window.IsVisible);
+    }
+
+    /// <summary>True if the element really draws something: a size alone doesn't prove it.</summary>
+    static bool HasInk(FrameworkElement element)
+    {
+        int w = (int)element.ActualWidth, h = (int)element.ActualHeight;
+        if (w < 1 || h < 1) return false;
+        var bitmap = new RenderTargetBitmap(w, h, 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(element);
+        var pixels = new int[w * h];
+        bitmap.CopyPixels(pixels, w * 4, 0);
+        return pixels.Distinct().Count() > 1;
     }
 
     static async Task Stages(string path)
